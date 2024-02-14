@@ -21,6 +21,7 @@
         <th>Speechiness</th>
         <th>Valence</th>
     </tr>
+
     <tr th:each="track : ${playlistTracks}">
         <td th:text="${track.track.name}"></td>
         <td th:text="${track.track.artists[0].name}"></td>

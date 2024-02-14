@@ -11,6 +11,45 @@ function keyToNote(key) {
     return notes[key];
 }
 
+function addSortListeners() {
+    const sortButtons = document.querySelectorAll('.sort-button');
+
+    sortButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const table = this.closest('table');
+            const tbody = table.querySelector('tbody');
+            const columnIndex = this.dataset.columnIndex;
+            const sortOrder = this.dataset.sortOrder;
+
+            // Convert HTMLCollection to Array and sort
+            const rows = Array.from(tbody.rows);
+            rows.sort((a, b) => {
+                let cellA, cellB;
+                // If the column is 'Track Name' or 'Artist Name', sort as string
+                if (columnIndex === '0' || columnIndex === '1') {
+                    cellA = a.cells[columnIndex].textContent;
+                    cellB = b.cells[columnIndex].textContent;
+                } else {
+                    cellA = parseFloat(a.cells[columnIndex].textContent) || a.cells[columnIndex].textContent;
+                    cellB = parseFloat(b.cells[columnIndex].textContent) || b.cells[columnIndex].textContent;
+                }
+
+                if (sortOrder === 'asc') {
+                    return cellA > cellB ? 1 : -1;
+                } else {
+                    return cellA < cellB ? 1 : -1;
+                }
+            });
+
+            // Append sorted rows to tbody
+            rows.forEach(row => tbody.appendChild(row));
+
+            // Toggle sort order
+            this.dataset.sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+        });
+    });
+}
+
 function createTable(tracks) {
     const table = document.createElement('table');
     const thead = document.createElement('thead');
@@ -18,9 +57,18 @@ function createTable(tracks) {
 
     // Create table header
     const headerRow = document.createElement('tr');
-    ['Track Name', 'Artist Name', 'BPM', 'Key', 'Mode', 'Acousticness', 'Danceability', 'Energy', /* 'Instrumentalness', */ 'Liveness', 'Speechiness', 'Valence'].forEach(text => {
+    ['Track Name', 'Artist Name', 'BPM', 'Key', 'Mode', 'Acousticness', 'Danceability', 'Energy', /* 'Instrumentalness', */ 'Liveness', 'Speechiness', 'Valence'].forEach((text, index) => {
         const th = document.createElement('th');
         th.textContent = text;
+
+        // Add sort button
+        const sortButton = document.createElement('button');
+        sortButton.textContent = 'Sort';
+        sortButton.classList.add('sort-button');
+        sortButton.dataset.sortOrder = 'asc';
+        sortButton.dataset.columnIndex = index;
+        th.appendChild(sortButton);
+
         headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
@@ -62,6 +110,7 @@ function fetchDataAndCreateTable(domElements) {
                     track.audioFeatures = data.find(item => item.playlistTrack.track.id === track.id).audioFeatures;
                 });
                 domElements.playlistTracksDiv.appendChild(createTable(tracks));
+                addSortListeners(); // Add this line
             })
             .catch(error => {
                 console.error('There was a problem with the fetch operation: ', error);
