@@ -13,7 +13,7 @@ function createTable(tracks) {
 
     // Create table header
     const headerRow = document.createElement('tr');
-    ['Track Name', 'Artist Name'].forEach(text => {
+    ['Track Name', 'Artist Name', 'BPM'].forEach(text => {
         const th = document.createElement('th');
         th.textContent = text;
         headerRow.appendChild(th);
@@ -23,7 +23,7 @@ function createTable(tracks) {
     // Create table body
     tracks.forEach(track => {
         const row = document.createElement('tr');
-        [track.name, track.artists[0].name].forEach(text => {
+        [track.name, track.artists[0].name, track.audioFeatures.tempo].forEach(text => {
             const td = document.createElement('td');
             td.textContent = text;
             row.appendChild(td);
@@ -52,7 +52,10 @@ function fetchDataAndCreateTable(domElements) {
             .then(data => {
                 console.log(data);
                 domElements.playlistTracksDiv.innerHTML = '';
-                const tracks = data.map(item => item.track);
+                const tracks = data.map(item => item.playlistTrack.track);
+                tracks.forEach(track => {
+                    track.audioFeatures = data.find(item => item.playlistTrack.track.id === track.id).audioFeatures;
+                });
                 domElements.playlistTracksDiv.appendChild(createTable(tracks));
             })
             .catch(error => {

@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
+import se.michaelthelin.spotify.model_objects.specification.AudioFeatures;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
 import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
+import se.michaelthelin.spotify.requests.data.tracks.GetAudioFeaturesForTrackRequest;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,9 +35,9 @@ public class GetPlaylistsItems {
     }
 
     @GetMapping("/playlist/{playlistId}")
-    public ResponseEntity<List<PlaylistTrack>> getPlaylistItems(@PathVariable String playlistId) {
+    public ResponseEntity<List<PlaylistTrackWithFeatures>> getPlaylistItems(@PathVariable String playlistId) {
         try {
-            List<PlaylistTrack> playlistTracks = fetchPlaylistTracks(playlistId);
+            List<PlaylistTrackWithFeatures> playlistTracks = fetchPlaylistTracks(playlistId);
             return ResponseEntity.ok(playlistTracks);
         } catch (Exception e) {
             logger.error("プレイリストの曲の取得中にエラーが発生しました: ", e);
@@ -43,8 +45,8 @@ public class GetPlaylistsItems {
         }
     }
 
-    private List<PlaylistTrack> fetchPlaylistTracks(String playlistId) {
-        List<PlaylistTrack> playlistTracks = new ArrayList<>();
+    private List<PlaylistTrackWithFeatures> fetchPlaylistTracks(String playlistId) {
+        List<PlaylistTrackWithFeatures> playlistTracks = new ArrayList<>();
         int offset = 0;
         Paging<PlaylistTrack> playlistTrackPaging;
 
@@ -58,7 +60,14 @@ public class GetPlaylistsItems {
 
                 playlistTrackPaging = getPlaylistsItemsRequest.execute();
 
-                playlistTracks.addAll(List.of(playlistTrackPaging.getItems()));
+                for (PlaylistTrack playlistTrack : playlistTrackPaging.getItems()) {
+                    String trackId = playlistTrack.getTrack().getId();
+                    GetAudioFeaturesForTrackRequest getAudioFeaturesForTrackRequest = spotifyApi.getAudioFeaturesForTrack(trackId)
+                            .build();
+                    AudioFeatures audioFeatures = getAudioFeaturesForTrackRequest.execute();
+                    playlistTracks.add(new PlaylistTrackWithFeatures(playlistTrack, audioFeatures));
+                }
+
                 offset = playlistTrackPaging.getOffset() + playlistTrackPaging.getItems().length;
             } catch (IOException | SpotifyWebApiException | ParseException e) {
                 logger.error("プレイリストのページ取得中にエラーが発生しました: ", e);

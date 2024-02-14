@@ -3,7 +3,6 @@ package data.playlists;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
 
 import java.util.List;
 
@@ -17,7 +16,7 @@ public class JavaPlaylistController {
     }
 
     @GetMapping("/java/playlist/{playlistId}")
-    public List<PlaylistTrack> getPlaylistItems(@PathVariable String playlistId) {
+    public List<PlaylistTrackWithFeatures> getPlaylistItems(@PathVariable String playlistId) {
         return getPlaylistsItems.getPlaylistItems(playlistId).getBody();
     }
 }
