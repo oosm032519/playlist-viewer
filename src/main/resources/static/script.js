@@ -6,6 +6,11 @@ function getDomElements() {
     };
 }
 
+function keyToNote(key) {
+    const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    return notes[key];
+}
+
 function createTable(tracks) {
     const table = document.createElement('table');
     const thead = document.createElement('thead');
@@ -13,7 +18,7 @@ function createTable(tracks) {
 
     // Create table header
     const headerRow = document.createElement('tr');
-    ['Track Name', 'Artist Name', 'BPM'].forEach(text => {
+    ['Track Name', 'Artist Name', 'BPM', 'Key', 'Mode', 'Acousticness', 'Danceability', 'Energy', 'Instrumentalness', 'Liveness', 'Speechiness', 'Valence'].forEach(text => {
         const th = document.createElement('th');
         th.textContent = text;
         headerRow.appendChild(th);
@@ -23,7 +28,7 @@ function createTable(tracks) {
     // Create table body
     tracks.forEach(track => {
         const row = document.createElement('tr');
-        [track.name, track.artists[0].name, track.audioFeatures.tempo].forEach(text => {
+        [track.name, track.artists[0].name, track.audioFeatures.tempo, keyToNote(track.audioFeatures.key), track.audioFeatures.mode, track.audioFeatures.acousticness, track.audioFeatures.danceability, track.audioFeatures.energy, track.audioFeatures.instrumentalness, track.audioFeatures.liveness, track.audioFeatures.speechiness, track.audioFeatures.valence].forEach(text => {
             const td = document.createElement('td');
             td.textContent = text;
             row.appendChild(td);
@@ -35,7 +40,6 @@ function createTable(tracks) {
     table.appendChild(tbody);
     return table;
 }
-
 function fetchDataAndCreateTable(domElements) {
     domElements.playlistForm.addEventListener('submit', function (event) {
         event.preventDefault();

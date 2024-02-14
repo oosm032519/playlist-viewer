@@ -11,11 +11,29 @@
         <th>Track Name</th>
         <th>Artist Name</th>
         <th>BPM</th>
+        <th>Key</th>
+        <th>Mode</th>
+        <th>Acousticness</th>
+        <th>Danceability</th>
+        <th>Energy</th>
+        <th>Instrumentalness</th>
+        <th>Liveness</th>
+        <th>Speechiness</th>
+        <th>Valence</th>
     </tr>
     <tr th:each="track : ${playlistTracks}">
         <td th:text="${track.track.name}"></td>
         <td th:text="${track.track.artists[0].name}"></td>
         <td th:text="${track.bpm}"></td>
+        <td th:text="${track.key}"></td>
+        <td th:text="${track.mode}"></td>
+        <td th:text="${track.acousticness}"></td>
+        <td th:text="${track.danceability}"></td>
+        <td th:text="${track.energy}"></td>
+        <td th:text="${track.instrumentalness}"></td>
+        <td th:text="${track.liveness}"></td>
+        <td th:text="${track.speechiness}"></td>
+        <td th:text="${track.valence}"></td>
     </tr>
 </table>
 </body>

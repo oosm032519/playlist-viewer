@@ -7,14 +7,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AppStartupRunner {
 
-    private final ClientCredentials clientCredentials;
-
-    public AppStartupRunner(ClientCredentials clientCredentials) {
-        this.clientCredentials = clientCredentials;
-    }
-
     @Bean
     public ApplicationRunner applicationRunner() {
-        return args -> clientCredentials.clientCredentials();
+        return args -> System.out.println("Application started with option names : " + args.getOptionNames());
     }
 }
