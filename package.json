@@ -1,0 +1,18 @@
+{
+  "name": "playlistinfo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main/resources/static/script.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node src/main/resources/static/script.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oosm032519/PlaylistInfo.git"
+  },
+  "private": true,
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
