@@ -1,3 +1,27 @@
+const descriptions = {
+    'Acousticness': 'アコースティック感。1に近いほどアコースティック。',
+    'Danceability': '踊りやすさ。1に近いほど踊りやすい。',
+    'Energy': '曲の激しさ。1に近いほど激しい。',
+    'Liveness': 'ライブ感。1に近いほどライブらしい。',
+    'Speechiness': '曲中の話し言葉の存在度合い。1に近いほど話し言葉が多い。',
+    'Valence': '明るさ。1に近いほど明るい。'
+};
+
+document.getElementById('theme-toggle').addEventListener('click', function () {
+    const body = document.body;
+    const sunIcon = document.getElementById('sun-icon');
+    
+    if (body.classList.contains('light-mode')) {
+        body.classList.remove('light-mode');
+        body.classList.add('dark-mode');
+        sunIcon.style.transform = 'rotate(180deg)';
+    } else {
+        body.classList.remove('dark-mode');
+        body.classList.add('light-mode');
+        sunIcon.style.transform = 'rotate(0deg)';
+    }
+});
+
 class DomElements {
     playlistForm: HTMLFormElement;
     playlistIdInput: HTMLInputElement;
@@ -78,6 +102,11 @@ class TrackTable {
         ['Track Name', 'Artist Name', 'BPM', 'Key', 'Mode', 'Acousticness', 'Danceability', 'Energy', /* 'Instrumentalness', */ 'Liveness', 'Speechiness', 'Valence'].forEach((text, index) => {
             const th = document.createElement('th');
             th.textContent = text;
+            
+            // Add mouseover listener to the header cell
+            if (descriptions[text]) {
+                th.title = descriptions[text];
+            }
             
             // Add click listener to the header cell
             th.addEventListener('click', (event) => {
