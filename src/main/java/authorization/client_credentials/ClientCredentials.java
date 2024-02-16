@@ -4,6 +4,7 @@ import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
@@ -50,5 +51,13 @@ public class ClientCredentials {
             logger.error("エラーが発生しました: ", e);
             throw new RuntimeException(e);
         }
+    }
+
+    @Bean
+    public SpotifyApi spotifyApi() {
+        return new SpotifyApi.Builder()
+                .setClientId(clientId)
+                .setClientSecret(clientSecret)
+                .build();
     }
 }

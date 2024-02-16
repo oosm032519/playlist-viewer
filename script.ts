@@ -7,21 +7,6 @@ const descriptions = {
     'Valence': '明るさ。1に近いほど明るい。'
 };
 
-document.getElementById('theme-toggle').addEventListener('click', function () {
-    const body = document.body;
-    const sunIcon = document.getElementById('sun-icon');
-    
-    if (body.classList.contains('light-mode')) {
-        body.classList.remove('light-mode');
-        body.classList.add('dark-mode');
-        sunIcon.style.transform = 'rotate(180deg)';
-    } else {
-        body.classList.remove('dark-mode');
-        body.classList.add('light-mode');
-        sunIcon.style.transform = 'rotate(0deg)';
-    }
-});
-
 class DomElements {
     playlistForm: HTMLFormElement;
     playlistIdInput: HTMLInputElement;
@@ -187,5 +172,18 @@ class TrackTable {
     }
 }
 
-const domElements = new DomElements();
-domElements.fetchData();
+document.addEventListener('DOMContentLoaded', () => {
+    const domElements = new DomElements();
+    domElements.fetchData();
+    
+    const sunIcon = document.getElementById('sun-icon');
+    sunIcon.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        sunIcon.style.transform = `rotate(${document.body.classList.contains('dark-mode') ? 180 : 0}deg)`;
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const domElements = new DomElements();
+    domElements.fetchData();
+});

@@ -6,20 +6,6 @@ const descriptions = {
     'Speechiness': '曲中の話し言葉の存在度合い。1に近いほど話し言葉が多い。',
     'Valence': '明るさ。1に近いほど明るい。'
 };
-document.getElementById('theme-toggle').addEventListener('click', function () {
-    const body = document.body;
-    const sunIcon = document.getElementById('sun-icon');
-    if (body.classList.contains('light-mode')) {
-        body.classList.remove('light-mode');
-        body.classList.add('dark-mode');
-        sunIcon.style.transform = 'rotate(180deg)';
-    }
-    else {
-        body.classList.remove('dark-mode');
-        body.classList.add('light-mode');
-        sunIcon.style.transform = 'rotate(0deg)';
-    }
-});
 class DomElements {
     constructor() {
         this.playlistForm = document.getElementById('playlistForm');
@@ -142,6 +128,17 @@ class TrackTable {
         return table;
     }
 }
-const domElements = new DomElements();
-domElements.fetchData();
+document.addEventListener('DOMContentLoaded', () => {
+    const domElements = new DomElements();
+    domElements.fetchData();
+    const sunIcon = document.getElementById('sun-icon');
+    sunIcon.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        sunIcon.style.transform = `rotate(${document.body.classList.contains('dark-mode') ? 180 : 0}deg)`;
+    });
+});
+document.addEventListener('DOMContentLoaded', () => {
+    const domElements = new DomElements();
+    domElements.fetchData();
+});
 //# sourceMappingURL=script.js.map
