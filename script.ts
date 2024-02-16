@@ -79,7 +79,15 @@ class DomElements {
             
             // Add click event listener to the table cell
             td.addEventListener('click', () => {
-                console.log(`Clicked playlist ID: ${result.id}`);
+                // Fetch the playlist tracks when the playlist name is clicked
+                fetch(`/java/playlist/${result.id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        this.playlistTracksDiv.innerHTML = '';
+                        const tracks = data.map((item: any) => new Track(item.playlistTrack.track, item.audioFeatures));
+                        this.createTable(tracks);
+                    })
+                    .catch(error => console.error('There was a problem with the fetch operation: ', error));
             });
             
             row.appendChild(td);
