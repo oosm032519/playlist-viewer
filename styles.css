@@ -159,48 +159,80 @@ form input[type="text"] {
     margin-right: 10px;
 }
 
-/* Hide the default radio button */
-input[type="radio"] {
-    display: none;
+table {
+    width:           100%;
+    border-collapse: collapse;
+    margin-top:      1rem;
 }
 
-/* Create a custom radio button */
-input[type="radio"] + label {
-    position:     relative;
-    padding-left: 35px;
-    cursor:       pointer;
-    display:      inline-block;
-    color:        #666;
-    font-size:    14px;
+table, th, td {
+    border: 1px solid #DDD;
 }
 
-/* Create the indicator (the dot/circle - hidden when not checked) */
-input[type="radio"] + label:before {
-    content:       "";
-    position:      absolute;
-    left:          0;
-    top:           0;
-    width:         25px;
-    height:        25px;
-    border:        2px solid #DDD;
-    border-radius: 50%;
-    background:    #FFF;
+th, td {
+    padding:    15px;
+    text-align: left;
 }
 
-/* Style the indicator (dot/circle) when radio is checked */
-input[type="radio"]:checked + label:before {
-    background: #66BB6A;
-    border:     2px solid #66BB6A;
+th {
+    background-color: #4CAF50;
+    color:            white;
 }
 
-/* Create the indicator (the dot/circle - when checked) */
-input[type="radio"]:checked + label:after {
-    content:       "";
-    position:      absolute;
-    width:         15px;
-    height:        15px;
-    top:           5px;
-    left:          5px;
-    border-radius: 50%;
-    background:    white;
+tr:nth-child(even) {
+    background-color: #F2F2F2;
+}
+
+td {
+    transition: background-color 0.3s ease;
+}
+
+td:hover {
+    background-color: #F5F5F5;
+}
+
+button[type="submit"] {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    border: 2px solid gray;
+    transition: border 0.1s ease;
+}
+
+form input[type="text"]:hover {
+    border-color:     #4CAF50;
+    transition:       border-color 0.3s ease;
+}
+
+.loader {
+    border:            16px solid #F3F3F3;
+    border-radius:     50%;
+    border-top:        16px solid #4CAF50; /* 緑色に変更 */
+    width:             120px;
+    height:            120px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation:         spin 2s linear infinite;
+    position:          fixed; /* 追加 */
+    top:               50%; /* 追加 */
+    left:              50%; /* 追加 */
+    transform:         translate(-50%, -50%); /* 追加 */
+}
+
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }

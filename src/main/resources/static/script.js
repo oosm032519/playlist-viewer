@@ -19,12 +19,16 @@ class DomElements {
         this.playlistForm.addEventListener('submit', (event) => {
             event.preventDefault();
             const playlistId = this.playlistIdInput.value;
+            // Show loading animation
+            document.getElementById('loading').classList.remove('hidden');
             fetch(`/java/playlist/${playlistId}`)
                 .then(TrackTable.handleResponse)
                 .then(data => {
                 this.playlistTracksDiv.innerHTML = '';
                 const tracks = data.map((item) => new Track(item.playlistTrack.track, item.audioFeatures));
                 this.createTable(tracks);
+                // Hide loading animation
+                document.getElementById('loading').classList.add('hidden');
             })
                 .catch(TrackTable.handleError);
         });
@@ -33,11 +37,15 @@ class DomElements {
         this.searchForm.addEventListener('submit', (event) => {
             event.preventDefault();
             const searchQuery = this.searchQueryInput.value;
+            // Show loading animation
+            document.getElementById('loading').classList.remove('hidden');
             fetch(`/java/search/${searchQuery}`)
                 .then(response => response.json())
                 .then(data => {
                 this.searchResultsDiv.innerHTML = '';
                 this.createSearchResultsTable(data);
+                // Hide loading animation
+                document.getElementById('loading').classList.add('hidden');
             })
                 .catch(error => console.error('There was a problem with the fetch operation: ', error));
         });
@@ -215,4 +223,8 @@ function checkTableWidth() {
 }
 // 初期ロード時にもチェックを行う
 checkTableWidth();
+// Show loading animation
+document.getElementById('loading').classList.remove('hidden');
+// Hide loading animation
+document.getElementById('loading').classList.add('hidden');
 //# sourceMappingURL=script.js.map
