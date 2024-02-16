@@ -247,10 +247,7 @@ function checkTableWidth() {
         }
     });
 }
-// 初期ロード時にもチェックを行う
 checkTableWidth();
-// Show loading animation
 document.getElementById('loading').classList.remove('hidden');
-// Hide loading animation
 document.getElementById('loading').classList.add('hidden');
 //# sourceMappingURL=script.js.map

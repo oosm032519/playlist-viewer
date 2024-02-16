@@ -194,6 +194,10 @@ td:hover {
 
 button[type="submit"] {
     transition: background-color 0.3s ease, color 0.3s ease;
+    display:         flex;
+    justify-content: center;
+    align-items:     center;
+    text-align:      center;
 }
 
 button[type="submit"]:hover {
@@ -262,4 +266,31 @@ th, td {
 table {
     background-color: white;
     color:            black;
+}
+
+input[type="radio"] + label {
+    display:       inline-block;
+    padding:       10px 20px;
+    margin:        10px;
+    border:        2px solid #4CAF50; /* ボーダーの色 */
+    border-radius: 5px; /* ボーダーの角を丸くする */
+    background:    #F2F2F2; /* 背景色 */
+    color:         #4CAF50; /* テキストの色 */
+    transition:    all 0.3s ease; /* アニメーション効果 */
+    cursor:        pointer; /* マウスカーソルを手にする */
+    width:         110%; /* ボタンの幅 */
+}
+
+input[type="radio"]:checked + label {
+    background: #4CAF50; /* 選択時の背景色 */
+    color:      #F2F2F2; /* 選択時のテキストの色 */
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+.radio-group {
+    display: flex;
+    justify-content: center;
 }
