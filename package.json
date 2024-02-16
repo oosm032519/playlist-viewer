@@ -5,7 +5,8 @@
   "main": "src/main/resources/static/script.js",
   "scripts": {
     "build": "tsc",
-    "start": "node src/main/resources/static/script.js"
+    "start": "node src/main/resources/static/script.js",
+    "build-css": "tailwindcss build styles.css -o output.css"
   },
   "repository": {
     "type": "git",
@@ -14,5 +15,8 @@
   "private": true,
   "devDependencies": {
     "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "tailwindcss": "^3.4.1"
   }
 }
