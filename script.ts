@@ -45,8 +45,22 @@ class DomElements {
                 .then(TrackTable.handleResponse)
                 .then(data => {
                     this.playlistTracksDiv.innerHTML = '';
-                    const tracks = data.map((item: any) => new Track(item.playlistTrack.track, item.audioFeatures));
-                    this.createTable(tracks);
+                    if (data && Array.isArray(data.tracks)) {
+                        const tracks = data.tracks.map((item: any) => new Track(item.playlistTrack.track, item.audioFeatures));
+                        this.createTable(tracks);
+                        
+                        // Output the playlist name to the console
+                        if (data.name) {
+                            console.log(`Playlist name: ${data.name}`);
+                            
+                            // Display the playlist name above the table
+                            const playlistNameElement = document.createElement('h2');
+                            playlistNameElement.textContent = `${data.name}`;
+                            this.playlistTracksDiv.insertBefore(playlistNameElement, this.playlistTracksDiv.firstChild);
+                        }
+                    } else {
+                        console.error('Expected data.tracks to be an array but received', data);
+                    }
                     
                     // Hide loading animation
                     document.getElementById('loading').classList.add('hidden');
@@ -92,12 +106,29 @@ class DomElements {
             // Add click event listener to the table cell
             td.addEventListener('click', () => {
                 // Fetch the playlist tracks when the playlist name is clicked
+                
+                // Show loading animation
+                document.getElementById('loading').classList.remove('hidden');
+                
                 fetch(`/java/playlist/${result.id}`)
                     .then(response => response.json())
                     .then(data => {
                         this.playlistTracksDiv.innerHTML = '';
-                        const tracks = data.map((item: any) => new Track(item.playlistTrack.track, item.audioFeatures));
-                        this.createTable(tracks);
+                        
+                        // Display the playlist name above the table
+                        const playlistNameElement = document.createElement('h2');
+                        playlistNameElement.textContent = `${result.name}`;
+                        this.playlistTracksDiv.appendChild(playlistNameElement);
+                        
+                        if (data && Array.isArray(data.tracks)) {
+                            const tracks = data.tracks.map((item: any) => new Track(item.playlistTrack.track, item.audioFeatures));
+                            this.createTable(tracks);
+                        } else {
+                            console.error('Expected data.tracks to be an array but received', data);
+                        }
+                        
+                        // Hide loading animation
+                        document.getElementById('loading').classList.add('hidden');
                     })
                     .catch(error => console.error('There was a problem with the fetch operation: ', error));
             });

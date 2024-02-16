@@ -12,13 +12,16 @@ import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.specification.AudioFeatures;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
+import se.michaelthelin.spotify.model_objects.specification.Playlist;
 import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import se.michaelthelin.spotify.requests.data.tracks.GetAudioFeaturesForTrackRequest;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class GetPlaylistsItems {
@@ -35,10 +38,14 @@ public class GetPlaylistsItems {
     }
 
     @GetMapping("/playlist/{playlistId}")
-    public ResponseEntity<List<PlaylistTrackWithFeatures>> getPlaylistItems(@PathVariable String playlistId) {
+    public ResponseEntity<Map<String, Object>> getPlaylistItems(@PathVariable String playlistId) {
         try {
             List<PlaylistTrackWithFeatures> playlistTracks = fetchPlaylistTracks(playlistId);
-            return ResponseEntity.ok(playlistTracks);
+            Playlist playlist = spotifyApi.getPlaylist(playlistId).build().execute();
+            Map<String, Object> response = new HashMap<>();
+            response.put("tracks", playlistTracks);
+            response.put("name", playlist.getName());
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("プレイリストの曲の取得中にエラーが発生しました: ", e);
             return ResponseEntity.badRequest().build();
