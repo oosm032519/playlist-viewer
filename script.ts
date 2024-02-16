@@ -9,6 +9,7 @@ const descriptions = {
 
 // PlaylistSimplified型を定義します。
 interface PlaylistSimplified {
+    id: string;
     name: string;
 }
 
@@ -75,6 +76,12 @@ class DomElements {
             const row = document.createElement('tr');
             const td = document.createElement('td');
             td.textContent = result.name;
+            
+            // Add click event listener to the table cell
+            td.addEventListener('click', () => {
+                console.log(`Clicked playlist ID: ${result.id}`);
+            });
+            
             row.appendChild(td);
             table.appendChild(row);
         });
