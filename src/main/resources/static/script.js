@@ -11,6 +11,9 @@ class DomElements {
         this.playlistForm = document.getElementById('playlistForm');
         this.playlistIdInput = document.getElementById('playlistId');
         this.playlistTracksDiv = document.getElementById('playlistTracks');
+        this.searchForm = document.getElementById('searchForm');
+        this.searchQueryInput = document.getElementById('searchQuery');
+        this.searchResultsDiv = document.getElementById('searchResults');
     }
     fetchData() {
         this.playlistForm.addEventListener('submit', (event) => {
@@ -26,9 +29,33 @@ class DomElements {
                 .catch(TrackTable.handleError);
         });
     }
+    fetchSearchResults() {
+        this.searchForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const searchQuery = this.searchQueryInput.value;
+            fetch(`/java/search/${searchQuery}`)
+                .then(response => response.json())
+                .then(data => {
+                this.searchResultsDiv.innerHTML = '';
+                this.createSearchResultsTable(data);
+            })
+                .catch(error => console.error('There was a problem with the fetch operation: ', error));
+        });
+    }
     createTable(tracks) {
         const trackTable = new TrackTable(tracks);
         this.playlistTracksDiv.appendChild(trackTable.createTable());
+    }
+    createSearchResultsTable(results) {
+        const table = document.createElement('table');
+        results.forEach(result => {
+            const row = document.createElement('tr');
+            const td = document.createElement('td');
+            td.textContent = result.name;
+            row.appendChild(td);
+            table.appendChild(row);
+        });
+        this.searchResultsDiv.appendChild(table);
     }
 }
 class Track {
@@ -131,14 +158,11 @@ class TrackTable {
 document.addEventListener('DOMContentLoaded', () => {
     const domElements = new DomElements();
     domElements.fetchData();
+    domElements.fetchSearchResults();
     const sunIcon = document.getElementById('sun-icon');
     sunIcon.addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
         sunIcon.style.transform = `rotate(${document.body.classList.contains('dark-mode') ? 180 : 0}deg)`;
     });
-});
-document.addEventListener('DOMContentLoaded', () => {
-    const domElements = new DomElements();
-    domElements.fetchData();
 });
 //# sourceMappingURL=script.js.map
