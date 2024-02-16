@@ -217,7 +217,13 @@ class TrackTable {
     static getSortValue(cell: string | number, columnIndex: number): string | number {
         const COLUMN_INDEX_NAME_ARTIST = 0;
         const COLUMN_INDEX_OTHERS = 1;
-        return columnIndex === COLUMN_INDEX_NAME_ARTIST || columnIndex === COLUMN_INDEX_OTHERS ? cell : parseFloat(cell as string);
+        const COLUMN_INDEX_KEY = 3;
+        const COLUMN_INDEX_MODE = 4;
+        if (columnIndex === COLUMN_INDEX_NAME_ARTIST || columnIndex === COLUMN_INDEX_OTHERS || columnIndex === COLUMN_INDEX_KEY || columnIndex === COLUMN_INDEX_MODE) {
+            return cell;
+        } else {
+            return parseFloat(cell as string);
+        }
     }
     
     createTable(): HTMLTableElement {
@@ -236,6 +242,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const sunIcon = document.getElementById('sun-icon');
     sunIcon.addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
+        document.body.classList.toggle('light-mode');
         sunIcon.style.transform = `rotate(${document.body.classList.contains('dark-mode') ? 180 : 0}deg)`;
     });
+    
+    const playlistIdOption = document.getElementById('playlistIdOption') as HTMLInputElement;
+    const searchQueryOption = document.getElementById('searchQueryOption') as HTMLInputElement;
+    const playlistForm = document.getElementById('playlistForm');
+    const searchForm = document.getElementById('searchForm');
+    playlistIdOption.addEventListener('change', () => {
+        if (playlistIdOption.checked) {
+            playlistForm.style.display = 'block';
+            searchForm.style.display = 'none';
+        }
+    });
+    searchQueryOption.addEventListener('change', () => {
+        if (searchQueryOption.checked) {
+            playlistForm.style.display = 'none';
+            searchForm.style.display = 'block';
+        }
+    });
 });
+
+window.addEventListener('resize', checkTableWidth);
+
+function checkTableWidth() {
+    const tables = document.querySelectorAll('table');
+    tables.forEach((table) => {
+        if (table.offsetWidth > window.innerWidth) {
+            table.style.overflowX = 'scroll';
+        } else {
+            table.style.overflowX = 'auto';
+        }
+    });
+}
+
+// 初期ロード時にもチェックを行う
+checkTableWidth();

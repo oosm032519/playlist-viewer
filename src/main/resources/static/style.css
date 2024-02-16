@@ -40,7 +40,6 @@ input[type="text"] {
 }
 
 input[type="text"]:hover {
-    background-color: var(--light-background);
     border-color: var(--highlight-color);
     transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
 }
@@ -48,14 +47,11 @@ input[type="text"]:hover {
 button[type="submit"] {
     background-color: var(--highlight-color);
     border: none;
-    color: var(--secondary-color);
     cursor: pointer;
-    transition: background-color var(--transition-speed) ease;
 }
 
 button[type="submit"]:hover {
     background-color: #45a049;
-    transition: background-color var(--transition-speed) ease;
 }
 
 table {
@@ -111,6 +107,10 @@ body.dark-mode {
     color: var(--secondary-color);
 }
 
+body.dark-mode h1 {
+    color: #ffffff;
+}
+
 @media only screen and (max-width: 600px) {
     body {
         font-size: 18px;
@@ -163,4 +163,41 @@ body.dark-mode {
         height: 40px;
         width: 40px;
     }
+}
+
+table {
+    overflow-x: auto;
+    display: block;
+}
+
+table th {
+    cursor: pointer;
+    position: relative;
+}
+
+table th::before, table th::after {
+    content: "";
+    height: 8px;
+    width: 8px;
+    position: absolute;
+    border-top: 2px #888 solid;
+    border-right: 2px #888 solid;
+    right: 10px;
+    top: 50%;
+}
+
+table th::before {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+table th::after {
+    transform: translateY(2px) rotate(135deg);
+}
+
+table th.asc::before {
+    border-color: #4CAF50;
+}
+
+table th.desc::after {
+    border-color: #4CAF50;
 }

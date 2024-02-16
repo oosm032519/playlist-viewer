@@ -7,9 +7,22 @@
 </head>
 <body>
 <h1>Playlist Viewer</h1>
+
+<form id="optionForm">
+    <input type="radio" id="playlistIdOption" name="option" checked>
+    <label for="playlistIdOption">プレイリストIDを入力</label><br>
+    <input type="radio" id="searchQueryOption" name="option">
+    <label for="searchQueryOption">プレイリスト名で検索</label>
+</form>
+
 <form id="playlistForm">
     <label for="playlistId"></label><input type="text" id="playlistId" placeholder="プレイリストIDを入力してください">
     <button type="submit">送信</button>
+</form>
+
+<form id="searchForm" style="display: none;">
+    <label for="searchQuery"></label><input type="text" id="searchQuery" placeholder="プレイリスト名を入力してください">
+    <button type="submit">検索</button>
 </form>
 
 <div id="playlistTracks"></div>
@@ -18,11 +31,6 @@
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
           d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
 </svg>
-
-<form id="searchForm">
-    <label for="searchQuery"></label><input type="text" id="searchQuery" placeholder="プレイリスト名を入力してください">
-    <button type="submit">検索</button>
-</form>
 
 <div id="searchResults"></div>
 
