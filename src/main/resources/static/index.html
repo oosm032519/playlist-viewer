@@ -2,37 +2,42 @@
 <html lang="ja">
 <head>
     <title>Playlist Viewer</title>
-    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
+    <link href="output.css" rel="stylesheet">
 </head>
-<body>
-<h1>Playlist Viewer</h1>
+<body class="bg-gray-100 text-gray-900">
+<h1 class="text-3xl font-light ml-5">Playlist Viewer</h1>
 
-<form id="optionForm">
+
+<div>
     <input type="radio" id="playlistIdOption" name="option" checked>
-    <label for="playlistIdOption">プレイリストIDを入力</label><br>
+    <label for="playlistIdOption">プレイリストIDを入力</label>
+</div>
+<div>
     <input type="radio" id="searchQueryOption" name="option">
     <label for="searchQueryOption">プレイリスト名で検索</label>
+</div>
+
+<form id="playlistForm" class="m-5 form-container">
+    <label for="playlistId"></label><input type="text" id="playlistId" placeholder="プレイリストIDを入力してください"
+                                           class="border-2 border-gray-300 rounded-lg h-10 w-3/4 p-3 mb-2">
+    <button type="submit" class="bg-green-500 text-white rounded-lg h-10 p-3">送信</button>
+</form>
+<form id="searchForm" class="m-5 form-container hidden">
+    <label for="searchQuery"></label><input type="text" id="searchQuery" placeholder="プレイリスト名を入力してください"
+                                            class="border-2 border-gray-300 rounded-lg h-10 w-3/4 p-3 mb-2">
+    <button type="submit" class="bg-green-500 text-white rounded-lg h-10 p-3">検索</button>
 </form>
 
-<form id="playlistForm">
-    <label for="playlistId"></label><input type="text" id="playlistId" placeholder="プレイリストIDを入力してください">
-    <button type="submit">送信</button>
-</form>
+<div id="playlistTracks" class="m-5"></div>
 
-<form id="searchForm" style="display: none;">
-    <label for="searchQuery"></label><input type="text" id="searchQuery" placeholder="プレイリスト名を入力してください">
-    <button type="submit">検索</button>
-</form>
-
-<div id="playlistTracks"></div>
-
-<svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+     class="h-12 w-12 absolute top-2 right-2 transition-transform duration-500">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
           d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
 </svg>
 
-<div id="searchResults"></div>
+<div id="searchResults" class="m-5"></div>
 
 <script src="script.js"></script>
 </body>

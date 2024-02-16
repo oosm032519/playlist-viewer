@@ -1,0 +1,206 @@
+@import "node_modules/tailwindcss/base.css";
+@import "node_modules/tailwindcss/components.css";
+@import "node_modules/tailwindcss/utilities.css";
+
+body.dark-mode {
+    @apply bg-gray-800 text-gray-100;
+}
+
+body.dark-mode h1 {
+    @apply text-white;
+}
+
+@media only screen and (max-width: 600px) {
+    body {
+        @apply text-lg;
+    }
+
+    h1 {
+        @apply text-2xl;
+    }
+
+    input[type="text"] {
+        @apply w-11/12;
+    }
+
+    table {
+        @apply w-full;
+    }
+
+    td, th {
+        @apply p-2;
+    }
+
+    #sun-icon {
+        @apply h-8 w-8;
+    }
+}
+
+@media only screen and (min-width: 600px) and (max-width: 1200px) {
+    body {
+        @apply text-xl;
+    }
+
+    h1 {
+        @apply text-3xl;
+    }
+
+    input[type="text"] {
+        @apply w-10/12;
+    }
+
+    table {
+        @apply w-11/12;
+    }
+
+    td, th {
+        @apply p-3;
+    }
+
+    #sun-icon {
+        @apply h-10 w-10;
+    }
+}
+
+table {
+    @apply overflow-x-auto block;
+}
+
+table th {
+    @apply cursor-pointer relative;
+}
+
+table th::before, table th::after {
+    @apply h-1 w-1 absolute border-t-2 border-r-2 border-gray-500;
+    @apply right-1 top-1/2;
+}
+
+table th::before {
+    @apply transform -translate-y-2 -rotate-45;
+}
+
+table th::after {
+    @apply transform translate-y-1 -rotate-45;
+}
+
+table th.asc::before {
+    @apply border-green-500;
+}
+
+table th.desc::after {
+    @apply border-green-500;
+}
+
+tr {
+    @apply h-12;
+}
+
+td {
+    @apply truncate;
+}
+
+body {
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+.radio-button-design {
+    top:        0;
+    left:       0;
+    width:      1rem;
+    height:     1rem;
+    border:     2px solid gray;
+    transition: background-color 0.2s;
+}
+
+input[type="radio"]:checked + .radio-button-design {
+    background-color: gray;
+}
+
+input[type="text"], button[type="submit"] {
+    height: 40px;
+}
+
+form {
+    display:         flex;
+    justify-content: center;
+}
+
+form input[type="text"], form button[type="submit"] {
+    height:         40px;
+    vertical-align: middle;
+}
+
+input[type="radio"] {
+    margin:         0;
+    vertical-align: top; /* Change from middle to top */
+    height:         1rem; /* Add this line to fix the height */
+    width:          1rem; /* Add this line to fix the width */
+}
+
+form {
+    display:         flex;
+    justify-content: center;
+    margin-top:      1em; /* Adjust this value to set the position of the form */
+}
+
+form input[type="text"], form button[type="submit"] {
+    @apply h-10 align-middle;
+}
+
+.hidden {
+    display: none;
+}
+
+form input[type="text"] {
+    margin-right: 10px;
+}
+
+/* Hide the default radio button */
+input[type="radio"] {
+    display: none;
+}
+
+/* Create a custom radio button */
+input[type="radio"] + label {
+    position:     relative;
+    padding-left: 35px;
+    cursor:       pointer;
+    display:      inline-block;
+    color:        #666;
+    font-size:    14px;
+}
+
+/* Create the indicator (the dot/circle - hidden when not checked) */
+input[type="radio"] + label:before {
+    content:       "";
+    position:      absolute;
+    left:          0;
+    top:           0;
+    width:         25px;
+    height:        25px;
+    border:        2px solid #DDD;
+    border-radius: 50%;
+    background:    #FFF;
+}
+
+/* Style the indicator (dot/circle) when radio is checked */
+input[type="radio"]:checked + label:before {
+    background: #66BB6A;
+    border:     2px solid #66BB6A;
+}
+
+/* Create the indicator (the dot/circle - when checked) */
+input[type="radio"]:checked + label:after {
+    content:       "";
+    position:      absolute;
+    width:         15px;
+    height:        15px;
+    top:           5px;
+    left:          5px;
+    border-radius: 50%;
+    background:    white;
+}

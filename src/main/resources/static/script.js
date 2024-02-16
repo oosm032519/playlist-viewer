@@ -190,14 +190,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchForm = document.getElementById('searchForm');
     playlistIdOption.addEventListener('change', () => {
         if (playlistIdOption.checked) {
-            playlistForm.style.display = 'block';
-            searchForm.style.display = 'none';
+            playlistForm.classList.remove('hidden');
+            searchForm.classList.add('hidden');
         }
     });
     searchQueryOption.addEventListener('change', () => {
         if (searchQueryOption.checked) {
-            playlistForm.style.display = 'none';
-            searchForm.style.display = 'block';
+            searchForm.classList.remove('hidden');
+            playlistForm.classList.add('hidden');
         }
     });
 });

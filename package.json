@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node src/main/resources/static/script.js",
-    "build-css": "tailwindcss build styles.css -o output.css"
+    "build-css": "tailwindcss -i  styles.css -o src/main/resources/static/output.css"
   },
   "repository": {
     "type": "git",
