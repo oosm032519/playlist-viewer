@@ -1,44 +1,61 @@
+:root {
+    --main-color: #212121;
+    --secondary-color: #fafafa;
+    --highlight-color: #4CAF50;
+    --light-background: #f2f2f2;
+    --dark-background: #183152;
+    --transition-speed: 0.3s;
+}
+
 body {
-    background-color: #fafafa;
+    background-color: var(--secondary-color);
     font-family: 'Helvetica Neue', sans-serif;
     margin: 0;
     padding: 0;
+    transition: background-color 0.5s ease;
 }
 
-button[type="submit"] {
-    background-color: #4CAF50;
-    border: none;
-    border-radius: 4px;
-    color: white;
-    cursor: pointer;
-    height: 50px;
-    margin: 8px 0;
-    padding: 14px 20px;
-    transition: background-color 0.3s ease;
-}
-
-button[type="submit"]:hover {
-    background-color: #45a049;
-    transition: background-color 0.3s ease;
+h1 {
+    color: var(--main-color);
+    font-family: 'Dancing Script', cursive;
+    font-weight: 300;
+    margin-left: 20px;
 }
 
 form {
     margin: 20px 0;
 }
 
-h1 {
-    color: #212121;
-    font-weight: 300;
+input[type="text"], button[type="submit"] {
+    border-radius: 4px;
+    height: 50px;
+    margin: 8px 0;
+    padding: 14px 20px;
 }
 
 input[type="text"] {
     border: 2px solid #ccc;
-    border-radius: 4px;
     box-sizing: border-box;
-    height: 50px;
-    margin: 8px 0;
-    padding: 12px 20px;
     width: 70%;
+}
+
+input[type="text"]:hover {
+    background-color: var(--light-background);
+    border-color: var(--highlight-color);
+    transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+}
+
+button[type="submit"] {
+    background-color: var(--highlight-color);
+    border: none;
+    color: var(--secondary-color);
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #45a049;
+    transition: background-color var(--transition-speed) ease;
 }
 
 table {
@@ -48,155 +65,52 @@ table {
     width: 100%;
 }
 
-td {
-    border-bottom: 1px solid #ddd;
-    color: #212121;
+td, th {
+    color: var(--main-color);
     min-width: 100px;
     padding: 20px;
     text-align: left;
+}
+
+td {
+    border-bottom: 1px solid #ddd;
 }
 
 th {
-    background-color: #212121;
-    color: #fff;
+    background-color: var(--main-color);
+    color: var(--secondary-color);
     cursor: pointer;
-    min-width: 100px;
-    padding: 20px;
     position: relative;
-    text-align: left;
-}
-
-th::after, th::before {
-    border: 5px solid transparent;
-    content: "";
-    height: 0;
-    position: absolute;
-    right: 0;
-    top: 50%;
-    width: 0;
-}
-
-th::before {
-    border-bottom-color: #aaa;
-    margin-top: -10px;
-}
-
-th::after {
-    border-top-color: #aaa;
-    margin-top: 2px;
-}
-
-th.asc::before {
-    border-bottom-color: transparent;
-}
-
-th.asc::after {
-    border-top-color: #4caf50;
-}
-
-th.desc::before {
-    border-bottom-color: #4CAF50;
-}
-
-th.desc::after {
-    border-top-color: transparent;
-}
-
-tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-h1 {
-    font-family: 'Dancing Script', cursive;
-}
-
-h1, form {
-    margin-left: 20px;
-}
-
-body {
-    transition: background-color 0.5s ease;
-}
-
-body.dark-mode {
-    background-color: #183152; /* 青みがかった背景色 */
-    color: #fafafa;
-}
-
-#sun-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 50px;
-    height: 50px;
-    transition: transform 0.5s ease;
-}
-
-/* Light mode */
-body.light-mode table {
-    background-color: #fff;
-    color: #212121;
-}
-
-body.light-mode th {
-    background-color: #212121;
-    color: #fff;
-}
-
-body.light-mode td {
-    color: #212121;
-}
-
-body.light-mode tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-/* Dark mode */
-body.dark-mode table {
-    background-color: #fff;
-    color: #212121;
-}
-
-body.dark-mode th {
-    background-color: #212121;
-    color: #fff;
-}
-
-body.dark-mode td {
-    color: #212121;
-}
-
-body.dark-mode tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-/* Light mode */
-body.light-mode h1 {
-    color: #212121; /* Black color */
-}
-
-/* Dark mode */
-body.dark-mode h1 {
-    color: #fafafa; /* White color */
 }
 
 th:hover {
     background-color: #333;
-    transition: background-color 0.3s ease;
+    transition: background-color var(--transition-speed) ease;
+}
+
+tr:nth-child(even) {
+    background-color: var(--light-background);
 }
 
 tr:hover {
     background-color: #e1e1e1;
-    transition: background-color 0.3s ease;
+    transition: background-color var(--transition-speed) ease;
 }
 
-input[type="text"]:hover {
-    background-color: #f2f2f2;
-    border-color: #4CAF50;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+#sun-icon {
+    height: 50px;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    transition: transform 0.5s ease;
+    width: 50px;
 }
 
-/* For mobile phones: */
+body.dark-mode {
+    background-color: var(--dark-background);
+    color: var(--secondary-color);
+}
+
 @media only screen and (max-width: 600px) {
     body {
         font-size: 18px;
@@ -219,12 +133,11 @@ input[type="text"]:hover {
     }
 
     #sun-icon {
-        width: 30px;
         height: 30px;
+        width: 30px;
     }
 }
 
-/* For tablets: */
 @media only screen and (min-width: 600px) and (max-width: 1200px) {
     body {
         font-size: 20px;
@@ -247,7 +160,7 @@ input[type="text"]:hover {
     }
 
     #sun-icon {
-        width: 40px;
         height: 40px;
+        width: 40px;
     }
 }
