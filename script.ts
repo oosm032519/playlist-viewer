@@ -325,3 +325,46 @@ checkTableWidth();
 document.getElementById('loading').classList.remove('hidden');
 
 document.getElementById('loading').classList.add('hidden');
+
+window.addEventListener('DOMContentLoaded', () => {
+    const loginButton = document.getElementById('loginButton');
+    const loginForm = document.getElementById('loginForm');
+    
+    loginButton.addEventListener('click', () => {
+        loginForm.style.display = 'block';
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const signupForm = document.getElementById('signupForm') as HTMLFormElement;
+    const signupUsername = document.getElementById('signupUsername') as HTMLInputElement;
+    const signupPassword = document.getElementById('signupPassword') as HTMLInputElement;
+    
+    signupForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        
+        const username = signupUsername.value;
+        const password = signupPassword.value;
+        
+        fetch('/java/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({username, password})
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Handle the response data here
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation: ', error);
+            });
+    });
+});

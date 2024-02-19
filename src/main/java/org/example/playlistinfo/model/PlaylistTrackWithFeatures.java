@@ -1,4 +1,4 @@
-package data.playlists;
+package org.example.playlistinfo.model;
 
 import lombok.Getter;
 import se.michaelthelin.spotify.model_objects.specification.AudioFeatures;
