@@ -277,36 +277,6 @@ class TrackTable {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const domElements = new DomElements();
-    domElements.fetchData();
-    domElements.fetchSearchResults();
-    
-    const sunIcon = document.getElementById('sun-icon');
-    sunIcon.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        document.body.classList.toggle('light-mode');
-        sunIcon.style.transform = `rotate(${document.body.classList.contains('dark-mode') ? 180 : 0}deg)`;
-    });
-    
-    const playlistIdOption = document.getElementById('playlistIdOption') as HTMLInputElement;
-    const searchQueryOption = document.getElementById('searchQueryOption') as HTMLInputElement;
-    const playlistForm = document.getElementById('playlistForm');
-    const searchForm = document.getElementById('searchForm');
-    playlistIdOption.addEventListener('change', () => {
-        if (playlistIdOption.checked) {
-            playlistForm.classList.remove('hidden');
-            searchForm.classList.add('hidden');
-        }
-    });
-    searchQueryOption.addEventListener('change', () => {
-        if (searchQueryOption.checked) {
-            searchForm.classList.remove('hidden');
-            playlistForm.classList.add('hidden');
-        }
-    });
-});
-
 window.addEventListener('resize', checkTableWidth);
 
 function checkTableWidth() {
@@ -332,7 +302,7 @@ if (loadingElement) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('/java/user/playlists', {credentials: 'include'})
+    fetch('/java/user/visited-playlists', {credentials: 'include'})
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -343,12 +313,51 @@ document.addEventListener('DOMContentLoaded', () => {
             const table = document.createElement('table');
             data.forEach(playlist => {
                 const row = document.createElement('tr');
-                const td = document.createElement('td');
-                td.textContent = playlist.playlistName;  // playlistIdをplaylistNameに変更
-                row.appendChild(td);
+                
+                const nameCell = document.createElement('td');
+                nameCell.textContent = playlist.name;
+                row.appendChild(nameCell);
+                
+                const idCell = document.createElement('td');
+                idCell.textContent = playlist.id;
+                row.appendChild(idCell);
+                
                 table.appendChild(row);
             });
-            document.getElementById('userPlaylists').appendChild(table);
-        })
-        .catch(error => console.error('There was a problem with the fetch operation: ', error));
+            const visitedPlaylistsElement = document.getElementById('visitedPlaylists');
+            if (visitedPlaylistsElement) {
+                visitedPlaylistsElement.appendChild(table);
+            } else {
+                console.error("Element with id 'visitedPlaylists' does not exist");
+            }
+        });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const menuIcon = document.getElementById('menu-icon');
+    const sidebar = document.getElementById('sidebar');
+    const sunIcon = document.getElementById('sun-icon');
+    
+    if (!menuIcon || !sidebar || !sunIcon) {
+        console.error('Could not fetch the menu icon, the sidebar element, or the sun icon');
+        return;
+    }
+    
+    menuIcon.addEventListener('click', () => {
+        if (sidebar.style.transform === 'translateX(0%)') {
+            sidebar.style.transform = 'translateX(100%)';
+            menuIcon.style.right = 'calc(2rem + 200px)';
+            sunIcon.style.right = 'calc(5rem + 200px)';
+        } else {
+            sidebar.style.transform = 'translateX(0%)';
+            menuIcon.style.right = '2rem';
+            sunIcon.style.right = '5rem';
+        }
+    });
+    
+    sunIcon.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        document.body.classList.toggle('light-mode');
+        sunIcon.style.transform = `rotate(${document.body.classList.contains('dark-mode') ? 180 : 0}deg)`;
+    });
 });
