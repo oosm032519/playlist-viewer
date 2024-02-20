@@ -308,8 +308,8 @@ input[type="radio"] {
     transition:       transform 0.5s ease;
 }
 
-#menu-icon {
-    right: 2rem;
+#clock-icon {
+    right: 1rem;
     transition: right 0.5s ease;
 }
 
@@ -333,7 +333,7 @@ input[type="radio"] {
 
 #sun-icon {
     left:  auto;
-    right: 5rem;
+    right: 4rem;
     transition: right 0.5s ease;
 }
 

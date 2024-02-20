@@ -991,8 +991,8 @@ input[type="radio"] {
   transition:       transform 0.5s ease;
 }
 
-#menu-icon {
-  right: 2rem;
+#clock-icon {
+  right: 1rem;
   transition: right 0.5s ease;
 }
 
@@ -1016,7 +1016,7 @@ input[type="radio"] {
 
 #sun-icon {
   left:  auto;
-  right: 5rem;
+  right: 4rem;
   transition: right 0.5s ease;
 }
 
@@ -1032,7 +1032,7 @@ body {
   background-color: #F0F0F0;
   border-radius:    10px;
   padding:          20px;
-  box-shadow:       0px 0px 10px rgba(0, 0, 0, 0.1);
+  box-shadow:       0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .visited-playlists-container h2 {
