@@ -3,12 +3,14 @@ package org.example.playlistinfo.servise;
 import org.apache.hc.core5.http.ParseException;
 import org.example.playlistinfo.model.PlaylistTrackWithFeatures;
 import org.example.playlistinfo.security.ClientCredentials;
-import org.example.playlistinfo.security.User;
+import org.example.playlistinfo.security.UserPlaylist;
 import org.example.playlistinfo.security.UserPlaylistRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,7 +31,6 @@ import java.util.Map;
 
 @RestController
 public class GetPlaylistsItems {
-
     private static final Logger logger = LoggerFactory.getLogger(GetPlaylistsItems.class);
 
     private final SpotifyApi spotifyApi;
@@ -44,20 +45,22 @@ public class GetPlaylistsItems {
     }
 
     @GetMapping("/playlist/{playlistId}")
-    public ResponseEntity<Map<String, Object>> getPlaylistItems(@PathVariable String playlistId, @AuthenticationPrincipal User user) {
+    public ResponseEntity<Map<String, Object>> getPlaylistItems(@PathVariable String playlistId) {
         try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = (authentication != null && authentication.getPrincipal() instanceof UserDetails) ? ((UserDetails) authentication.getPrincipal()).getUsername() : null;
+            logger.info("Username from SecurityContextHolder: {}", username);
+
             List<PlaylistTrackWithFeatures> playlistTracks = fetchPlaylistTracks(playlistId);
             Playlist playlist = spotifyApi.getPlaylist(playlistId).build().execute();
             Map<String, Object> response = new HashMap<>();
             response.put("tracks", playlistTracks);
             response.put("name", playlist.getName());
-            // ログインユーザーがいれば、そのユーザーが参照したプレイリストを保存
-            if (user != null) {
-                UserPlaylist userPlaylist = new UserPlaylist();
-                userPlaylist.setUser(user);
-                userPlaylist.setPlaylistId(playlistId);
-                userPlaylistRepository.save(userPlaylist);
+
+            if (username != null) {
+                saveUserPlaylist(username, playlistId, playlist.getName());  // プレイリスト名を引数として渡す
             }
+            deletePlaylistsWithNullNames();  // 新しいメソッドを呼び出す
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -65,6 +68,25 @@ public class GetPlaylistsItems {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    private void deletePlaylistsWithNullNames() {
+        List<UserPlaylist> playlistsWithNullNames = userPlaylistRepository.findByPlaylistNameIsNull();
+        userPlaylistRepository.deleteAll(playlistsWithNullNames);
+    }
+
+    private void saveUserPlaylist(String username, String playlistId, String playlistName) {
+        if (playlistName != null) {
+            List<UserPlaylist> existingPlaylists = userPlaylistRepository.findByUsernameAndPlaylistId(username, playlistId);
+            if (existingPlaylists.isEmpty()) {
+                UserPlaylist userPlaylist = new UserPlaylist();
+                userPlaylist.setUsername(username);
+                userPlaylist.setPlaylistId(playlistId);
+                userPlaylist.setPlaylistName(playlistName);  // プレイリスト名を設定
+                userPlaylistRepository.save(userPlaylist);
+            }
+        }
+    }
+
 
     private List<PlaylistTrackWithFeatures> fetchPlaylistTracks(String playlistId) {
         List<PlaylistTrackWithFeatures> playlistTracks = new ArrayList<>();

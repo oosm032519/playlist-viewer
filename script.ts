@@ -322,49 +322,33 @@ function checkTableWidth() {
 
 checkTableWidth();
 
-document.getElementById('loading').classList.remove('hidden');
+const loadingElement = document.getElementById('loading');
+if (loadingElement) {
+    loadingElement.classList.remove('hidden');
+}
 
-document.getElementById('loading').classList.add('hidden');
-
-window.addEventListener('DOMContentLoaded', () => {
-    const loginButton = document.getElementById('loginButton');
-    const loginForm = document.getElementById('loginForm');
-    
-    loginButton.addEventListener('click', () => {
-        loginForm.style.display = 'block';
-    });
-});
+if (loadingElement) {
+    loadingElement.classList.add('hidden');
+}
 
 document.addEventListener('DOMContentLoaded', () => {
-    const signupForm = document.getElementById('signupForm') as HTMLFormElement;
-    const signupUsername = document.getElementById('signupUsername') as HTMLInputElement;
-    const signupPassword = document.getElementById('signupPassword') as HTMLInputElement;
-    
-    signupForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        
-        const username = signupUsername.value;
-        const password = signupPassword.value;
-        
-        fetch('/java/signup', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({username, password})
+    fetch('/java/user/playlists', {credentials: 'include'})
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Handle the response data here
-                console.log(data);
-            })
-            .catch(error => {
-                console.error('There was a problem with the fetch operation: ', error);
+        .then(data => {
+            const table = document.createElement('table');
+            data.forEach(playlist => {
+                const row = document.createElement('tr');
+                const td = document.createElement('td');
+                td.textContent = playlist.playlistName;  // playlistIdをplaylistNameに変更
+                row.appendChild(td);
+                table.appendChild(row);
             });
-    });
+            document.getElementById('userPlaylists').appendChild(table);
+        })
+        .catch(error => console.error('There was a problem with the fetch operation: ', error));
 });
