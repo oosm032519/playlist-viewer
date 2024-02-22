@@ -1,4 +1,4 @@
-package authorization.client_credentials;
+package org.example.playlistinfo.security;
 
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;

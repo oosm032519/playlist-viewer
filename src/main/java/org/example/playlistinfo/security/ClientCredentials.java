@@ -1,4 +1,4 @@
-package authorization.client_credentials;
+package org.example.playlistinfo.security;
 
 import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;

@@ -21,6 +21,8 @@ class DomElements {
             const playlistId = this.playlistIdInput.value;
             // Show loading animation
             document.getElementById('loading').classList.remove('hidden');
+            // Clear search results
+            this.searchResultsDiv.innerHTML = '';
             fetch(`/java/playlist/${playlistId}`)
                 .then(TrackTable.handleResponse)
                 .then(data => {
@@ -52,6 +54,8 @@ class DomElements {
             const searchQuery = this.searchQueryInput.value;
             // Show loading animation
             document.getElementById('loading').classList.remove('hidden');
+            // Clear playlist tracks
+            this.playlistTracksDiv.innerHTML = '';
             fetch(`/java/search/${searchQuery}`)
                 .then(response => response.json())
                 .then(data => {
@@ -213,10 +217,12 @@ document.addEventListener('DOMContentLoaded', () => {
     domElements.fetchData();
     domElements.fetchSearchResults();
     const sunIcon = document.getElementById('sun-icon');
+    sunIcon.style.transition = 'transform 0.5s';
     sunIcon.addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
         document.body.classList.toggle('light-mode');
-        sunIcon.style.transform = `rotate(${document.body.classList.contains('dark-mode') ? 180 : 0}deg)`;
+        const rotationDegree = document.body.classList.contains('dark-mode') ? 180 : 0;
+        sunIcon.style.transform = `rotate(${rotationDegree}deg)`;
     });
     const playlistIdOption = document.getElementById('playlistIdOption');
     const searchQueryOption = document.getElementById('searchQueryOption');
@@ -248,6 +254,74 @@ function checkTableWidth() {
     });
 }
 checkTableWidth();
-document.getElementById('loading').classList.remove('hidden');
-document.getElementById('loading').classList.add('hidden');
+const loadingElement = document.getElementById('loading');
+if (loadingElement) {
+    loadingElement.classList.remove('hidden');
+}
+if (loadingElement) {
+    loadingElement.classList.add('hidden');
+}
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('/java/user/visited-playlists', { credentials: 'include' })
+        .then(response => response.json())
+        .then(data => {
+        const tableBody = document.querySelector('#visitedPlaylists table tbody');
+        data.forEach(playlist => {
+            const row = document.createElement('tr');
+            const nameCell = document.createElement('td');
+            nameCell.textContent = playlist.name;
+            row.appendChild(nameCell);
+            const idCell = document.createElement('td');
+            idCell.textContent = playlist.id;
+            row.appendChild(idCell);
+            tableBody.appendChild(row);
+        });
+    });
+});
+document.getElementById('clock-icon').addEventListener('click', function () {
+    window.open('mypage.html', '_blank');
+});
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('/java/user/visited-playlists', { credentials: 'include' })
+        .then(response => response.json())
+        .then(data => {
+        const tableBody = document.querySelector('#visitedPlaylists table tbody');
+        data.forEach(playlist => {
+            const row = document.createElement('tr');
+            const nameCell = document.createElement('td');
+            nameCell.textContent = playlist.name;
+            row.appendChild(nameCell);
+            const idCell = document.createElement('td');
+            idCell.textContent = playlist.id;
+            row.appendChild(idCell);
+            // Add click event listener to the table row
+            row.addEventListener('click', () => {
+                // Fetch the playlist tracks when the playlist id is clicked
+                // Show loading animation
+                document.getElementById('loading').classList.remove('hidden');
+                fetch(`/java/playlist/${playlist.id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                    const domElements = new DomElements();
+                    domElements.playlistTracksDiv.innerHTML = '';
+                    // Display the playlist name above the table
+                    const playlistNameElement = document.createElement('h2');
+                    playlistNameElement.textContent = `${playlist.name}`;
+                    domElements.playlistTracksDiv.appendChild(playlistNameElement);
+                    if (data && Array.isArray(data.tracks)) {
+                        const tracks = data.tracks.map((item) => new Track(item.playlistTrack.track, item.audioFeatures));
+                        domElements.createTable(tracks);
+                    }
+                    else {
+                        console.error('Expected data.tracks to be an array but received', data);
+                    }
+                    // Hide loading animation
+                    document.getElementById('loading').classList.add('hidden');
+                })
+                    .catch(error => console.error('There was a problem with the fetch operation: ', error));
+            });
+            tableBody.appendChild(row);
+        });
+    });
+});
 //# sourceMappingURL=script.js.map

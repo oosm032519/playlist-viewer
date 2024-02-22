@@ -1,6 +1,6 @@
-package data.playlists;
+package org.example.playlistinfo.servise;
 
-import authorization.client_credentials.ClientCredentials;
+import org.example.playlistinfo.security.ClientCredentials;
 import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
