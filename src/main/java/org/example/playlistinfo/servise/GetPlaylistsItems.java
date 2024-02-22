@@ -1,6 +1,8 @@
 package org.example.playlistinfo.servise;
 
 import org.apache.hc.core5.http.ParseException;
+import org.example.playlistinfo.model.MusicInformation;
+import org.example.playlistinfo.model.MusicInformationRepository;
 import org.example.playlistinfo.model.PlaylistTrackWithFeatures;
 import org.example.playlistinfo.security.ClientCredentials;
 import org.example.playlistinfo.security.UserPlaylist;
@@ -16,10 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
-import se.michaelthelin.spotify.model_objects.specification.AudioFeatures;
-import se.michaelthelin.spotify.model_objects.specification.Paging;
-import se.michaelthelin.spotify.model_objects.specification.Playlist;
-import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
+import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import se.michaelthelin.spotify.requests.data.tracks.GetAudioFeaturesForTrackRequest;
 
@@ -35,13 +34,22 @@ public class GetPlaylistsItems {
 
     private final SpotifyApi spotifyApi;
     private final UserPlaylistRepository userPlaylistRepository;
+    private final MusicInformationRepository musicInformationRepository;
 
-    public GetPlaylistsItems(final ClientCredentials clientCredentials, UserPlaylistRepository userPlaylistRepository) {
+    private String keyToNote(int key) {
+        String[] NOTES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+        return NOTES[key];
+    }
+
+
+
+    public GetPlaylistsItems(final ClientCredentials clientCredentials, UserPlaylistRepository userPlaylistRepository, MusicInformationRepository musicInformationRepository) {
         String accessToken = clientCredentials.clientCredentials();
         this.spotifyApi = new SpotifyApi.Builder()
                 .setAccessToken(accessToken)
                 .build();
         this.userPlaylistRepository = userPlaylistRepository;
+        this.musicInformationRepository = musicInformationRepository;
     }
 
     @GetMapping("/playlist/{playlistId}")
@@ -108,6 +116,28 @@ public class GetPlaylistsItems {
                     GetAudioFeaturesForTrackRequest getAudioFeaturesForTrackRequest = spotifyApi.getAudioFeaturesForTrack(trackId)
                             .build();
                     AudioFeatures audioFeatures = getAudioFeaturesForTrackRequest.execute();
+
+                    // Save track information to the database
+                    MusicInformation musicInformation = new MusicInformation();
+                    musicInformation.setTrackId(trackId);
+
+                    // Store the track object in a variable
+                    se.michaelthelin.spotify.model_objects.specification.Track track = (Track) playlistTrack.getTrack();
+
+                    // Use the stored track object to access its properties
+                    musicInformation.setTrackName(track.getName());
+                    musicInformation.setArtistName(track.getArtists()[0].getName());
+                    musicInformation.setBpm(audioFeatures.getTempo());
+                    musicInformation.setKeyvalue(keyToNote(audioFeatures.getKey()));
+                    musicInformation.setMode(audioFeatures.getMode().name());
+                    musicInformation.setAcousticness(audioFeatures.getAcousticness());
+                    musicInformation.setDanceability(audioFeatures.getDanceability());
+                    musicInformation.setEnergy(audioFeatures.getEnergy());
+                    musicInformation.setLiveness(audioFeatures.getLiveness());
+                    musicInformation.setSpeechiness(audioFeatures.getSpeechiness());
+                    musicInformation.setValence(audioFeatures.getValence());
+                    musicInformationRepository.save(musicInformation);
+
                     playlistTracks.add(new PlaylistTrackWithFeatures(playlistTrack, audioFeatures));
                 }
 
@@ -116,6 +146,7 @@ public class GetPlaylistsItems {
                 logger.error("プレイリストのページ取得中にエラーが発生しました: ", e);
                 break;
             }
+
         } while (playlistTrackPaging.getNext() != null);
 
         return playlistTracks;
