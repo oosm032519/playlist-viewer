@@ -544,12 +544,74 @@ video {
   --tw-backdrop-sepia:  ;
 }
 
+.container {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
+
+.fixed {
+  position: fixed;
+}
+
 .absolute {
   position: absolute;
 }
 
+.relative {
+  position: relative;
+}
+
+.sticky {
+  position: sticky;
+}
+
+.bottom-0 {
+  bottom: 0;
+}
+
+.left-0 {
+  left: 0;
+}
+
+.right-0 {
+  right: 0;
+}
+
 .right-2 {
   right: 0.5rem;
+}
+
+.top-0 {
+  top: 0;
 }
 
 .top-2 {
@@ -566,6 +628,18 @@ video {
 
 .ml-5 {
   margin-left: 1.25rem;
+}
+
+.block {
+  display: block;
+}
+
+.inline {
+  display: inline;
+}
+
+.flex {
+  display: flex;
 }
 
 .table {
@@ -590,6 +664,22 @@ video {
 
 .w-3\/4 {
   width: 75%;
+}
+
+.flex-auto {
+  flex: 1 1 auto;
+}
+
+.overflow-auto {
+  overflow: auto;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.rounded {
+  border-radius: 0.25rem;
 }
 
 .rounded-lg {
@@ -636,6 +726,10 @@ video {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.filter {
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
 .transition-transform {
@@ -1017,6 +1111,8 @@ input[type="radio"] {
 #sun-icon {
   left:  auto;
   right: 4rem;
+  top:    auto;
+  bottom: 2rem;
   transition: right 0.5s ease;
 }
 
@@ -1058,4 +1154,58 @@ body {
 
 .visited-playlists-container table tr:nth-child(even) {
   background-color: #F2F2F2;
+}
+
+.side-menu {
+  position:         fixed;
+  right:            0;
+  top:              0;
+  width:            200px;
+  height:           100vh;
+  background-color: #F8F8F8;
+  padding:          20px;
+  box-shadow:       0 0 10px rgba(0, 0, 0, 0.1);
+  transform:  translateX(100%);
+  transition: transform 0.3s ease-in-out;
+}
+
+.side-menu.open {
+  transform: translateX(0);
+}
+
+body.dark-mode .side-menu {
+  background-color: #333;
+}
+
+.side-menu {
+  position:         fixed;
+  right:            0;
+  top:              0;
+  width:            300px;
+  height:           100vh;
+  background-color: #FFF;
+  /* darker shade of gray */
+  padding:          20px;
+  box-shadow:       0 0 10px rgba(0, 0, 0, 0.1);
+  transition:       transform 0.3s ease-in-out;
+}
+
+.side-menu button {
+  display:          block;
+  width:            100%;
+  padding:          10px;
+  margin-bottom:    10px;
+  background-color: #8C7AE6;
+  /* purple */
+  color:            #FFF;
+  /* white */
+  border:           none;
+  border-radius:    20px;
+  /* rounded corners */
+  transition:       background-color 0.3s ease-in-out;
+}
+
+.side-menu button:hover {
+  background-color: #E1B12C;
+  /* gold */
 }

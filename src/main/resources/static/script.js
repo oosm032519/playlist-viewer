@@ -212,35 +212,6 @@ class TrackTable {
         return table;
     }
 }
-document.addEventListener('DOMContentLoaded', () => {
-    const domElements = new DomElements();
-    domElements.fetchData();
-    domElements.fetchSearchResults();
-    const sunIcon = document.getElementById('sun-icon');
-    sunIcon.style.transition = 'transform 0.5s';
-    sunIcon.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        document.body.classList.toggle('light-mode');
-        const rotationDegree = document.body.classList.contains('dark-mode') ? 180 : 0;
-        sunIcon.style.transform = `rotate(${rotationDegree}deg)`;
-    });
-    const playlistIdOption = document.getElementById('playlistIdOption');
-    const searchQueryOption = document.getElementById('searchQueryOption');
-    const playlistForm = document.getElementById('playlistForm');
-    const searchForm = document.getElementById('searchForm');
-    playlistIdOption.addEventListener('change', () => {
-        if (playlistIdOption.checked) {
-            playlistForm.classList.remove('hidden');
-            searchForm.classList.add('hidden');
-        }
-    });
-    searchQueryOption.addEventListener('change', () => {
-        if (searchQueryOption.checked) {
-            searchForm.classList.remove('hidden');
-            playlistForm.classList.add('hidden');
-        }
-    });
-});
 window.addEventListener('resize', checkTableWidth);
 function checkTableWidth() {
     const tables = document.querySelectorAll('table');
@@ -254,38 +225,21 @@ function checkTableWidth() {
     });
 }
 checkTableWidth();
-const loadingElement = document.getElementById('loading');
-if (loadingElement) {
-    loadingElement.classList.remove('hidden');
-}
-if (loadingElement) {
-    loadingElement.classList.add('hidden');
-}
-document.addEventListener('DOMContentLoaded', () => {
+function fetchVisitedPlaylists() {
     fetch('/java/user/visited-playlists', { credentials: 'include' })
         .then(response => response.json())
         .then(data => {
-        const tableBody = document.querySelector('#visitedPlaylists table tbody');
-        data.forEach(playlist => {
-            const row = document.createElement('tr');
-            const nameCell = document.createElement('td');
-            nameCell.textContent = playlist.name;
-            row.appendChild(nameCell);
-            const idCell = document.createElement('td');
-            idCell.textContent = playlist.id;
-            row.appendChild(idCell);
-            tableBody.appendChild(row);
-        });
-    });
-});
-document.getElementById('clock-icon').addEventListener('click', function () {
-    window.open('mypage.html', '_blank');
-});
-document.addEventListener('DOMContentLoaded', () => {
-    fetch('/java/user/visited-playlists', { credentials: 'include' })
-        .then(response => response.json())
-        .then(data => {
-        const tableBody = document.querySelector('#visitedPlaylists table tbody');
+        const visitedPlaylistsDiv = document.getElementById('visitedPlaylists');
+        let table = visitedPlaylistsDiv.querySelector('table');
+        if (!table) {
+            table = document.createElement('table');
+            visitedPlaylistsDiv.appendChild(table);
+        }
+        let tableBody = table.querySelector('tbody');
+        if (!tableBody) {
+            tableBody = document.createElement('tbody');
+            table.appendChild(tableBody);
+        }
         data.forEach(playlist => {
             const row = document.createElement('tr');
             const nameCell = document.createElement('td');
@@ -322,7 +276,21 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             tableBody.appendChild(row);
         });
+        visitedPlaylistsDiv.classList.add('hidden');
     });
+}
+document.getElementById('clock-icon').addEventListener('click', function () {
+    const visitedPlaylistsDiv = document.getElementById('visitedPlaylists');
+    visitedPlaylistsDiv.classList.toggle('hidden');
+    // Get the button element
+    const button = this;
+    // Toggle the button text
+    if (button.textContent === '参照履歴を表示') {
+        button.textContent = '参照履歴を非表示';
+    }
+    else {
+        button.textContent = '参照履歴を表示';
+    }
 });
 document.getElementById('spotify-login').addEventListener('click', function () {
     fetch('/java/authorize')
@@ -350,4 +318,44 @@ function fetchUserPlaylists() {
         .catch(error => console.error('There was a problem with the fetch operation: ', error));
 }
 document.getElementById('show-playlists').addEventListener('click', fetchUserPlaylists);
+document.addEventListener('DOMContentLoaded', () => {
+    const domElements = new DomElements();
+    domElements.fetchData();
+    domElements.fetchSearchResults();
+    const sunIcon = document.getElementById('sun-icon');
+    sunIcon.style.transition = 'transform 0.5s';
+    sunIcon.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        document.body.classList.toggle('light-mode');
+        const rotationDegree = document.body.classList.contains('dark-mode') ? 180 : 0;
+        sunIcon.style.transform = `rotate(${rotationDegree}deg)`;
+    });
+    const playlistIdOption = document.getElementById('playlistIdOption');
+    const searchQueryOption = document.getElementById('searchQueryOption');
+    const playlistForm = document.getElementById('playlistForm');
+    const searchForm = document.getElementById('searchForm');
+    playlistIdOption.addEventListener('change', () => {
+        if (playlistIdOption.checked) {
+            playlistForm.classList.remove('hidden');
+            searchForm.classList.add('hidden');
+        }
+    });
+    searchQueryOption.addEventListener('change', () => {
+        if (searchQueryOption.checked) {
+            searchForm.classList.remove('hidden');
+            playlistForm.classList.add('hidden');
+        }
+    });
+    fetchVisitedPlaylists();
+    const openButton = document.getElementById('open');
+    const closeButton = document.getElementById('close'); // closeボタンを取得
+    const sideMenu = document.querySelector('.side-menu');
+    openButton.addEventListener('click', () => {
+        sideMenu.classList.toggle('open');
+    });
+    // closeボタンにも同じイベントリスナーを追加
+    closeButton.addEventListener('click', () => {
+        sideMenu.classList.toggle('open');
+    });
+});
 //# sourceMappingURL=script.js.map
