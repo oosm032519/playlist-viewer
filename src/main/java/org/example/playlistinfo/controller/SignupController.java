@@ -1,5 +1,7 @@
-package org.example.playlistinfo.security;
+package org.example.playlistinfo.controller;
 
+import org.example.playlistinfo.security.User;
+import org.example.playlistinfo.security.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;

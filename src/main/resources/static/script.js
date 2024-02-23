@@ -324,4 +324,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+document.getElementById('spotify-login').addEventListener('click', function () {
+    fetch('/java/authorize')
+        .then(response => response.text())
+        .then(uri => {
+        console.log("認証が完了しました");
+        console.log(uri);
+        window.location.href = uri;
+    })
+        .catch(error => console.error('There was a problem with the fetch operation: ', error));
+});
 //# sourceMappingURL=script.js.map

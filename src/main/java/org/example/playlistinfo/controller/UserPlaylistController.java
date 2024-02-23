@@ -1,5 +1,8 @@
-package org.example.playlistinfo.security;
+package org.example.playlistinfo.controller;
 
+import org.example.playlistinfo.security.User;
+import org.example.playlistinfo.security.UserPlaylist;
+import org.example.playlistinfo.security.UserPlaylistRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
