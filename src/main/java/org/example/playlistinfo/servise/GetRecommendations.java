@@ -2,6 +2,8 @@ package org.example.playlistinfo.servise;
 
 import org.apache.hc.core5.http.ParseException;
 import org.example.playlistinfo.authorization.SpotifyAuthorizationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -14,6 +16,7 @@ import java.io.IOException;
 
 @Service
 public class GetRecommendations {
+    private static final Logger logger = LoggerFactory.getLogger(GetRecommendations.class);
 
     private static SpotifyAuthorizationService spotifyAuthorizationService;
 
@@ -33,20 +36,25 @@ public class GetRecommendations {
     }
 
 
-    public static Recommendations getRecommendationsBasedOnTrackFeatures(float tempo, int key, float danceability, float energy, String modeArtistId) {
+    public static Recommendations getRecommendationsBasedOnTrackFeatures(float tempo, int key, float danceability, float energy, float acousticness, float liveness, float speechiness, float valence, String modeArtistId) {
         try {
             SpotifyApi spotifyApi = spotifyAuthorizationService.getSpotifyApi();
             return spotifyApi.getRecommendations()
                     .seed_artists(modeArtistId)
+                    .target_key(key)
                     .target_tempo(tempo)
+                    .target_danceability(danceability)
+                    .target_energy(energy)
+                    .target_acousticness(acousticness)
+                    .target_liveness(liveness)
+                    .target_speechiness(speechiness)
+                    .target_valence(valence)
                     .build()
                     .execute();
         } catch (BadRequestException e) {
-            System.out.println("Invalid request: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Invalid request: " + e.getMessage(), e);
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error: " + e.getMessage(), e);
         }
         return null;
     }

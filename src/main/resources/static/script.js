@@ -360,8 +360,8 @@ document.addEventListener('DOMContentLoaded', () => {
         sideMenu.classList.toggle('open');
     });
 });
-function fetchRecommendedTracks(averageTempo, averageKey, averageDanceability, averageEnergy, modeArtistName) {
-    fetch(`/java/recommendations?tempo=${averageTempo}&key=${averageKey}&danceability=${averageDanceability}&energy=${averageEnergy}&modeArtistName=${modeArtistName}`)
+function fetchRecommendedTracks(averageTempo, averageKey, averageDanceability, averageEnergy, averageAcousticness, averageLiveness, averageSpeechiness, averageValence, modeArtistName) {
+    fetch(`/java/recommendations?tempo=${averageTempo}&key=${averageKey}&danceability=${averageDanceability}&energy=${averageEnergy}&acousticness=${averageAcousticness}&liveness=${averageLiveness}&speechiness=${averageSpeechiness}&valence=${averageValence}&modeArtistName=${modeArtistName}`)
         .then(response => response.json())
         .then(data => {
         console.log("Response data:", data); // レスポンスデータをログに出力
@@ -370,12 +370,37 @@ function fetchRecommendedTracks(averageTempo, averageKey, averageDanceability, a
             data.tracks.forEach((track) => {
                 console.log(`- ${track.name} by ${track.artists[0].name}`);
             });
+            // Call the function to display the recommended tracks
+            displayRecommendedTracks(data.tracks);
         }
         else {
             console.log("No tracks found in the response.");
         }
     })
         .catch(error => console.error('There was a problem with the fetch operation: ', error));
+}
+function displayRecommendedTracks(tracks) {
+    // Get the table element from the DOM
+    const table = document.querySelector('table');
+    // Create a new row for the table header
+    const headerRow = document.createElement('tr');
+    const headerCell = document.createElement('th');
+    headerCell.textContent = "Recommended Tracks";
+    headerRow.appendChild(headerCell);
+    table.appendChild(headerRow);
+    // Add each track to the table
+    tracks.forEach((track) => {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.textContent = `${track.name} by ${track.artists[0].name}`;
+        // Add click event listener to the table cell
+        cell.addEventListener('click', () => {
+            // Redirect to the Spotify track page when the cell is clicked
+            window.location.href = `https://open.spotify.com/track/${track.id}`;
+        });
+        row.appendChild(cell);
+        table.appendChild(row);
+    });
 }
 // 平均値と最頻値を計算する関数
 function calculateAverageAndMode(tracks) {
@@ -421,7 +446,7 @@ function calculateAverageAndMode(tracks) {
     console.log(`Mode Artist Name: ${modeArtistName}`);
     console.log(`Mode Key: ${modeKey}`);
     console.log(`Mode Mode: ${modeMode}`);
-    fetchRecommendedTracks(averageTempo, modeKey, averageDanceability, averageEnergy, modeArtistName);
+    fetchRecommendedTracks(averageTempo, modeKey, averageDanceability, averageEnergy, averageAcousticness, averageLiveness, averageSpeechiness, averageValence, modeArtistName);
 }
 // 最頻値を計算する関数
 function mode(array) {

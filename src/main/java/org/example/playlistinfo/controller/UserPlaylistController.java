@@ -58,17 +58,13 @@ public class UserPlaylistController {
     }
 
     @GetMapping("/java/recommendations")
-    public ResponseEntity<Recommendations> getRecommendations(@RequestParam float tempo, @RequestParam int key, @RequestParam float danceability, @RequestParam float energy, @RequestParam String modeArtistName) {
+    public ResponseEntity<Recommendations> getRecommendations(@RequestParam float tempo, @RequestParam int key, @RequestParam float danceability, @RequestParam float energy, @RequestParam float acousticness, @RequestParam float liveness, @RequestParam float speechiness, @RequestParam float valence, @RequestParam String modeArtistName) {
         try {
             String modeArtistId = GetRecommendations.getArtistIdFromName(modeArtistName);
-            Recommendations recommendations = GetRecommendations.getRecommendationsBasedOnTrackFeatures(tempo, key, danceability, energy, modeArtistId);
-            if (recommendations != null) {
-                return ResponseEntity.ok(recommendations);
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
+            Recommendations recommendations = GetRecommendations.getRecommendationsBasedOnTrackFeatures(tempo, key, danceability, energy, acousticness, liveness, speechiness, valence, modeArtistId);
+            return ResponseEntity.ok(recommendations);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.badRequest().build();
         }
     }
 }
