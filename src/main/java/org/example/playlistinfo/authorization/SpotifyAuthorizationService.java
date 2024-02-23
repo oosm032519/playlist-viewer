@@ -55,4 +55,8 @@ public class SpotifyAuthorizationService {
             throw new RuntimeException(e);
         }
     }
+
+    public String getAccessToken() {
+        return spotifyApi.getAccessToken();
+    }
 }

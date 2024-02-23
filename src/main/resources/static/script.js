@@ -334,4 +334,20 @@ document.getElementById('spotify-login').addEventListener('click', function () {
     })
         .catch(error => console.error('There was a problem with the fetch operation: ', error));
 });
+function fetchUserPlaylists() {
+    // Show loading animation
+    document.getElementById('loading').classList.remove('hidden');
+    fetch('/java/spotify/user/playlists')
+        .then(response => response.json())
+        .then(data => {
+        const domElements = new DomElements();
+        domElements.playlistTracksDiv.innerHTML = '';
+        // Pass the entire data object instead of data.items
+        domElements.createSearchResultsTable(data);
+        // Hide loading animation
+        document.getElementById('loading').classList.add('hidden');
+    })
+        .catch(error => console.error('There was a problem with the fetch operation: ', error));
+}
+document.getElementById('show-playlists').addEventListener('click', fetchUserPlaylists);
 //# sourceMappingURL=script.js.map
