@@ -395,8 +395,8 @@ function displayRecommendedTracks(tracks) {
         cell.textContent = `${track.name} by ${track.artists[0].name}`;
         // Add click event listener to the table cell
         cell.addEventListener('click', () => {
-            // Redirect to the Spotify track page when the cell is clicked
-            window.location.href = `https://open.spotify.com/track/${track.id}`;
+            // Open the Spotify track page in a new tab when the cell is clicked
+            window.open(`https://open.spotify.com/track/${track.id}`, '_blank');
         });
         row.appendChild(cell);
         table.appendChild(row);
