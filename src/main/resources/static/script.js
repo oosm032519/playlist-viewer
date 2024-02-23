@@ -30,6 +30,8 @@ class DomElements {
                 if (data && Array.isArray(data.tracks)) {
                     const tracks = data.tracks.map((item) => new Track(item.playlistTrack.track, item.audioFeatures));
                     this.createTable(tracks);
+                    // Calculate and log the average and mode
+                    calculateAverageAndMode(tracks);
                     // Output the playlist name to the console
                     if (data.name) {
                         console.log(`Playlist name: ${data.name}`);
@@ -358,4 +360,72 @@ document.addEventListener('DOMContentLoaded', () => {
         sideMenu.classList.toggle('open');
     });
 });
+function fetchRecommendedTracks(averageTempo, averageKey, averageDanceability, averageEnergy, modeArtistName) {
+    fetch(`/java/recommendations?tempo=${averageTempo}&key=${averageKey}&danceability=${averageDanceability}&energy=${averageEnergy}&modeArtistName=${modeArtistName}`)
+        .then(response => response.json())
+        .then(data => {
+        console.log("Response data:", data); // レスポンスデータをログに出力
+        if (data.tracks) { // data.tracksが存在することを確認
+            console.log("Recommended tracks based on the playlist:");
+            data.tracks.forEach((track) => {
+                console.log(`- ${track.name} by ${track.artists[0].name}`);
+            });
+        }
+        else {
+            console.log("No tracks found in the response.");
+        }
+    })
+        .catch(error => console.error('There was a problem with the fetch operation: ', error));
+}
+// 平均値と最頻値を計算する関数
+function calculateAverageAndMode(tracks) {
+    let totalTempo = 0;
+    let totalAcousticness = 0;
+    let totalDanceability = 0;
+    let totalEnergy = 0;
+    let totalLiveness = 0;
+    let totalSpeechiness = 0;
+    let totalValence = 0;
+    let artistNames = [];
+    let keys = [];
+    let modes = [];
+    tracks.forEach(track => {
+        totalTempo += track.audioFeatures.tempo;
+        totalAcousticness += track.audioFeatures.acousticness;
+        totalDanceability += track.audioFeatures.danceability;
+        totalEnergy += track.audioFeatures.energy;
+        totalLiveness += track.audioFeatures.liveness;
+        totalSpeechiness += track.audioFeatures.speechiness;
+        totalValence += track.audioFeatures.valence;
+        artistNames.push(track.artists[0].name);
+        keys.push(track.audioFeatures.key);
+        modes.push(track.audioFeatures.mode);
+    });
+    const averageTempo = totalTempo / tracks.length;
+    const averageAcousticness = totalAcousticness / tracks.length;
+    const averageDanceability = totalDanceability / tracks.length;
+    const averageEnergy = totalEnergy / tracks.length;
+    const averageLiveness = totalLiveness / tracks.length;
+    const averageSpeechiness = totalSpeechiness / tracks.length;
+    const averageValence = totalValence / tracks.length;
+    const modeArtistName = mode(artistNames);
+    const modeKey = mode(keys);
+    const modeMode = mode(modes);
+    console.log(`Average Tempo: ${averageTempo}`);
+    console.log(`Average Acousticness: ${averageAcousticness}`);
+    console.log(`Average Danceability: ${averageDanceability}`);
+    console.log(`Average Energy: ${averageEnergy}`);
+    console.log(`Average Liveness: ${averageLiveness}`);
+    console.log(`Average Speechiness: ${averageSpeechiness}`);
+    console.log(`Average Valence: ${averageValence}`);
+    console.log(`Mode Artist Name: ${modeArtistName}`);
+    console.log(`Mode Key: ${modeKey}`);
+    console.log(`Mode Mode: ${modeMode}`);
+    fetchRecommendedTracks(averageTempo, modeKey, averageDanceability, averageEnergy, modeArtistName);
+}
+// 最頻値を計算する関数
+function mode(array) {
+    return array.sort((a, b) => array.filter(v => v === a).length
+        - array.filter(v => v === b).length).pop();
+}
 //# sourceMappingURL=script.js.map

@@ -1,5 +1,6 @@
 package org.example.playlistinfo.authorization;
 
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,8 @@ public class SpotifyAuthorizationService {
     @Value("${spotify.redirect.uri}")
     private String redirectUri;
 
+    // spotifyApiのgetterメソッドを追加
+    @Getter
     private SpotifyApi spotifyApi;
 
     @PostConstruct
@@ -59,4 +62,5 @@ public class SpotifyAuthorizationService {
     public String getAccessToken() {
         return spotifyApi.getAccessToken();
     }
+
 }
