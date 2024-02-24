@@ -649,13 +649,11 @@ function showMessage(message: string) {
     // メッセージを表示するための新しいdiv要素を作成
     const messageDiv = document.createElement('div');
     messageDiv.textContent = message;
-    
-    // メッセージdivにスタイリッシュなスタイルを適用
     messageDiv.style.position = 'fixed';
     messageDiv.style.bottom = '20px';
     messageDiv.style.right = '20px';
     messageDiv.style.padding = '10px';
-    messageDiv.style.backgroundColor = '#007BFF';
+    messageDiv.style.backgroundColor = '#2EBD59';
     messageDiv.style.color = 'white';
     messageDiv.style.borderRadius = '5px';
     
