@@ -58,10 +58,12 @@ public class UserPlaylistController {
     }
 
     @GetMapping("/java/recommendations")
-    public ResponseEntity<Recommendations> getRecommendations(@RequestParam float tempo, @RequestParam int key, @RequestParam float danceability, @RequestParam float energy, @RequestParam float acousticness, @RequestParam float liveness, @RequestParam float speechiness, @RequestParam float valence, @RequestParam String modeArtistName) {
+    public ResponseEntity<Recommendations> getRecommendations(@RequestParam float tempo, @RequestParam int key, @RequestParam float danceability, @RequestParam float energy, @RequestParam float acousticness, @RequestParam float liveness, @RequestParam float speechiness, @RequestParam float valence, @RequestParam List<String> modeArtistNames) {
         try {
-            String modeArtistId = GetRecommendations.getArtistIdFromName(modeArtistName);
-            Recommendations recommendations = GetRecommendations.getRecommendationsBasedOnTrackFeatures(tempo, key, danceability, energy, acousticness, liveness, speechiness, valence, modeArtistId);
+            System.out.println("modeArtistNames: " + modeArtistNames);
+            List<String> modeArtistIds = GetRecommendations.getTopFiveArtistIdsFromNames(modeArtistNames);
+            System.out.println("modeArtistIds: " + modeArtistIds);
+            Recommendations recommendations = GetRecommendations.getRecommendationsBasedOnTrackFeatures(tempo, key, danceability, energy, acousticness, liveness, speechiness, valence, modeArtistIds);
             return ResponseEntity.ok(recommendations);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

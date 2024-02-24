@@ -13,6 +13,8 @@ import se.michaelthelin.spotify.model_objects.specification.Artist;
 import se.michaelthelin.spotify.model_objects.specification.Recommendations;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class GetRecommendations {
@@ -25,23 +27,29 @@ public class GetRecommendations {
         GetRecommendations.spotifyAuthorizationService = spotifyAuthorizationService;
     }
 
-    public static String getArtistIdFromName(String artistName) throws IOException, SpotifyWebApiException, ParseException {
+    public static List<String> getTopFiveArtistIdsFromNames(List<String> artistNames) throws IOException, SpotifyWebApiException, ParseException {
         SpotifyApi spotifyApi = spotifyAuthorizationService.getSpotifyApi();
-        Artist[] artists = spotifyApi.searchArtists(artistName).build().execute().getItems();
-        if (artists.length > 0) {
-            return artists[0].getId();
-        } else {
-            throw new RuntimeException("No artist found with name: " + artistName);
+        List<String> artistIds = new ArrayList<>();
+        for (String artistName : artistNames) {
+            if (artistIds.size() >= 5) {
+                break;
+            }
+            Artist[] artists = spotifyApi.searchArtists(artistName).build().execute().getItems();
+            if (artists.length > 0) {
+                artistIds.add(artists[0].getId());
+            }
         }
+        return artistIds;
     }
 
-
-    public static Recommendations getRecommendationsBasedOnTrackFeatures(float tempo, int key, float danceability, float energy, float acousticness, float liveness, float speechiness, float valence, String modeArtistId) {
+    public static Recommendations getRecommendationsBasedOnTrackFeatures(float tempo, int key, float danceability, float energy, float acousticness, float liveness, float speechiness, float valence, List<String> modeArtistIds) {
         try {
             SpotifyApi spotifyApi = spotifyAuthorizationService.getSpotifyApi();
+            String seedArtists = String.join(",", modeArtistIds);
+            logger.info("Seed artists: " + seedArtists);
             return spotifyApi.getRecommendations()
                     .limit(10)
-                    .seed_artists(modeArtistId)
+                    .seed_artists(seedArtists)
                     .target_tempo(tempo)
                     .target_key(key)
                     .target_danceability(danceability)

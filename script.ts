@@ -464,8 +464,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-function fetchRecommendedTracks(averageTempo: number, averageKey: number, averageDanceability: number, averageEnergy: number, averageAcousticness: number, averageLiveness: number, averageSpeechiness: number, averageValence: number, modeArtistName: string) {
-    fetch(`/java/recommendations?tempo=${averageTempo}&key=${averageKey}&danceability=${averageDanceability}&energy=${averageEnergy}&acousticness=${averageAcousticness}&liveness=${averageLiveness}&speechiness=${averageSpeechiness}&valence=${averageValence}&modeArtistName=${modeArtistName}`)
+function fetchRecommendedTracks(averageTempo: number, averageKey: number, averageDanceability: number, averageEnergy: number, averageAcousticness: number, averageLiveness: number, averageSpeechiness: number, averageValence: number, topFiveArtistNames: string[]) {
+    const artistNamesParam = topFiveArtistNames.join(',');
+    fetch(`/java/recommendations?tempo=${averageTempo}&key=${averageKey}&danceability=${averageDanceability}&energy=${averageEnergy}&acousticness=${averageAcousticness}&liveness=${averageLiveness}&speechiness=${averageSpeechiness}&valence=${averageValence}&modeArtistNames=${artistNamesParam}`)
         .then(response => response.json())
         .then(data => {
             console.log("Response data:", data);  // レスポンスデータをログに出力
@@ -579,7 +580,7 @@ function calculateAverageAndMode(tracks: Track[]) {
     const averageSpeechiness = totalSpeechiness / tracks.length;
     const averageValence = totalValence / tracks.length;
     
-    const modeArtistName = mode(artistNames);
+    const topFiveArtistNames = getTopFiveModes(artistNames);
     const modeKey = mode(keys);
     const modeMode = mode(modes);
     
@@ -590,10 +591,10 @@ function calculateAverageAndMode(tracks: Track[]) {
     console.log(`Average Liveness: ${averageLiveness}`);
     console.log(`Average Speechiness: ${averageSpeechiness}`);
     console.log(`Average Valence: ${averageValence}`);
-    console.log(`Mode Artist Name: ${modeArtistName}`);
     console.log(`Mode Key: ${modeKey}`);
     console.log(`Mode Mode: ${modeMode}`);
-    fetchRecommendedTracks(averageTempo, modeKey, averageDanceability, averageEnergy, averageAcousticness, averageLiveness, averageSpeechiness, averageValence, modeArtistName);
+    console.log(`Top Five Artist Names: ${topFiveArtistNames}`);
+    fetchRecommendedTracks(averageTempo, modeKey, averageDanceability, averageEnergy, averageAcousticness, averageLiveness, averageSpeechiness, averageValence, topFiveArtistNames);
 }
 
 // 最頻値を計算する関数
@@ -602,6 +603,24 @@ function mode(array: any[]) {
         array.filter(v => v === a).length
         - array.filter(v => v === b).length
     ).pop();
+}
+
+function getTopFiveModes(array: any[]) {
+    const frequency = {};
+    let maxFrequency = 0;
+    let modes = [];
+    
+    for (let i in array) {
+        frequency[array[i]] = (frequency[array[i]] || 0) + 1;
+        if (frequency[array[i]] > maxFrequency) {
+            maxFrequency = frequency[array[i]];
+            modes = [array[i]];
+        } else if (frequency[array[i]] === maxFrequency) {
+            modes.push(array[i]);
+        }
+    }
+    
+    return modes.slice(0, 5);
 }
 
 function showMessage(message: string) {
