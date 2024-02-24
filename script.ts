@@ -148,6 +148,7 @@ class DomElements {
                         if (data && Array.isArray(data.tracks)) {
                             const tracks = data.tracks.map((item: any) => new Track(item.playlistTrack.track, item.audioFeatures));
                             this.createTable(tracks);
+                            calculateAverageAndMode(tracks);
                         } else {
                             console.error('Expected data.tracks to be an array but received', data);
                         }
