@@ -22,7 +22,6 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/login", "/signup").permitAll()
-                        .requestMatchers("/java/user/playlists").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login

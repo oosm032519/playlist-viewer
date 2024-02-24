@@ -1,6 +1,6 @@
 package org.example.playlistinfo.controller;
 
-import org.example.playlistinfo.authorization.SpotifyAuthorizationService;
+import org.example.playlistinfo.authorization.SpotifyAccessTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,19 +13,19 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RestController
-public class CallbackController {
+public class SpotifyCallbackController {
 
-    private final SpotifyAuthorizationService spotifyAuthorizationService;
-    private static final Logger logger = LoggerFactory.getLogger(CallbackController.class);
+    private final SpotifyAccessTokenService spotifyAccessTokenService;
+    private static final Logger logger = LoggerFactory.getLogger(SpotifyCallbackController.class);
 
     @Autowired
-    public CallbackController(SpotifyAuthorizationService spotifyAuthorizationService) {
-        this.spotifyAuthorizationService = spotifyAuthorizationService;
+    public SpotifyCallbackController(SpotifyAccessTokenService spotifyAccessTokenService) {
+        this.spotifyAccessTokenService = spotifyAccessTokenService;
     }
 
     @GetMapping("/callback")
     public void handleCallback(@RequestParam("code") String code, HttpServletResponse response) {
-        spotifyAuthorizationService.authorizationCode(code);
+        spotifyAccessTokenService.authorizationCode(code);
         try {
             response.sendRedirect("/"); // ホームページにリダイレクト
         } catch (IOException e) {

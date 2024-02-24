@@ -1,7 +1,7 @@
 package org.example.playlistinfo.servise;
 
 import org.apache.hc.core5.http.ParseException;
-import org.example.playlistinfo.authorization.SpotifyAuthorizationService;
+import org.example.playlistinfo.authorization.SpotifyAccessTokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +20,15 @@ import java.util.List;
 public class GetRecommendations {
     private static final Logger logger = LoggerFactory.getLogger(GetRecommendations.class);
 
-    private static SpotifyAuthorizationService spotifyAuthorizationService;
+    private static SpotifyAccessTokenService spotifyAccessTokenService;
 
     @Autowired
-    public GetRecommendations(SpotifyAuthorizationService spotifyAuthorizationService) {
-        GetRecommendations.spotifyAuthorizationService = spotifyAuthorizationService;
+    public GetRecommendations(SpotifyAccessTokenService spotifyAccessTokenService) {
+        GetRecommendations.spotifyAccessTokenService = spotifyAccessTokenService;
     }
 
     public static List<String> getTopFiveArtistIdsFromNames(List<String> artistNames) throws IOException, SpotifyWebApiException, ParseException {
-        SpotifyApi spotifyApi = spotifyAuthorizationService.getSpotifyApi();
+        SpotifyApi spotifyApi = spotifyAccessTokenService.getSpotifyApi();
         List<String> artistIds = new ArrayList<>();
         for (String artistName : artistNames) {
             if (artistIds.size() >= 5) {
@@ -44,7 +44,7 @@ public class GetRecommendations {
 
     public static Recommendations getRecommendationsBasedOnTrackFeatures(float tempo, int key, float danceability, float energy, float acousticness, float liveness, float speechiness, float valence, List<String> modeArtistNames) {
         try {
-            SpotifyApi spotifyApi = spotifyAuthorizationService.getSpotifyApi();
+            SpotifyApi spotifyApi = spotifyAccessTokenService.getSpotifyApi();
             List<String> modeArtistIds = getTopFiveArtistIdsFromNames(modeArtistNames);
             String seedArtists = String.join(",", modeArtistIds);
             logger.info("Seed artists: " + seedArtists);

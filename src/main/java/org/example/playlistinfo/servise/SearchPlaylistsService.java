@@ -1,6 +1,6 @@
 package org.example.playlistinfo.servise;
 
-import org.example.playlistinfo.security.ClientCredentials;
+import org.example.playlistinfo.authorization.SpotifyClientAuthenticator;
 import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +22,8 @@ public class SearchPlaylistsService {
 
     private final SpotifyApi spotifyApi;
 
-    public SearchPlaylistsService(final ClientCredentials clientCredentials) {
-        String accessToken = clientCredentials.clientCredentials();
+    public SearchPlaylistsService(final SpotifyClientAuthenticator spotifyClientAuthenticator) {
+        String accessToken = spotifyClientAuthenticator.clientCredentials();
         this.spotifyApi = new SpotifyApi.Builder()
                 .setAccessToken(accessToken)
                 .build();

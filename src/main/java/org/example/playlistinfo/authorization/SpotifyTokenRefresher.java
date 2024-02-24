@@ -10,7 +10,7 @@ import org.apache.hc.core5.http.ParseException;
 
 import java.io.IOException;
 
-public class AuthorizationCodeRefresh {
+public class SpotifyTokenRefresher {
     @Value("${spotify.client.id}")
     private String clientId;
 

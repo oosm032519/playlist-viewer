@@ -5,18 +5,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="output.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 text-gray-900">
-<h1 class="text-3xl font-light ml-5">Playlist Viewer</h1>
+<body class="bg-gray-100 text-gray-900 font-sans">
+<h1 class="text-3xl font-light ml-5 text-center py-5">Playlist Viewer</h1>
 
-
-<div class="radio-group">
-    <div>
+<div class="radio-group flex justify-center my-5">
+    <div class="mx-2">
         <input type="radio" id="playlistIdOption" name="option" checked>
-        <label for="playlistIdOption">プレイリストIDを入力</label>
+        <label for="playlistIdOption" class="text-green-500">プレイリストIDを入力</label>
     </div>
-    <div>
+    <div class="mx-2">
         <input type="radio" id="searchQueryOption" name="option">
-        <label for="searchQueryOption">プレイリスト名で検索</label>
+        <label for="searchQueryOption" class="text-green-500">プレイリスト名で検索</label>
     </div>
 </div>
 
@@ -39,14 +38,15 @@
 
 <div id="visitedPlaylists" class="m-5"></div>
 
-<button id="open" class="bg-green-500 text-white rounded-lg h-10 p-3" style="position: absolute; top: 0; right: 0;">
+<button id="open" class="bg-green-500 text-white rounded-lg h-10 p-3 absolute top-0 right-0">
     メニューを開く
 </button>
 
 <div class="side-menu">
     <button id="close" class="bg-green-500 text-white rounded-lg h-10 p-3">メニューを閉じる</button>
     <button id="spotify-login" class="bg-green-500 text-white rounded-lg h-10 p-3">Spotifyアカウントでログイン</button>
-    <button id="show-playlists" class="bg-green-500 text-white rounded-lg h-10 p-3">フォロー中のプレイリストを表示</button>
+    <button id="show-playlists" class="bg-green-500 text-white rounded-lg h-10 p-3">フォロー中のプレイリストを表示
+    </button>
     <button id="clock-icon" class="bg-green-500 text-white rounded-lg h-10 p-3">参照履歴を表示</button>
     <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
          class="h-12 w-12 absolute top-2 right-2 transition-transform duration-500">

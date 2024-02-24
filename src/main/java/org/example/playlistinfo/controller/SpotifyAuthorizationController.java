@@ -1,8 +1,8 @@
 package org.example.playlistinfo.controller;
 
 import org.apache.hc.core5.http.ParseException;
-import org.example.playlistinfo.authorization.AuthorizationCodeUri;
-import org.example.playlistinfo.authorization.SpotifyAuthorizationService;
+import org.example.playlistinfo.authorization.SpotifyAuthorizationUriGenerator;
+import org.example.playlistinfo.authorization.SpotifyAccessTokenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,24 +22,24 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/java")
-public class SpotifyController {
+public class SpotifyAuthorizationController {
 
-    private final AuthorizationCodeUri authorizationCodeUri;
-    private final SpotifyAuthorizationService spotifyAuthorizationService;
+    private final SpotifyAuthorizationUriGenerator spotifyAuthorizationUriGenerator;
+    private final SpotifyAccessTokenService spotifyAccessTokenService;
 
-    public SpotifyController(AuthorizationCodeUri authorizationCodeUri, SpotifyAuthorizationService spotifyAuthorizationService) {
-        this.authorizationCodeUri = authorizationCodeUri;
-        this.spotifyAuthorizationService = spotifyAuthorizationService;
+    public SpotifyAuthorizationController(SpotifyAuthorizationUriGenerator spotifyAuthorizationUriGenerator, SpotifyAccessTokenService spotifyAccessTokenService) {
+        this.spotifyAuthorizationUriGenerator = spotifyAuthorizationUriGenerator;
+        this.spotifyAccessTokenService = spotifyAccessTokenService;
     }
 
     @GetMapping("/authorize")
     public ResponseEntity<String> authorize() {
-        return authorizationCodeUri.authorizationCodeUri();
+        return spotifyAuthorizationUriGenerator.authorizationCodeUri();
     }
 
     @GetMapping("/spotify/user/playlists")
     public ResponseEntity<List<PlaylistSimplified>> getUserPlaylists() {
-        String accessToken = spotifyAuthorizationService.getAccessToken();
+        String accessToken = spotifyAccessTokenService.getAccessToken();
         SpotifyApi spotifyApi = new SpotifyApi.Builder()
                 .setAccessToken(accessToken)
                 .build();

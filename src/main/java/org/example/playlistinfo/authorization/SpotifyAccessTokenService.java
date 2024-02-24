@@ -15,8 +15,8 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 
 @Service
-public class SpotifyAuthorizationService {
-    private static final Logger logger = LoggerFactory.getLogger(SpotifyAuthorizationService.class);
+public class SpotifyAccessTokenService {
+    private static final Logger logger = LoggerFactory.getLogger(SpotifyAccessTokenService.class);
 
     @Value("${spotify.client.id}")
     private String clientId;

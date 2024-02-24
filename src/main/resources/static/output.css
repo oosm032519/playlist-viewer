@@ -935,6 +935,7 @@ table {
   width:           100%;
   border-collapse: collapse;
   margin-top:      1rem;
+  padding: 0;
 }
 
 table, th, td {
@@ -1247,4 +1248,8 @@ body.dark-mode .side-menu {
 
 .track-button:hover {
   background-color: #2EBD59;
+}
+
+table {
+  width: 100%;
 }

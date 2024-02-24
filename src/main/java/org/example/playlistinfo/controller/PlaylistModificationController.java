@@ -3,7 +3,7 @@ package org.example.playlistinfo.controller;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import org.apache.hc.core5.http.ParseException;
-import org.example.playlistinfo.authorization.SpotifyAuthorizationService;
+import org.example.playlistinfo.authorization.SpotifyAccessTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,17 +17,17 @@ import se.michaelthelin.spotify.requests.data.playlists.RemoveItemsFromPlaylistR
 import java.io.IOException;
 
 @RestController
-public class PlaylistController {
-    private final SpotifyAuthorizationService spotifyAuthorizationService;
+public class PlaylistModificationController {
+    private final SpotifyAccessTokenService spotifyAccessTokenService;
 
     @Autowired
-    public PlaylistController(SpotifyAuthorizationService spotifyAuthorizationService) {
-        this.spotifyAuthorizationService = spotifyAuthorizationService;
+    public PlaylistModificationController(SpotifyAccessTokenService spotifyAccessTokenService) {
+        this.spotifyAccessTokenService = spotifyAccessTokenService;
     }
 
     @GetMapping("/java/playlist/addTrack")
     public SnapshotResult addTrackToPlaylist(@RequestParam String trackId, @RequestParam String playlistId) {
-        String accessToken = spotifyAuthorizationService.getAccessToken();
+        String accessToken = spotifyAccessTokenService.getAccessToken();
         SpotifyApi spotifyApi = new SpotifyApi.Builder()
                 .setAccessToken(accessToken)
                 .build();
@@ -44,7 +44,7 @@ public class PlaylistController {
 
     @GetMapping("/java/playlist/removeTrack")
     public SnapshotResult removeTrackFromPlaylist(@RequestParam String trackId, @RequestParam String playlistId) {
-        String accessToken = spotifyAuthorizationService.getAccessToken();
+        String accessToken = spotifyAccessTokenService.getAccessToken();
         SpotifyApi spotifyApi = new SpotifyApi.Builder()
                 .setAccessToken(accessToken)
                 .build();

@@ -7,7 +7,6 @@ const descriptions = {
     'Valence': '明るさ。1に近いほど明るい。'
 };
 
-// PlaylistSimplified型を定義します。
 interface PlaylistSimplified {
     id: string;
     name: string;
@@ -16,120 +15,132 @@ interface PlaylistSimplified {
 let playlistId: string;
 
 class DomElements {
-    playlistForm: HTMLFormElement;
-    playlistIdInput: HTMLInputElement;
-    playlistTracksDiv: HTMLDivElement;
+    get playlistForm(): HTMLFormElement {
+        return document.getElementById('playlistForm') as HTMLFormElement;
+    }
     
-    searchForm: HTMLFormElement;
-    searchQueryInput: HTMLInputElement;
-    searchResultsDiv: HTMLDivElement;
+    get playlistIdInput(): HTMLInputElement {
+        return document.getElementById('playlistId') as HTMLInputElement;
+    }
     
-    constructor() {
-        this.playlistForm = document.getElementById('playlistForm') as HTMLFormElement;
-        this.playlistIdInput = document.getElementById('playlistId') as HTMLInputElement;
-        this.playlistTracksDiv = document.getElementById('playlistTracks') as HTMLDivElement;
-        
-        this.searchForm = document.getElementById('searchForm') as HTMLFormElement;
-        this.searchQueryInput = document.getElementById('searchQuery') as HTMLInputElement;
-        this.searchResultsDiv = document.getElementById('searchResults') as HTMLDivElement;
+    get playlistTracksDiv(): HTMLDivElement {
+        return document.getElementById('playlistTracks') as HTMLDivElement;
+    }
+    
+    get searchForm(): HTMLFormElement {
+        return document.getElementById('searchForm') as HTMLFormElement;
+    }
+    
+    get searchQueryInput(): HTMLInputElement {
+        return document.getElementById('searchQuery') as HTMLInputElement;
+    }
+    
+    get searchResultsDiv(): HTMLDivElement {
+        return document.getElementById('searchResults') as HTMLDivElement;
     }
     
     fetchData(): void {
-        this.playlistForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            
-            playlistId = this.playlistIdInput.value;
-            
-            // Show loading animation
-            document.getElementById('loading').classList.remove('hidden');
-            
-            // Clear search results
-            this.searchResultsDiv.innerHTML = '';
-            
-            fetch(`/java/playlist/${playlistId}`)
-                .then(TrackTable.handleResponse)
-                .then(data => {
-                    this.playlistTracksDiv.innerHTML = '';
-                    if (data && Array.isArray(data.tracks)) {
-                        const tracks = data.tracks.map((item: any) => new Track(item.playlistTrack.track, item.audioFeatures));
-                        this.createTable(tracks);
-                        
-                        // Calculate and log the average and mode
-                        calculateAverageAndMode(tracks);
-                        
-                        // Output the playlist name to the console
-                        if (data.name) {
-                            console.log(`Playlist name: ${data.name}`);
-                            
-                            // Display the playlist name above the table
-                            const playlistNameElement = document.createElement('h2');
-                            playlistNameElement.textContent = `${data.name}`;
-                            this.playlistTracksDiv.insertBefore(playlistNameElement, this.playlistTracksDiv.firstChild);
-                        }
-                        
-                        // Output the playlist ID to the console
-                        console.log(`Playlist ID: ${playlistId}`);
-                    } else {
-                        console.error('Expected data.tracks to be an array but received', data);
-                    }
-                    
-                    // Hide loading animation
-                    document.getElementById('loading').classList.add('hidden');
-                })
-                .catch(TrackTable.handleError);
-        });
+        this.playlistForm.addEventListener('submit', this.handlePlaylistFormSubmit.bind(this));
     }
     
     fetchSearchResults(): void {
-        this.searchForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            
-            const searchQuery = this.searchQueryInput.value;
-            
-            // Show loading animation
-            document.getElementById('loading').classList.remove('hidden');
-            
-            // Clear playlist tracks
-            this.playlistTracksDiv.innerHTML = '';
-            
-            fetch(`/java/search/${searchQuery}`)
-                .then(response => response.json())
-                .then(data => {
-                    this.searchResultsDiv.innerHTML = '';
-                    this.createSearchResultsTable(data);
-                    
-                    // Hide loading animation
-                    document.getElementById('loading').classList.add('hidden');
-                })
-                .catch(error => console.error('There was a problem with the fetch operation: ', error));
-        });
+        this.searchForm.addEventListener('submit', this.handleSearchFormSubmit.bind(this));
+    }
+    
+    fetchPlaylistData(playlistId: string): void {
+        this.clearAllTables();
+        this.showLoadingAnimation();
+        fetch(`/java/playlist/${playlistId}`)
+            .then(TrackTable.handleResponse)
+            .then(this.handlePlaylistData.bind(this))
+            .catch(TrackTable.handleError);
+    }
+    
+    fetchSearchData(searchQuery: string): void {
+        this.clearAllTables();
+        this.showLoadingAnimation();
+        fetch(`/java/search/${searchQuery}`)
+            .then(response => response.json())
+            .then(this.handleSearchData.bind(this))
+            .catch(error => console.error('There was a problem with the fetch operation: ', error));
+    }
+    
+    handlePlaylistFormSubmit(event: Event): void {
+        event.preventDefault();
+        this.fetchPlaylistData(this.playlistIdInput.value);
+    }
+    
+    handleSearchFormSubmit(event: Event): void {
+        event.preventDefault();
+        this.fetchSearchData(this.searchQueryInput.value);
+    }
+    
+    handlePlaylistData(data: any): void {
+        this.clearAllTables();
+        this.processPlaylistData(data);
+        this.hideLoadingAnimation();
+    }
+    
+    handleSearchData(data: any): void {
+        this.clearAllTables();
+        this.createSearchResultsTable(data);
+        this.hideLoadingAnimation();
+    }
+    
+    processPlaylistData(data: any): void {
+        if (data && Array.isArray(data.tracks)) {
+            const tracks = data.tracks.map((item: any) => new Track(item.playlistTrack.track, item.audioFeatures));
+            this.createTable(tracks);
+            calculateAverageAndMode(tracks);
+            this.displayPlaylistName(data.name);
+            console.log(`Playlist ID: ${playlistId}`);
+        } else {
+            console.error('Expected data.tracks to be an array but received', data);
+        }
+    }
+    
+    displayPlaylistName(name: string): void {
+        if (name) {
+            console.log(`Playlist name: ${name}`);
+            const playlistNameElement = document.createElement('h2');
+            playlistNameElement.textContent = `${name}`;
+            this.playlistTracksDiv.insertBefore(playlistNameElement, this.playlistTracksDiv.firstChild);
+        }
+    }
+    
+    showLoadingAnimation(): void {
+        document.getElementById('loading').classList.remove('hidden');
+    }
+    
+    hideLoadingAnimation(): void {
+        document.getElementById('loading').classList.add('hidden');
+    }
+    
+    clearAllTables(): void {
+        this.playlistTracksDiv.innerHTML = '';
+        this.searchResultsDiv.innerHTML = '';
     }
     
     createTable(tracks: Track[]): void {
+        this.clearAllTables();
         const trackTable = new TrackTable(tracks);
         this.playlistTracksDiv.appendChild(trackTable.createTable());
     }
     
     createSearchResultsTable(results: PlaylistSimplified[]): void {
+        this.clearAllTables();
         const table = document.createElement('table');
         results.forEach(result => {
             const row = document.createElement('tr');
             const td = document.createElement('td');
             td.textContent = result.name;
-            
-            // Add click event listener to the table cell
             td.addEventListener('click', () => {
-                // Fetch the playlist tracks when the playlist name is clicked
-                
-                // Show loading animation
                 document.getElementById('loading').classList.remove('hidden');
                 
                 fetch(`/java/playlist/${result.id}`)
                     .then(response => response.json())
                     .then(data => {
                         this.playlistTracksDiv.innerHTML = '';
-                        
-                        // Display the playlist name above the table
                         const playlistNameElement = document.createElement('h2');
                         playlistNameElement.textContent = `${result.name}`;
                         this.playlistTracksDiv.appendChild(playlistNameElement);
@@ -140,8 +151,6 @@ class DomElements {
                         } else {
                             console.error('Expected data.tracks to be an array but received', data);
                         }
-                        
-                        // Hide loading animation
                         document.getElementById('loading').classList.add('hidden');
                     })
                     .catch(error => console.error('There was a problem with the fetch operation: ', error));
@@ -152,8 +161,6 @@ class DomElements {
         });
         this.searchResultsDiv.appendChild(table);
     }
-    
-    
 }
 
 class Track {
@@ -202,13 +209,10 @@ class TrackTable {
         ['Track Name', 'Artist Name', 'BPM', 'Key', 'Mode', 'Acousticness', 'Danceability', 'Energy', /* 'Instrumentalness', */ 'Liveness', 'Speechiness', 'Valence'].forEach((text, index) => {
             const th = document.createElement('th');
             th.textContent = text;
-            
-            // Add mouseover listener to the header cell
             if (descriptions[text]) {
                 th.title = descriptions[text];
             }
             
-            // Add click listener to the header cell
             th.addEventListener('click', (event) => {
                 const element = event.target as HTMLElement;
                 
@@ -228,11 +232,9 @@ class TrackTable {
                 const tbody = table.querySelector('tbody') as HTMLTableSectionElement;
                 const sortOrder = th.classList.contains('asc') ? -1 : 1;
                 
-                // Convert HTMLCollection to Array and sort
                 const rows = Array.from(tbody.rows);
                 rows.sort((a, b) => TrackTable.sortRows(a, b, index, sortOrder));
                 
-                // Append sorted rows to tbody
                 rows.forEach(row => tbody.appendChild(row));
             });
             
@@ -319,6 +321,15 @@ function fetchVisitedPlaylists() {
                 table = document.createElement('table');
                 visitedPlaylistsDiv.appendChild(table);
             }
+            
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            const headerCell = document.createElement('th');
+            headerCell.textContent = "参照履歴";
+            headerRow.appendChild(headerCell);
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+            
             let tableBody = table.querySelector('tbody');
             if (!tableBody) {
                 tableBody = document.createElement('tbody');
@@ -326,46 +337,34 @@ function fetchVisitedPlaylists() {
             }
             data.forEach(playlist => {
                 const row = document.createElement('tr');
-
+                
                 const nameCell = document.createElement('td');
                 nameCell.textContent = playlist.name;
                 row.appendChild(nameCell);
-
-                const idCell = document.createElement('td');
-                idCell.textContent = playlist.id;
-                row.appendChild(idCell);
-
-                // Add click event listener to the table row
+                
                 row.addEventListener('click', () => {
-                    // Fetch the playlist tracks when the playlist id is clicked
-
-                    // Show loading animation
                     document.getElementById('loading').classList.remove('hidden');
-
+                    
                     fetch(`/java/playlist/${playlist.id}`)
                         .then(response => response.json())
                         .then(data => {
                             const domElements = new DomElements();
                             domElements.playlistTracksDiv.innerHTML = '';
-
-                            // Display the playlist name above the table
                             const playlistNameElement = document.createElement('h2');
                             playlistNameElement.textContent = `${playlist.name}`;
                             domElements.playlistTracksDiv.appendChild(playlistNameElement);
-
+                            
                             if (data && Array.isArray(data.tracks)) {
                                 const tracks = data.tracks.map((item: any) => new Track(item.playlistTrack.track, item.audioFeatures));
                                 domElements.createTable(tracks);
                             } else {
                                 console.error('Expected data.tracks to be an array but received', data);
                             }
-
-                            // Hide loading animation
                             document.getElementById('loading').classList.add('hidden');
                         })
                         .catch(error => console.error('There was a problem with the fetch operation: ', error));
                 });
-
+                
                 tableBody.appendChild(row);
             });
             visitedPlaylistsDiv.classList.add('hidden');
@@ -375,10 +374,7 @@ function fetchVisitedPlaylists() {
 document.getElementById('clock-icon').addEventListener('click', function () {
     const visitedPlaylistsDiv = document.getElementById('visitedPlaylists');
     visitedPlaylistsDiv.classList.toggle('hidden');
-    // Get the button element
     const button = this as HTMLButtonElement;
-    
-    // Toggle the button text
     if (button.textContent === '参照履歴を表示') {
         button.textContent = '参照履歴を非表示';
     } else {
@@ -398,7 +394,6 @@ document.getElementById('spotify-login').addEventListener('click', function () {
 });
 
 function fetchUserPlaylists() {
-    // Show loading animation
     document.getElementById('loading').classList.remove('hidden');
     
     fetch('/java/spotify/user/playlists')
@@ -406,11 +401,7 @@ function fetchUserPlaylists() {
         .then(data => {
             const domElements = new DomElements();
             domElements.playlistTracksDiv.innerHTML = '';
-            
-            // Pass the entire data object instead of data.items
             domElements.createSearchResultsTable(data);
-            
-            // Hide loading animation
             document.getElementById('loading').classList.add('hidden');
         })
         .catch(error => console.error('There was a problem with the fetch operation: ', error));
@@ -452,14 +443,12 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchVisitedPlaylists();
     
     const openButton = document.getElementById('open');
-    const closeButton = document.getElementById('close'); // closeボタンを取得
+    const closeButton = document.getElementById('close');
     const sideMenu = document.querySelector('.side-menu');
     
     openButton.addEventListener('click', () => {
         sideMenu.classList.toggle('open');
     });
-    
-    // closeボタンにも同じイベントリスナーを追加
     closeButton.addEventListener('click', () => {
         sideMenu.classList.toggle('open');
     });
@@ -470,13 +459,12 @@ function fetchRecommendedTracks(averageTempo: number, averageKey: number, averag
     fetch(`/java/recommendations?tempo=${averageTempo}&key=${averageKey}&danceability=${averageDanceability}&energy=${averageEnergy}&acousticness=${averageAcousticness}&liveness=${averageLiveness}&speechiness=${averageSpeechiness}&valence=${averageValence}&modeArtistNames=${artistNamesParam}`)
         .then(response => response.json())
         .then(data => {
-            console.log("Response data:", data);  // レスポンスデータをログに出力
-            if (data.tracks) {  // data.tracksが存在することを確認
+            console.log("Response data:", data);
+            if (data.tracks) {
                 console.log("Recommended tracks based on the playlist:");
                 data.tracks.forEach((track: any) => {
                     console.log(`- ${track.name} by ${track.artists[0].name}`);
                 });
-                // Call the function to display the recommended tracks
                 displayRecommendedTracks(data.tracks);
             } else {
                 console.log("No tracks found in the response.");
@@ -486,44 +474,33 @@ function fetchRecommendedTracks(averageTempo: number, averageKey: number, averag
 }
 
 function displayRecommendedTracks(tracks: any[]) {
-    // Create a new table element and add a class
     const table = document.createElement('table');
     table.classList.add('recommendations-table');
-    
-    // Create a new row for the table header
     const headerRow = document.createElement('tr');
     const headerCell = document.createElement('th');
     headerCell.textContent = "Recommended Tracks";
     headerRow.appendChild(headerCell);
     table.appendChild(headerRow);
     
-    // Split tracks array into chunks of 2
     const trackPairs = [];
     for (let i = 0; i < tracks.length; i += 2) {
         trackPairs.push(tracks.slice(i, i + 2));
     }
     
-    // Add each pair of tracks to the table
     trackPairs.forEach((pair: any[]) => {
         const row = document.createElement('tr');
         
         pair.forEach((track: any) => {
             const cell = document.createElement('td');
             cell.textContent = `${track.name} by ${track.artists[0].name}`;
-            
-            // Add click event listener to the table cell
             cell.addEventListener('click', () => {
-                // Open the Spotify track page in a new tab when the cell is clicked
                 window.open(`https://open.spotify.com/track/${track.id}`, '_blank');
             });
-            
-            // Add a plus button to the cell
             const addButton = document.createElement('button');
             addButton.textContent = '+';
             addButton.className = 'track-button';
             addButton.addEventListener('click', () => {
                 showMessage('楽曲を追加しました！');
-                // Send a request to the server to add the track to the playlist
                 fetch(`/java/playlist/addTrack?trackId=${track.id}&playlistId=${playlistId}`)
                     .then(response => response.json())
                     .then(data => {
@@ -533,13 +510,11 @@ function displayRecommendedTracks(tracks: any[]) {
                 cell.style.backgroundColor = 'lightgreen';
             });
             
-            // Add a remove button to the cell
             const removeButton = document.createElement('button');
             removeButton.textContent = '-';
             removeButton.className = 'track-button';
             removeButton.addEventListener('click', () => {
                 showMessage('楽曲を削除しました！');
-                // Send a request to the server to delete the track from the playlist
                 fetch(`/java/playlist/removeTrack?trackId=${track.id}&playlistId=${playlistId}`)
                     .then(response => response.json())
                     .then(data => {
@@ -553,22 +528,16 @@ function displayRecommendedTracks(tracks: any[]) {
                     cell.style.backgroundColor = '#F2F2F2';
                 }
             });
-            
-            // Append the cell and buttons to the row
             row.appendChild(cell);
             row.appendChild(addButton);
             row.appendChild(removeButton);
         });
-        
-        // Append the row to the table
         table.appendChild(row);
     });
     const domElements = new DomElements();
     domElements.playlistTracksDiv.appendChild(table);
 }
 
-
-// 平均値と最頻値を計算する関数
 function calculateAverageAndMode(tracks: Track[]) {
     let totalTempo = 0;
     let totalAcousticness = 0;
@@ -619,7 +588,6 @@ function calculateAverageAndMode(tracks: Track[]) {
     fetchRecommendedTracks(averageTempo, modeKey, averageDanceability, averageEnergy, averageAcousticness, averageLiveness, averageSpeechiness, averageValence, topFiveArtistNames);
 }
 
-// 最頻値を計算する関数
 function mode(array: any[]) {
     return array.sort((a, b) =>
         array.filter(v => v === a).length
@@ -646,7 +614,6 @@ function getTopFiveModes(array: any[]) {
 }
 
 function showMessage(message: string) {
-    // メッセージを表示するための新しいdiv要素を作成
     const messageDiv = document.createElement('div');
     messageDiv.textContent = message;
     messageDiv.style.position = 'fixed';
@@ -656,11 +623,7 @@ function showMessage(message: string) {
     messageDiv.style.backgroundColor = '#2EBD59';
     messageDiv.style.color = 'white';
     messageDiv.style.borderRadius = '5px';
-    
-    // メッセージdivをbodyに追加
     document.body.appendChild(messageDiv);
-    
-    // 3秒後にメッセージを削除
     setTimeout(() => {
         document.body.removeChild(messageDiv);
     }, 3000);

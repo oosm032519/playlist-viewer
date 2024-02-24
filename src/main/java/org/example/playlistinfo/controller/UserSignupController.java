@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-public class SignupController {
+public class UserSignupController {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public SignupController(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserSignupController(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }

@@ -11,7 +11,7 @@ import se.michaelthelin.spotify.requests.authorization.authorization_code.Author
 import java.net.URI;
 
 @Service
-public class AuthorizationCodeUri {
+public class SpotifyAuthorizationUriGenerator {
     @Value("${spotify.client.id}")
     private String clientId;
 

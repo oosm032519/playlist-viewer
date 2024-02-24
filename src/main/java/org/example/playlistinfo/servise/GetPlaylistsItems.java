@@ -1,10 +1,8 @@
 package org.example.playlistinfo.servise;
 
 import org.apache.hc.core5.http.ParseException;
-import org.example.playlistinfo.model.MusicInformation;
-import org.example.playlistinfo.model.MusicInformationRepository;
 import org.example.playlistinfo.model.PlaylistTrackWithFeatures;
-import org.example.playlistinfo.security.ClientCredentials;
+import org.example.playlistinfo.authorization.SpotifyClientAuthenticator;
 import org.example.playlistinfo.security.UserPlaylist;
 import org.example.playlistinfo.security.UserPlaylistRepository;
 import org.slf4j.Logger;
@@ -34,22 +32,13 @@ public class GetPlaylistsItems {
 
     private final SpotifyApi spotifyApi;
     private final UserPlaylistRepository userPlaylistRepository;
-    private final MusicInformationRepository musicInformationRepository;
 
-    private String keyToNote(int key) {
-        String[] NOTES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
-        return NOTES[key];
-    }
-
-
-
-    public GetPlaylistsItems(final ClientCredentials clientCredentials, UserPlaylistRepository userPlaylistRepository, MusicInformationRepository musicInformationRepository) {
-        String accessToken = clientCredentials.clientCredentials();
+    public GetPlaylistsItems(final SpotifyClientAuthenticator spotifyClientAuthenticator, UserPlaylistRepository userPlaylistRepository) {
+        String accessToken = spotifyClientAuthenticator.clientCredentials();
         this.spotifyApi = new SpotifyApi.Builder()
                 .setAccessToken(accessToken)
                 .build();
         this.userPlaylistRepository = userPlaylistRepository;
-        this.musicInformationRepository = musicInformationRepository;
     }
 
     @GetMapping("/playlist/{playlistId}")
@@ -116,27 +105,6 @@ public class GetPlaylistsItems {
                     GetAudioFeaturesForTrackRequest getAudioFeaturesForTrackRequest = spotifyApi.getAudioFeaturesForTrack(trackId)
                             .build();
                     AudioFeatures audioFeatures = getAudioFeaturesForTrackRequest.execute();
-
-                    // Save track information to the database
-                    MusicInformation musicInformation = new MusicInformation();
-                    musicInformation.setTrackId(trackId);
-
-                    // Store the track object in a variable
-                    se.michaelthelin.spotify.model_objects.specification.Track track = (Track) playlistTrack.getTrack();
-
-                    // Use the stored track object to access its properties
-                    musicInformation.setTrackName(track.getName());
-                    musicInformation.setArtistName(track.getArtists()[0].getName());
-                    musicInformation.setBpm(audioFeatures.getTempo());
-                    musicInformation.setKeyvalue(keyToNote(audioFeatures.getKey()));
-                    musicInformation.setMode(audioFeatures.getMode().name());
-                    musicInformation.setAcousticness(audioFeatures.getAcousticness());
-                    musicInformation.setDanceability(audioFeatures.getDanceability());
-                    musicInformation.setEnergy(audioFeatures.getEnergy());
-                    musicInformation.setLiveness(audioFeatures.getLiveness());
-                    musicInformation.setSpeechiness(audioFeatures.getSpeechiness());
-                    musicInformation.setValence(audioFeatures.getValence());
-                    musicInformationRepository.save(musicInformation);
 
                     playlistTracks.add(new PlaylistTrackWithFeatures(playlistTrack, audioFeatures));
                 }

@@ -1,4 +1,4 @@
-package org.example.playlistinfo.security;
+package org.example.playlistinfo.authorization;
 
 import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;
@@ -14,9 +14,9 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 
 @Service
-public class ClientCredentials {
+public class SpotifyClientAuthenticator {
 
-    private static final Logger logger = LoggerFactory.getLogger(ClientCredentials.class);
+    private static final Logger logger = LoggerFactory.getLogger(SpotifyClientAuthenticator.class);
 
     @Value("${spotify.client.id}")
     private String clientId;
