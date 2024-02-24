@@ -7,6 +7,7 @@ const descriptions = {
     'Valence': '明るさ。1に近いほど明るい。'
 };
 let playlistId;
+let playlistTrackIds = [];
 class DomElements {
     get playlistForm() {
         return document.getElementById('playlistForm');
@@ -33,6 +34,7 @@ class DomElements {
         this.searchForm.addEventListener('submit', this.handleSearchFormSubmit.bind(this));
     }
     fetchPlaylistData(playlistId) {
+        playlistTrackIds = [];
         this.clearAllTables();
         this.showLoadingAnimation();
         fetch(`/java/playlist/${playlistId}`)
@@ -41,6 +43,7 @@ class DomElements {
             .catch(TrackTable.handleError);
     }
     fetchSearchData(searchQuery) {
+        playlistTrackIds = [];
         this.clearAllTables();
         this.showLoadingAnimation();
         fetch(`/java/search/${searchQuery}`)
@@ -68,11 +71,15 @@ class DomElements {
     }
     processPlaylistData(data) {
         if (data && Array.isArray(data.tracks)) {
-            const tracks = data.tracks.map((item) => new Track(item.playlistTrack.track, item.audioFeatures));
+            const tracks = data.tracks.map((item) => {
+                playlistTrackIds.push(item.playlistTrack.track.id);
+                return new Track(item.playlistTrack.track, item.audioFeatures);
+            });
             this.createTable(tracks);
             calculateAverageAndMode(tracks);
             this.displayPlaylistName(data.name);
             console.log(`Playlist ID: ${playlistId}`);
+            console.log(`Playlist Track IDs: ${playlistTrackIds}`);
         }
         else {
             console.error('Expected data.tracks to be an array but received', data);
@@ -137,6 +144,7 @@ class DomElements {
 }
 class Track {
     constructor(track, audioFeatures) {
+        this.id = track.id;
         this.name = track.name;
         this.artists = track.artists;
         this.audioFeatures = audioFeatures;
@@ -383,10 +391,12 @@ function fetchRecommendedTracks(averageTempo, averageKey, averageDanceability, a
         console.log("Response data:", data);
         if (data.tracks) {
             console.log("Recommended tracks based on the playlist:");
-            data.tracks.forEach((track) => {
+            const filteredTracks = data.tracks.filter((track) => !playlistTrackIds.includes(track.id)); // Use the global variable playlistTrackIds
+            filteredTracks.forEach((track) => {
                 console.log(`- ${track.name} by ${track.artists[0].name}`);
             });
-            displayRecommendedTracks(data.tracks);
+            console.log(playlistTrackIds);
+            displayRecommendedTracks(filteredTracks);
         }
         else {
             console.log("No tracks found in the response.");
@@ -477,6 +487,7 @@ function calculateAverageAndMode(tracks) {
         artistNames.push(track.artists[0].name);
         keys.push(track.audioFeatures.key);
         modes.push(track.audioFeatures.mode);
+        playlistTrackIds.push(track.id);
     });
     const averageTempo = totalTempo / tracks.length;
     const averageAcousticness = totalAcousticness / tracks.length;
@@ -498,6 +509,7 @@ function calculateAverageAndMode(tracks) {
     console.log(`Mode Key: ${modeKey}`);
     console.log(`Mode Mode: ${modeMode}`);
     console.log(`Top Five Artist Names: ${topFiveArtistNames}`);
+    console.log(`Playlist Track IDs: ${playlistTrackIds}`);
     fetchRecommendedTracks(averageTempo, modeKey, averageDanceability, averageEnergy, averageAcousticness, averageLiveness, averageSpeechiness, averageValence, topFiveArtistNames);
 }
 function mode(array) {
