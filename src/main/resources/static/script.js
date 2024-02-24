@@ -6,6 +6,7 @@ const descriptions = {
     'Speechiness': '曲中の話し言葉の存在度合い。1に近いほど話し言葉が多い。',
     'Valence': '明るさ。1に近いほど明るい。'
 };
+let playlistId;
 class DomElements {
     constructor() {
         this.playlistForm = document.getElementById('playlistForm');
@@ -18,7 +19,7 @@ class DomElements {
     fetchData() {
         this.playlistForm.addEventListener('submit', (event) => {
             event.preventDefault();
-            const playlistId = this.playlistIdInput.value;
+            playlistId = this.playlistIdInput.value;
             // Show loading animation
             document.getElementById('loading').classList.remove('hidden');
             // Clear search results
@@ -40,6 +41,8 @@ class DomElements {
                         playlistNameElement.textContent = `${data.name}`;
                         this.playlistTracksDiv.insertBefore(playlistNameElement, this.playlistTracksDiv.firstChild);
                     }
+                    // Output the playlist ID to the console
+                    console.log(`Playlist ID: ${playlistId}`);
                 }
                 else {
                     console.error('Expected data.tracks to be an array but received', data);
@@ -398,8 +401,39 @@ function displayRecommendedTracks(tracks) {
             // Open the Spotify track page in a new tab when the cell is clicked
             window.open(`https://open.spotify.com/track/${track.id}`, '_blank');
         });
+        // Add a plus button to the row
+        const addButton = document.createElement('button');
+        addButton.textContent = '+';
+        addButton.className = 'button';
+        addButton.addEventListener('click', () => {
+            showMessage('楽曲を追加しました！');
+            // Send a request to the server to add the track to the playlist
+            fetch(`/java/playlist/addTrack?trackId=${track.id}&playlistId=${playlistId}`)
+                .then(response => response.json())
+                .then(data => {
+                console.log(data);
+            })
+                .catch(error => console.error('There was a problem with the fetch operation: ', error));
+            row.style.backgroundColor = 'lightgreen';
+        });
         row.appendChild(cell);
+        row.appendChild(addButton); // Append the button to the row
         table.appendChild(row);
+        const removeButton = document.createElement('button');
+        removeButton.textContent = '-';
+        removeButton.className = 'button';
+        removeButton.addEventListener('click', () => {
+            showMessage('楽曲を削除しました！');
+            // Send a request to the server to delete the track from the playlist
+            fetch(`/java/playlist/removeTrack?trackId=${track.id}&playlistId=${playlistId}`)
+                .then(response => response.json())
+                .then(data => {
+                console.log(data);
+            })
+                .catch(error => console.error('There was a problem with the fetch operation: ', error));
+            row.style.backgroundColor = 'salmon';
+        });
+        row.appendChild(removeButton); // Append the button to the row
     });
 }
 // 平均値と最頻値を計算する関数
@@ -452,5 +486,24 @@ function calculateAverageAndMode(tracks) {
 function mode(array) {
     return array.sort((a, b) => array.filter(v => v === a).length
         - array.filter(v => v === b).length).pop();
+}
+function showMessage(message) {
+    // メッセージを表示するための新しいdiv要素を作成
+    const messageDiv = document.createElement('div');
+    messageDiv.textContent = message;
+    // メッセージdivにスタイリッシュなスタイルを適用
+    messageDiv.style.position = 'fixed';
+    messageDiv.style.bottom = '20px';
+    messageDiv.style.right = '20px';
+    messageDiv.style.padding = '10px';
+    messageDiv.style.backgroundColor = '#007BFF';
+    messageDiv.style.color = 'white';
+    messageDiv.style.borderRadius = '5px';
+    // メッセージdivをbodyに追加
+    document.body.appendChild(messageDiv);
+    // 3秒後にメッセージを削除
+    setTimeout(() => {
+        document.body.removeChild(messageDiv);
+    }, 3000);
 }
 //# sourceMappingURL=script.js.map

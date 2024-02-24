@@ -40,15 +40,16 @@ public class GetRecommendations {
         try {
             SpotifyApi spotifyApi = spotifyAuthorizationService.getSpotifyApi();
             return spotifyApi.getRecommendations()
+                    .limit(10)
                     .seed_artists(modeArtistId)
-                    .target_key(key)
                     .target_tempo(tempo)
+                    .target_key(key)
                     .target_danceability(danceability)
+                    .target_valence(valence)
                     .target_energy(energy)
                     .target_acousticness(acousticness)
-                    .target_liveness(liveness)
                     .target_speechiness(speechiness)
-                    .target_valence(valence)
+                    .target_liveness(liveness)
                     .build()
                     .execute();
         } catch (BadRequestException e) {

@@ -33,7 +33,7 @@ public class AuthorizationCodeUri {
                 .build();
         this.authorizationCodeUriRequest = spotifyApi.authorizationCodeUri()
 //          .state("x4xkmn9pu3j6ukrs8n")
-//          .scope("user-read-birthdate,user-read-email")
+          .scope("playlist-read-private,playlist-read-collaborative,playlist-modify-private,playlist-modify-public")
           .show_dialog(true)
         .build();
     }
