@@ -1210,31 +1210,33 @@ body.dark-mode .side-menu {
   /* gold */
 }
 
-button {
-  background-color:    #4CAF50;
-  /* Green background */
-  border:              none;
-  /* Remove border */
-  color:               white;
-  /* White text */
-  padding:             15px 32px;
-  /* Some padding */
-  text-align:          center;
-  /* Centered text */
-  text-decoration:     none;
-  /* Remove underline */
-  display:             inline-block;
-  font-size:           16px;
-  margin:              4px 2px;
-  cursor:              pointer;
-  /* Mouse pointer on hover */
-  border-radius:       12px;
-  /* Rounded corners */
-  transition-duration: 0.4s;
-  /* Transition effect */
+.playlist-table {
+  margin-bottom: 20px;
+  /* Adjust as needed */
 }
 
-button:hover {
-  background-color: #45A049;
-  /* Green background on hover */
+.recommendations-table {
+  margin-top: 20px;
+  /* Adjust as needed */
+}
+
+.track-button {
+  background-color: #007BFF;
+  /* blue */
+  color:            #FFF;
+  /* white */
+  border:           none;
+  border-radius:    5px;
+  /* rounded corners */
+  padding:          10px 20px;
+  /* padding to make the button larger and easier to click */
+  cursor:           pointer;
+  /* change cursor to pointer when hovering over the button */
+  transition:       background-color 0.3s ease-in-out;
+  /* smooth transition effect when hovering over the button */
+}
+
+.track-button:hover {
+  background-color: #0056B3;
+  /* darker blue */
 }

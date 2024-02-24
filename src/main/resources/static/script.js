@@ -212,6 +212,7 @@ class TrackTable {
     }
     createTable() {
         const table = document.createElement('table');
+        table.classList.add('playlist-table');
         table.appendChild(this.createTableHeader());
         table.appendChild(this.createTableBody());
         return table;
@@ -384,58 +385,77 @@ function fetchRecommendedTracks(averageTempo, averageKey, averageDanceability, a
         .catch(error => console.error('There was a problem with the fetch operation: ', error));
 }
 function displayRecommendedTracks(tracks) {
-    // Get the table element from the DOM
-    const table = document.querySelector('table');
+    // Create a new table element and add a class
+    const table = document.createElement('table');
+    table.classList.add('recommendations-table');
     // Create a new row for the table header
     const headerRow = document.createElement('tr');
     const headerCell = document.createElement('th');
     headerCell.textContent = "Recommended Tracks";
     headerRow.appendChild(headerCell);
     table.appendChild(headerRow);
-    // Add each track to the table
-    tracks.forEach((track) => {
+    // Split tracks array into chunks of 2
+    const trackPairs = [];
+    for (let i = 0; i < tracks.length; i += 2) {
+        trackPairs.push(tracks.slice(i, i + 2));
+    }
+    // Add each pair of tracks to the table
+    trackPairs.forEach((pair) => {
         const row = document.createElement('tr');
-        const cell = document.createElement('td');
-        cell.textContent = `${track.name} by ${track.artists[0].name}`;
-        // Add click event listener to the table cell
-        cell.addEventListener('click', () => {
-            // Open the Spotify track page in a new tab when the cell is clicked
-            window.open(`https://open.spotify.com/track/${track.id}`, '_blank');
+        pair.forEach((track) => {
+            const cell = document.createElement('td');
+            cell.textContent = `${track.name} by ${track.artists[0].name}`;
+            // Add click event listener to the table cell
+            cell.addEventListener('click', () => {
+                // Open the Spotify track page in a new tab when the cell is clicked
+                window.open(`https://open.spotify.com/track/${track.id}`, '_blank');
+            });
+            // Add a plus button to the cell
+            const addButton = document.createElement('button');
+            addButton.textContent = '+';
+            addButton.className = 'track-button';
+            addButton.addEventListener('click', () => {
+                showMessage('楽曲を追加しました！');
+                // Send a request to the server to add the track to the playlist
+                fetch(`/java/playlist/addTrack?trackId=${track.id}&playlistId=${playlistId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                    console.log(data);
+                })
+                    .catch(error => console.error('There was a problem with the fetch operation: ', error));
+                cell.style.backgroundColor = 'lightgreen';
+            });
+            // Add a remove button to the cell
+            const removeButton = document.createElement('button');
+            removeButton.textContent = '-';
+            removeButton.className = 'track-button';
+            removeButton.addEventListener('click', () => {
+                showMessage('楽曲を削除しました！');
+                // Send a request to the server to delete the track from the playlist
+                fetch(`/java/playlist/removeTrack?trackId=${track.id}&playlistId=${playlistId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                    console.log(data);
+                })
+                    .catch(error => console.error('There was a problem with the fetch operation: ', error));
+                const rowIndex = row.sectionRowIndex;
+                if (rowIndex % 2 === 0) {
+                    cell.style.backgroundColor = '#FFF';
+                }
+                else {
+                    cell.style.backgroundColor = '#F2F2F2';
+                }
+            });
+            // Append the cell and buttons to the row
+            row.appendChild(cell);
+            row.appendChild(addButton);
+            row.appendChild(removeButton);
         });
-        // Add a plus button to the row
-        const addButton = document.createElement('button');
-        addButton.textContent = '+';
-        addButton.className = 'button';
-        addButton.addEventListener('click', () => {
-            showMessage('楽曲を追加しました！');
-            // Send a request to the server to add the track to the playlist
-            fetch(`/java/playlist/addTrack?trackId=${track.id}&playlistId=${playlistId}`)
-                .then(response => response.json())
-                .then(data => {
-                console.log(data);
-            })
-                .catch(error => console.error('There was a problem with the fetch operation: ', error));
-            row.style.backgroundColor = 'lightgreen';
-        });
-        row.appendChild(cell);
-        row.appendChild(addButton); // Append the button to the row
+        // Append the row to the table
         table.appendChild(row);
-        const removeButton = document.createElement('button');
-        removeButton.textContent = '-';
-        removeButton.className = 'button';
-        removeButton.addEventListener('click', () => {
-            showMessage('楽曲を削除しました！');
-            // Send a request to the server to delete the track from the playlist
-            fetch(`/java/playlist/removeTrack?trackId=${track.id}&playlistId=${playlistId}`)
-                .then(response => response.json())
-                .then(data => {
-                console.log(data);
-            })
-                .catch(error => console.error('There was a problem with the fetch operation: ', error));
-            row.style.backgroundColor = 'salmon';
-        });
-        row.appendChild(removeButton); // Append the button to the row
     });
+    const domElements = new DomElements();
+    domElements.playlistTracksDiv.appendChild(table);
 }
 // 平均値と最頻値を計算する関数
 function calculateAverageAndMode(tracks) {
