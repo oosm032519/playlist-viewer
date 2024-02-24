@@ -1,7 +1,7 @@
-package org.example.playlistinfo.servise;
+package org.example.playlistinfo.service;
 
 import org.apache.hc.core5.http.ParseException;
-import org.example.playlistinfo.authorization.SpotifyAccessTokenService;
+import org.example.playlistinfo.config.SpotifyAccessTokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

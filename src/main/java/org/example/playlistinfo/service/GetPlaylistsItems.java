@@ -1,10 +1,10 @@
-package org.example.playlistinfo.servise;
+package org.example.playlistinfo.service;
 
 import org.apache.hc.core5.http.ParseException;
-import org.example.playlistinfo.model.PlaylistTrackWithFeatures;
-import org.example.playlistinfo.authorization.SpotifyClientAuthenticator;
-import org.example.playlistinfo.security.UserPlaylist;
-import org.example.playlistinfo.security.UserPlaylistRepository;
+import org.example.playlistinfo.entity.AnnotatedPlaylistTrack;
+import org.example.playlistinfo.security.SpotifyClientAuthenticator;
+import org.example.playlistinfo.entity.UserVisitedPlaylist;
+import org.example.playlistinfo.repository.VisitedPlaylistRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -31,14 +31,14 @@ public class GetPlaylistsItems {
     private static final Logger logger = LoggerFactory.getLogger(GetPlaylistsItems.class);
 
     private final SpotifyApi spotifyApi;
-    private final UserPlaylistRepository userPlaylistRepository;
+    private final VisitedPlaylistRepository visitedPlaylistRepository;
 
-    public GetPlaylistsItems(final SpotifyClientAuthenticator spotifyClientAuthenticator, UserPlaylistRepository userPlaylistRepository) {
+    public GetPlaylistsItems(final SpotifyClientAuthenticator spotifyClientAuthenticator, VisitedPlaylistRepository visitedPlaylistRepository) {
         String accessToken = spotifyClientAuthenticator.clientCredentials();
         this.spotifyApi = new SpotifyApi.Builder()
                 .setAccessToken(accessToken)
                 .build();
-        this.userPlaylistRepository = userPlaylistRepository;
+        this.visitedPlaylistRepository = visitedPlaylistRepository;
     }
 
     @GetMapping("/playlist/{playlistId}")
@@ -48,7 +48,7 @@ public class GetPlaylistsItems {
             String username = (authentication != null && authentication.getPrincipal() instanceof UserDetails) ? ((UserDetails) authentication.getPrincipal()).getUsername() : null;
             logger.info("Username from SecurityContextHolder: {}", username);
 
-            List<PlaylistTrackWithFeatures> playlistTracks = fetchPlaylistTracks(playlistId);
+            List<AnnotatedPlaylistTrack> playlistTracks = fetchPlaylistTracks(playlistId);
             Playlist playlist = spotifyApi.getPlaylist(playlistId).build().execute();
             Map<String, Object> response = new HashMap<>();
             response.put("tracks", playlistTracks);
@@ -67,26 +67,26 @@ public class GetPlaylistsItems {
     }
 
     private void deletePlaylistsWithNullNames() {
-        List<UserPlaylist> playlistsWithNullNames = userPlaylistRepository.findByPlaylistNameIsNull();
-        userPlaylistRepository.deleteAll(playlistsWithNullNames);
+        List<UserVisitedPlaylist> playlistsWithNullNames = visitedPlaylistRepository.findByPlaylistNameIsNull();
+        visitedPlaylistRepository.deleteAll(playlistsWithNullNames);
     }
 
     private void saveUserPlaylist(String username, String playlistId, String playlistName) {
         if (playlistName != null) {
-            List<UserPlaylist> existingPlaylists = userPlaylistRepository.findByUsernameAndPlaylistId(username, playlistId);
+            List<UserVisitedPlaylist> existingPlaylists = visitedPlaylistRepository.findByUsernameAndPlaylistId(username, playlistId);
             if (existingPlaylists.isEmpty()) {
-                UserPlaylist userPlaylist = new UserPlaylist();
-                userPlaylist.setUsername(username);
-                userPlaylist.setPlaylistId(playlistId);
-                userPlaylist.setPlaylistName(playlistName);  // プレイリスト名を設定
-                userPlaylistRepository.save(userPlaylist);
+                UserVisitedPlaylist userVisitedPlaylist = new UserVisitedPlaylist();
+                userVisitedPlaylist.setUsername(username);
+                userVisitedPlaylist.setPlaylistId(playlistId);
+                userVisitedPlaylist.setPlaylistName(playlistName);  // プレイリスト名を設定
+                visitedPlaylistRepository.save(userVisitedPlaylist);
             }
         }
     }
 
 
-    private List<PlaylistTrackWithFeatures> fetchPlaylistTracks(String playlistId) {
-        List<PlaylistTrackWithFeatures> playlistTracks = new ArrayList<>();
+    private List<AnnotatedPlaylistTrack> fetchPlaylistTracks(String playlistId) {
+        List<AnnotatedPlaylistTrack> playlistTracks = new ArrayList<>();
         int offset = 0;
         Paging<PlaylistTrack> playlistTrackPaging;
 
@@ -106,7 +106,7 @@ public class GetPlaylistsItems {
                             .build();
                     AudioFeatures audioFeatures = getAudioFeaturesForTrackRequest.execute();
 
-                    playlistTracks.add(new PlaylistTrackWithFeatures(playlistTrack, audioFeatures));
+                    playlistTracks.add(new AnnotatedPlaylistTrack(playlistTrack, audioFeatures));
                 }
 
                 offset = playlistTrackPaging.getOffset() + playlistTrackPaging.getItems().length;

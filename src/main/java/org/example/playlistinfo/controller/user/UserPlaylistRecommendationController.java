@@ -1,9 +1,9 @@
-package org.example.playlistinfo.controller;
+package org.example.playlistinfo.controller.user;
 
-import org.example.playlistinfo.security.User;
-import org.example.playlistinfo.security.UserPlaylist;
-import org.example.playlistinfo.security.UserPlaylistRepository;
-import org.example.playlistinfo.servise.GetRecommendations;
+import org.example.playlistinfo.entity.AppUser;
+import org.example.playlistinfo.entity.UserVisitedPlaylist;
+import org.example.playlistinfo.repository.VisitedPlaylistRepository;
+import org.example.playlistinfo.service.GetRecommendations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -23,15 +23,15 @@ import java.util.Map;
 @RestController
 public class UserPlaylistRecommendationController {
 
-    private final UserPlaylistRepository userPlaylistRepository;
+    private final VisitedPlaylistRepository visitedPlaylistRepository;
 
-    public UserPlaylistRecommendationController(UserPlaylistRepository userPlaylistRepository) {
-        this.userPlaylistRepository = userPlaylistRepository;
+    public UserPlaylistRecommendationController(VisitedPlaylistRepository visitedPlaylistRepository) {
+        this.visitedPlaylistRepository = visitedPlaylistRepository;
     }
 
     @GetMapping("/user/playlists")
-    public List<UserPlaylist> getUserPlaylists(@AuthenticationPrincipal User user) {
-        return userPlaylistRepository.findByUsername(user.getUsername());
+    public List<UserVisitedPlaylist> getUserPlaylists(@AuthenticationPrincipal AppUser appUser) {
+        return visitedPlaylistRepository.findByUsername(appUser.getUsername());
     }
 
     @GetMapping("/java/user/visited-playlists")
@@ -42,14 +42,14 @@ public class UserPlaylistRecommendationController {
         }
 
         String username = ((UserDetails) authentication.getPrincipal()).getUsername();
-        List<UserPlaylist> userPlaylists = userPlaylistRepository.findByUsername(username);
+        List<UserVisitedPlaylist> userVisitedPlaylists = visitedPlaylistRepository.findByUsername(username);
         List<Map<String, String>> response = new ArrayList<>();
 
-        for (UserPlaylist userPlaylist : userPlaylists) {
-            if (userPlaylist.getPlaylistName() != null) {
+        for (UserVisitedPlaylist userVisitedPlaylist : userVisitedPlaylists) {
+            if (userVisitedPlaylist.getPlaylistName() != null) {
                 Map<String, String> playlistData = new HashMap<>();
-                playlistData.put("id", userPlaylist.getPlaylistId());
-                playlistData.put("name", userPlaylist.getPlaylistName());
+                playlistData.put("id", userVisitedPlaylist.getPlaylistId());
+                playlistData.put("name", userVisitedPlaylist.getPlaylistName());
                 response.add(playlistData);
             }
         }

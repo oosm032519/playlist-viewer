@@ -1,4 +1,4 @@
-package org.example.playlistinfo.authorization;
+package org.example.playlistinfo.config;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;

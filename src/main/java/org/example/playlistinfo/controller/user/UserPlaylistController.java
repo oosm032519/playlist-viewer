@@ -1,10 +1,10 @@
-package org.example.playlistinfo.controller;
+package org.example.playlistinfo.controller.user;
 
-import org.example.playlistinfo.security.User;
-import org.example.playlistinfo.security.UserPlaylist;
-import org.example.playlistinfo.security.UserPlaylistRepository;
-import org.example.playlistinfo.servise.GetPlaylistsItems;
-import org.example.playlistinfo.servise.SearchPlaylistsService;
+import org.example.playlistinfo.entity.AppUser;
+import org.example.playlistinfo.entity.UserVisitedPlaylist;
+import org.example.playlistinfo.repository.VisitedPlaylistRepository;
+import org.example.playlistinfo.service.GetPlaylistsItems;
+import org.example.playlistinfo.service.SearchPlaylistsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -26,12 +26,12 @@ public class UserPlaylistController {
     private final GetPlaylistsItems getPlaylistsItems;
     private final SearchPlaylistsService searchPlaylistsService;
 
-    private final UserPlaylistRepository userPlaylistRepository;
+    private final VisitedPlaylistRepository visitedPlaylistRepository;
 
-    public UserPlaylistController(GetPlaylistsItems getPlaylistsItems, SearchPlaylistsService searchPlaylistsService, UserPlaylistRepository userPlaylistRepository) {
+    public UserPlaylistController(GetPlaylistsItems getPlaylistsItems, SearchPlaylistsService searchPlaylistsService, VisitedPlaylistRepository visitedPlaylistRepository) {
         this.getPlaylistsItems = getPlaylistsItems;
         this.searchPlaylistsService = searchPlaylistsService;
-        this.userPlaylistRepository = userPlaylistRepository;
+        this.visitedPlaylistRepository = visitedPlaylistRepository;
     }
 
     @GetMapping("/java/playlist/{playlistId}")
@@ -42,10 +42,10 @@ public class UserPlaylistController {
         Map<String, Object> playlistItems = getPlaylistsItems.getPlaylistItems(playlistId).getBody();
 
         if (principal != null) {
-            UserPlaylist userPlaylist = new UserPlaylist();
-            userPlaylist.setPlaylistId(playlistId);
-            userPlaylist.setUsername(principal.getUsername());  // ユーザー名を設定
-            userPlaylistRepository.save(userPlaylist);
+            UserVisitedPlaylist userVisitedPlaylist = new UserVisitedPlaylist();
+            userVisitedPlaylist.setPlaylistId(playlistId);
+            userVisitedPlaylist.setUsername(principal.getUsername());  // ユーザー名を設定
+            visitedPlaylistRepository.save(userVisitedPlaylist);
         }
 
         return playlistItems;
@@ -57,21 +57,21 @@ public class UserPlaylistController {
     }
 
     @GetMapping("/java/user/playlists")
-    public ResponseEntity<List<UserPlaylist>> getUserPlaylists(@AuthenticationPrincipal User user) {
-        if (user == null) {
+    public ResponseEntity<List<UserVisitedPlaylist>> getUserPlaylists(@AuthenticationPrincipal AppUser appUser) {
+        if (appUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        List<UserPlaylist> userPlaylists = userPlaylistRepository.findByUsername(user.getUsername());
-        return ResponseEntity.ok(userPlaylists);
+        List<UserVisitedPlaylist> userVisitedPlaylists = visitedPlaylistRepository.findByUsername(appUser.getUsername());
+        return ResponseEntity.ok(userVisitedPlaylists);
     }
 
     @GetMapping("/java/user")
-    public ResponseEntity<Map<String, Object>> getCurrentUser(@AuthenticationPrincipal User user) {
+    public ResponseEntity<Map<String, Object>> getCurrentUser(@AuthenticationPrincipal AppUser appUser) {
         Map<String, Object> response = new HashMap<>();
-        if (user != null) {
-            response.put("id", user.getId());
-            response.put("username", user.getUsername());
+        if (appUser != null) {
+            response.put("id", appUser.getId());
+            response.put("username", appUser.getUsername());
         } else {
             response.put("message", "未ログイン");
         }

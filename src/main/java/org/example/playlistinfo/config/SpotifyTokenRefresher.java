@@ -1,4 +1,4 @@
-package org.example.playlistinfo.authorization;
+package org.example.playlistinfo.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;

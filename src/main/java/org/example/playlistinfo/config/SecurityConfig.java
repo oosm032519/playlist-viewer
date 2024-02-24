@@ -1,4 +1,4 @@
-package org.example.playlistinfo.security;
+package org.example.playlistinfo.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

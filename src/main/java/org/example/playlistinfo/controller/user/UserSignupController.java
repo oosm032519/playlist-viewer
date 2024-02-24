@@ -1,7 +1,7 @@
-package org.example.playlistinfo.controller;
+package org.example.playlistinfo.controller.user;
 
-import org.example.playlistinfo.security.User;
-import org.example.playlistinfo.security.UserRepository;
+import org.example.playlistinfo.entity.AppUser;
+import org.example.playlistinfo.repository.AppUserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class UserSignupController {
 
-    private final UserRepository userRepository;
+    private final AppUserRepository appUserRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public UserSignupController(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
+    public UserSignupController(AppUserRepository appUserRepository, BCryptPasswordEncoder passwordEncoder) {
+        this.appUserRepository = appUserRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -24,15 +24,15 @@ public class UserSignupController {
             return "redirect:/signup?error";
         }
 
-        User existingUser = userRepository.findByUsername(username);
-        if (existingUser != null) {
+        AppUser existingAppUser = appUserRepository.findByUsername(username);
+        if (existingAppUser != null) {
             return "redirect:/signup?error";
         }
 
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(password));
-        userRepository.save(user);
+        AppUser appUser = new AppUser();
+        appUser.setUsername(username);
+        appUser.setPassword(passwordEncoder.encode(password));
+        appUserRepository.save(appUser);
         return "redirect:/login";
     }
 }

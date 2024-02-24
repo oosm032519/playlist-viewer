@@ -1,4 +1,4 @@
-package org.example.playlistinfo.security;
+package org.example.playlistinfo.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "user_playlists")
-public class UserPlaylist {
+public class UserVisitedPlaylist {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,6 +18,5 @@ public class UserPlaylist {
 
     private String username;
 
-    // 新しいフィールドを追加
     private String playlistName;
 }

@@ -1,8 +1,8 @@
-package org.example.playlistinfo.controller;
+package org.example.playlistinfo.controller.spotify;
 
 import org.apache.hc.core5.http.ParseException;
-import org.example.playlistinfo.authorization.SpotifyAuthorizationUriGenerator;
-import org.example.playlistinfo.authorization.SpotifyAccessTokenService;
+import org.example.playlistinfo.config.SpotifyAuthorizationUriGenerator;
+import org.example.playlistinfo.config.SpotifyAccessTokenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

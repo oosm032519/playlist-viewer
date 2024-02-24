@@ -1,4 +1,4 @@
-package org.example.playlistinfo.authorization;
+package org.example.playlistinfo.config;
 
 import lombok.Getter;
 import org.slf4j.Logger;
