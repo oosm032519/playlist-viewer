@@ -42,9 +42,10 @@ public class GetRecommendations {
         return artistIds;
     }
 
-    public static Recommendations getRecommendationsBasedOnTrackFeatures(float tempo, int key, float danceability, float energy, float acousticness, float liveness, float speechiness, float valence, List<String> modeArtistIds) {
+    public static Recommendations getRecommendationsBasedOnTrackFeatures(float tempo, int key, float danceability, float energy, float acousticness, float liveness, float speechiness, float valence, List<String> modeArtistNames) {
         try {
             SpotifyApi spotifyApi = spotifyAuthorizationService.getSpotifyApi();
+            List<String> modeArtistIds = getTopFiveArtistIdsFromNames(modeArtistNames);
             String seedArtists = String.join(",", modeArtistIds);
             logger.info("Seed artists: " + seedArtists);
             return spotifyApi.getRecommendations()
