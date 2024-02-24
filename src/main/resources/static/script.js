@@ -476,6 +476,7 @@ function calculateAverageAndMode(tracks) {
     let artistNames = [];
     let keys = [];
     let modes = [];
+    playlistTrackIds = [];
     tracks.forEach(track => {
         totalTempo += track.audioFeatures.tempo;
         totalAcousticness += track.audioFeatures.acousticness;
