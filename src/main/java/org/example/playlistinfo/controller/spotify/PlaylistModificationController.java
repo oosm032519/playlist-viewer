@@ -16,18 +16,18 @@ import se.michaelthelin.spotify.requests.data.playlists.RemoveItemsFromPlaylistR
 
 import java.io.IOException;
 
-@RestController
+@RestController // REST APIのコントローラー
 public class PlaylistModificationController {
-    private final SpotifyAccessTokenService spotifyAccessTokenService;
+    private final SpotifyAccessTokenService spotifyAccessTokenService; // Spotifyのアクセストークンを取得するサービス
 
-    @Autowired
+    @Autowired // 依存性注入
     public PlaylistModificationController(SpotifyAccessTokenService spotifyAccessTokenService) {
         this.spotifyAccessTokenService = spotifyAccessTokenService;
     }
 
-    @GetMapping("/java/playlist/addTrack")
+    @GetMapping("/java/playlist/addTrack") // GETリクエストで曲をプレイリストに追加するエンドポイント
     public SnapshotResult addTrackToPlaylist(@RequestParam String trackId, @RequestParam String playlistId) {
-        String accessToken = spotifyAccessTokenService.getAccessToken();
+        String accessToken = spotifyAccessTokenService.getAccessToken(); // アクセストークンを取得
         SpotifyApi spotifyApi = new SpotifyApi.Builder()
                 .setAccessToken(accessToken)
                 .build();
@@ -36,15 +36,15 @@ public class PlaylistModificationController {
                 .build();
 
         try {
-            return addItemsToPlaylistRequest.execute();
+            return addItemsToPlaylistRequest.execute(); // リクエストを実行して結果を返す
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            throw new RuntimeException("Error: " + e.getMessage());
+            throw new RuntimeException("Error: " + e.getMessage()); // エラーが発生した場合は例外をスロー
         }
     }
 
-    @GetMapping("/java/playlist/removeTrack")
+    @GetMapping("/java/playlist/removeTrack") // GETリクエストで曲をプレイリストから削除するエンドポイント
     public SnapshotResult removeTrackFromPlaylist(@RequestParam String trackId, @RequestParam String playlistId) {
-        String accessToken = spotifyAccessTokenService.getAccessToken();
+        String accessToken = spotifyAccessTokenService.getAccessToken(); // アクセストークンを取得
         SpotifyApi spotifyApi = new SpotifyApi.Builder()
                 .setAccessToken(accessToken)
                 .build();
@@ -54,9 +54,9 @@ public class PlaylistModificationController {
                 .build();
 
         try {
-            return removeItemsFromPlaylistRequest.execute();
+            return removeItemsFromPlaylistRequest.execute(); // リクエストを実行して結果を返す
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            throw new RuntimeException("Error: " + e.getMessage());
+            throw new RuntimeException("Error: " + e.getMessage()); // エラーが発生した場合は例外をスロー
         }
     }
 }

@@ -10,5 +10,5 @@ public interface VisitedPlaylistRepository extends JpaRepository<UserVisitedPlay
 
     List<UserVisitedPlaylist> findByUsernameAndPlaylistId(String username, String playlistId);
 
-    List<UserVisitedPlaylist> findByPlaylistNameIsNull();  // 新しいメソッド
+    List<UserVisitedPlaylist> findByPlaylistNameIsNull();
 }

@@ -16,17 +16,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+// Spotifyの推奨曲を取得するサービス
 @Service
 public class GetRecommendations {
     private static final Logger logger = LoggerFactory.getLogger(GetRecommendations.class);
 
     private static SpotifyAccessTokenService spotifyAccessTokenService;
 
+    // SpotifyAccessTokenServiceを注入
     @Autowired
     public GetRecommendations(SpotifyAccessTokenService spotifyAccessTokenService) {
         GetRecommendations.spotifyAccessTokenService = spotifyAccessTokenService;
     }
 
+    // アーティスト名からトップ5のアーティストIDを取得
     public static List<String> getTopFiveArtistIdsFromNames(List<String> artistNames) throws IOException, SpotifyWebApiException, ParseException {
         SpotifyApi spotifyApi = spotifyAccessTokenService.getSpotifyApi();
         List<String> artistIds = new ArrayList<>();
@@ -42,6 +45,7 @@ public class GetRecommendations {
         return artistIds;
     }
 
+    // トラックの特徴に基づいて推奨曲を取得
     public static Recommendations getRecommendationsBasedOnTrackFeatures(float tempo, int key, float danceability, float energy, float acousticness, float liveness, float speechiness, float valence, List<String> modeArtistNames) {
         try {
             SpotifyApi spotifyApi = spotifyAccessTokenService.getSpotifyApi();

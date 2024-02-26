@@ -12,24 +12,27 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@RestController
+@RestController // REST APIのコントローラー
 public class SpotifyCallbackController {
 
-    private final SpotifyAccessTokenService spotifyAccessTokenService;
-    private static final Logger logger = LoggerFactory.getLogger(SpotifyCallbackController.class);
+    private final SpotifyAccessTokenService spotifyAccessTokenService; // Spotifyのアクセストークンを管理するサービス
+    private static final Logger logger = LoggerFactory.getLogger(SpotifyCallbackController.class); // ロギングのためのロガー
 
+    // コンストラクタ
     @Autowired
     public SpotifyCallbackController(SpotifyAccessTokenService spotifyAccessTokenService) {
         this.spotifyAccessTokenService = spotifyAccessTokenService;
     }
 
+    // Spotifyからのコールバックを処理するエンドポイント
     @GetMapping("/callback")
     public void handleCallback(@RequestParam("code") String code, HttpServletResponse response) {
-        spotifyAccessTokenService.authorizationCode(code);
+        spotifyAccessTokenService.authorizationCode(code); // 認証コードを使用してアクセストークンを取得
+
         try {
             response.sendRedirect("/"); // ホームページにリダイレクト
         } catch (IOException e) {
-            logger.error("Error occurred while redirecting", e);
+            logger.error("Error occurred while redirecting", e); // リダイレクト中にエラーが発生した場合、エラーメッセージをログに出力
         }
     }
 }

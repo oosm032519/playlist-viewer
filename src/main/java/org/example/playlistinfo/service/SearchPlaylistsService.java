@@ -15,13 +15,14 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-@Service
+@Service // このクラスをSpringのサービスとして登録
 public class SearchPlaylistsService {
 
     private static final Logger logger = LoggerFactory.getLogger(SearchPlaylistsService.class);
 
     private final SpotifyApi spotifyApi;
 
+    // SpotifyClientAuthenticatorを利用してSpotifyApiを初期化
     public SearchPlaylistsService(final SpotifyClientAuthenticator spotifyClientAuthenticator) {
         String accessToken = spotifyClientAuthenticator.clientCredentials();
         this.spotifyApi = new SpotifyApi.Builder()
@@ -29,6 +30,7 @@ public class SearchPlaylistsService {
                 .build();
     }
 
+    // Spotifyでプレイリストを検索するメソッド
     public List<PlaylistSimplified> searchPlaylists(String query) {
         try {
             SearchPlaylistsRequest searchPlaylistsRequest = spotifyApi.searchPlaylists(query).build();

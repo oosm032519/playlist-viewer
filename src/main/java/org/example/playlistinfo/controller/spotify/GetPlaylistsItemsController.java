@@ -1,4 +1,4 @@
-package org.example.playlistinfo.service;
+package org.example.playlistinfo.controller.spotify;
 
 import org.apache.hc.core5.http.ParseException;
 import org.example.playlistinfo.entity.AnnotatedPlaylistTrack;
@@ -26,14 +26,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RestController
-public class GetPlaylistsItems {
-    private static final Logger logger = LoggerFactory.getLogger(GetPlaylistsItems.class);
+@RestController // このクラスをRESTコントローラとして登録
+public class GetPlaylistsItemsController {
+    private static final Logger logger = LoggerFactory.getLogger(GetPlaylistsItemsController.class);
 
     private final SpotifyApi spotifyApi;
     private final VisitedPlaylistRepository visitedPlaylistRepository;
 
-    public GetPlaylistsItems(final SpotifyClientAuthenticator spotifyClientAuthenticator, VisitedPlaylistRepository visitedPlaylistRepository) {
+    // コンストラクタ
+    public GetPlaylistsItemsController(final SpotifyClientAuthenticator spotifyClientAuthenticator, VisitedPlaylistRepository visitedPlaylistRepository) {
         String accessToken = spotifyClientAuthenticator.clientCredentials();
         this.spotifyApi = new SpotifyApi.Builder()
                 .setAccessToken(accessToken)
@@ -41,6 +42,7 @@ public class GetPlaylistsItems {
         this.visitedPlaylistRepository = visitedPlaylistRepository;
     }
 
+    // プレイリストのアイテムを取得するエンドポイント
     @GetMapping("/playlist/{playlistId}")
     public ResponseEntity<Map<String, Object>> getPlaylistItems(@PathVariable String playlistId) {
         try {
@@ -54,10 +56,11 @@ public class GetPlaylistsItems {
             response.put("tracks", playlistTracks);
             response.put("name", playlist.getName());
 
+            // ユーザーがログインしている場合、訪問したプレイリストを保存
             if (username != null) {
-                saveUserPlaylist(username, playlistId, playlist.getName());  // プレイリスト名を引数として渡す
+                saveUserPlaylist(username, playlistId, playlist.getName());
             }
-            deletePlaylistsWithNullNames();  // 新しいメソッドを呼び出す
+            deletePlaylistsWithNullNames();
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -66,11 +69,13 @@ public class GetPlaylistsItems {
         }
     }
 
+    // プレイリスト名がnullのプレイリストを削除
     private void deletePlaylistsWithNullNames() {
         List<UserVisitedPlaylist> playlistsWithNullNames = visitedPlaylistRepository.findByPlaylistNameIsNull();
         visitedPlaylistRepository.deleteAll(playlistsWithNullNames);
     }
 
+    // ユーザーが訪問したプレイリストを保存
     private void saveUserPlaylist(String username, String playlistId, String playlistName) {
         if (playlistName != null) {
             List<UserVisitedPlaylist> existingPlaylists = visitedPlaylistRepository.findByUsernameAndPlaylistId(username, playlistId);
@@ -78,13 +83,13 @@ public class GetPlaylistsItems {
                 UserVisitedPlaylist userVisitedPlaylist = new UserVisitedPlaylist();
                 userVisitedPlaylist.setUsername(username);
                 userVisitedPlaylist.setPlaylistId(playlistId);
-                userVisitedPlaylist.setPlaylistName(playlistName);  // プレイリスト名を設定
+                userVisitedPlaylist.setPlaylistName(playlistName);
                 visitedPlaylistRepository.save(userVisitedPlaylist);
             }
         }
     }
 
-
+    // プレイリストのトラックを取得
     private List<AnnotatedPlaylistTrack> fetchPlaylistTracks(String playlistId) {
         List<AnnotatedPlaylistTrack> playlistTracks = new ArrayList<>();
         int offset = 0;

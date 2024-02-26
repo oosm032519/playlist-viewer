@@ -20,20 +20,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// ユーザーのプレイリスト情報を管理するコントローラー
 @RestController
 public class UserPlaylistRecommendationController {
 
+    // 訪問したプレイリストのリポジトリ
     private final VisitedPlaylistRepository visitedPlaylistRepository;
 
+    // コンストラクタ
     public UserPlaylistRecommendationController(VisitedPlaylistRepository visitedPlaylistRepository) {
         this.visitedPlaylistRepository = visitedPlaylistRepository;
     }
 
+    // ユーザーのプレイリストを取得するエンドポイント
     @GetMapping("/user/playlists")
     public List<UserVisitedPlaylist> getUserPlaylists(@AuthenticationPrincipal AppUser appUser) {
         return visitedPlaylistRepository.findByUsername(appUser.getUsername());
     }
 
+    // ユーザーが訪問したプレイリストを取得するエンドポイント
     @GetMapping("/java/user/visited-playlists")
     public ResponseEntity<List<Map<String, String>>> getVisitedPlaylists() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -57,6 +62,7 @@ public class UserPlaylistRecommendationController {
         return ResponseEntity.ok(response);
     }
 
+    // ユーザーのプレイリストに基づいて推奨曲を取得するエンドポイント
     @GetMapping("/java/recommendations")
     public ResponseEntity<Recommendations> getRecommendations(@RequestParam float tempo, @RequestParam int key, @RequestParam float danceability, @RequestParam float energy, @RequestParam float acousticness, @RequestParam float liveness, @RequestParam float speechiness, @RequestParam float valence, @RequestParam List<String> modeArtistNames) {
         try {

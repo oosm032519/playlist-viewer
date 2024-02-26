@@ -20,26 +20,29 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-@RestController
-@RequestMapping("/java")
+@RestController // REST APIのコントローラー
+@RequestMapping("/java") // このコントローラーのルートURLを設定
 public class SpotifyAuthorizationController {
 
     private final SpotifyAuthorizationUriGenerator spotifyAuthorizationUriGenerator;
     private final SpotifyAccessTokenService spotifyAccessTokenService;
 
+    // コンストラクタ
     public SpotifyAuthorizationController(SpotifyAuthorizationUriGenerator spotifyAuthorizationUriGenerator, SpotifyAccessTokenService spotifyAccessTokenService) {
         this.spotifyAuthorizationUriGenerator = spotifyAuthorizationUriGenerator;
         this.spotifyAccessTokenService = spotifyAccessTokenService;
     }
 
+    // Spotifyの認証ページのURLを生成して返すエンドポイント
     @GetMapping("/authorize")
     public ResponseEntity<String> authorize() {
         return spotifyAuthorizationUriGenerator.authorizationCodeUri();
     }
 
+    // ユーザーのプレイリストを取得するエンドポイント
     @GetMapping("/spotify/user/playlists")
     public ResponseEntity<List<PlaylistSimplified>> getUserPlaylists() {
-        String accessToken = spotifyAccessTokenService.getAccessToken();
+        String accessToken = spotifyAccessTokenService.getAccessToken(); // アクセストークンを取得
         SpotifyApi spotifyApi = new SpotifyApi.Builder()
                 .setAccessToken(accessToken)
                 .build();
@@ -47,15 +50,15 @@ public class SpotifyAuthorizationController {
                 .build();
 
         try {
-            final User user = getCurrentUsersProfileRequest.execute();
+            final User user = getCurrentUsersProfileRequest.execute(); // ユーザー情報を取得
             GetListOfUsersPlaylistsRequest getListOfUsersPlaylistsRequest = spotifyApi
-                    .getListOfUsersPlaylists(user.getId())
+                    .getListOfUsersPlaylists(user.getId()) // ユーザーのプレイリストを取得するリクエストを作成
                     .build();
-            final Paging<PlaylistSimplified> playlistSimplifiedPaging = getListOfUsersPlaylistsRequest.execute();
-            return ResponseEntity.ok(Arrays.asList(playlistSimplifiedPaging.getItems()));
+            final Paging<PlaylistSimplified> playlistSimplifiedPaging = getListOfUsersPlaylistsRequest.execute(); // リクエストを実行
+            return ResponseEntity.ok(Arrays.asList(playlistSimplifiedPaging.getItems())); // プレイリストをレスポンスとして返す
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            System.out.println("Error: " + e.getMessage()); // エラーメッセージを出力
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // エラーが発生した場合は500エラーを返す
         }
     }
 }

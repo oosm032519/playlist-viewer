@@ -14,23 +14,27 @@ import se.michaelthelin.spotify.requests.authorization.authorization_code.Author
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 
-@Service
+@Service // このクラスがサービスクラスであることを示す
 public class SpotifyAccessTokenService {
     private static final Logger logger = LoggerFactory.getLogger(SpotifyAccessTokenService.class);
 
+    // SpotifyのクライアントID
     @Value("${spotify.client.id}")
     private String clientId;
 
+    // Spotifyのクライアントシークレット
     @Value("${spotify.client.secret}")
     private String clientSecret;
 
+    // SpotifyのリダイレクトURI
     @Value("${spotify.redirect.uri}")
     private String redirectUri;
 
-    // spotifyApiのgetterメソッドを追加
+    // SpotifyApiのインスタンス
     @Getter
     private SpotifyApi spotifyApi;
 
+    // サービスクラスの初期化処理
     @PostConstruct
     public void init() {
         spotifyApi = new SpotifyApi.Builder()
@@ -40,6 +44,7 @@ public class SpotifyAccessTokenService {
                 .build();
     }
 
+    // 認証コードを使用してアクセストークンを取得する
     public void authorizationCode(String code) {
         logger.info("認証コードを取得しました: " + code);
         AuthorizationCodeRequest authorizationCodeRequest = spotifyApi.authorizationCode(code)
@@ -47,7 +52,7 @@ public class SpotifyAccessTokenService {
         try {
             final AuthorizationCodeCredentials authorizationCodeCredentials = authorizationCodeRequest.execute();
 
-            // Set access and refresh token for further "spotifyApi" object usage
+            // アクセストークンとリフレッシュトークンを設定する
             spotifyApi.setAccessToken(authorizationCodeCredentials.getAccessToken());
             spotifyApi.setRefreshToken(authorizationCodeCredentials.getRefreshToken());
 
@@ -59,6 +64,7 @@ public class SpotifyAccessTokenService {
         }
     }
 
+    // アクセストークンを取得する
     public String getAccessToken() {
         return spotifyApi.getAccessToken();
     }

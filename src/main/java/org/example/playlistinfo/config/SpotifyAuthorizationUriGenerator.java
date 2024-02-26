@@ -10,7 +10,7 @@ import se.michaelthelin.spotify.requests.authorization.authorization_code.Author
 
 import java.net.URI;
 
-@Service
+@Service // このクラスがサービスクラスであることを示す
 public class SpotifyAuthorizationUriGenerator {
     @Value("${spotify.client.id}")
     private String clientId;
@@ -23,7 +23,7 @@ public class SpotifyAuthorizationUriGenerator {
 
     private AuthorizationCodeUriRequest authorizationCodeUriRequest;
 
-    @PostConstruct
+    @PostConstruct // インスタンス生成後に実行されるメソッド
     public void init() {
         URI redirectUri = SpotifyHttpManager.makeUri(redirectUriStr);
         SpotifyApi spotifyApi = new SpotifyApi.Builder()
@@ -31,6 +31,7 @@ public class SpotifyAuthorizationUriGenerator {
                 .setClientSecret(clientSecret)
                 .setRedirectUri(redirectUri)
                 .build();
+        // 認証コードのリクエストを作成
         this.authorizationCodeUriRequest = spotifyApi.authorizationCodeUri()
 //          .state("x4xkmn9pu3j6ukrs8n")
           .scope("playlist-read-private,playlist-read-collaborative,playlist-modify-private,playlist-modify-public")
@@ -38,6 +39,7 @@ public class SpotifyAuthorizationUriGenerator {
         .build();
     }
 
+    // 認証コードのURIを取得するメソッド
     public ResponseEntity<String> authorizationCodeUri() {
         final URI uri = authorizationCodeUriRequest.execute();
         return ResponseEntity.ok(uri.toString());
