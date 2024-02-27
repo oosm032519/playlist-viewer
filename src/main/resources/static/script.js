@@ -53,11 +53,13 @@ class DomElements {
     }
     handlePlaylistFormSubmit(event) {
         event.preventDefault();
-        this.fetchPlaylistData(this.playlistIdInput.value);
+        playlistId = this.playlistIdInput.value;
+        this.fetchPlaylistData(playlistId);
     }
     handleSearchFormSubmit(event) {
         event.preventDefault();
-        this.fetchSearchData(this.searchQueryInput.value);
+        playlistId = this.searchQueryInput.value;
+        this.fetchSearchData(playlistId);
     }
     handlePlaylistData(data) {
         this.clearAllTables();
@@ -117,6 +119,7 @@ class DomElements {
             td.textContent = result.name;
             td.addEventListener('click', () => {
                 document.getElementById('loading').classList.remove('hidden');
+                playlistId = result.id;
                 fetch(`/java/playlist/${result.id}`)
                     .then(response => response.json())
                     .then(data => {
@@ -428,6 +431,10 @@ function displayRecommendedTracks(tracks) {
             addButton.textContent = '+';
             addButton.className = 'track-button';
             addButton.addEventListener('click', () => {
+                if (!playlistId) {
+                    console.error('Playlist ID is not set.');
+                    return;
+                }
                 showMessage('楽曲を追加しました！');
                 fetch(`/java/playlist/addTrack?trackId=${track.id}&playlistId=${playlistId}`)
                     .then(response => response.json())
@@ -441,6 +448,10 @@ function displayRecommendedTracks(tracks) {
             removeButton.textContent = '-';
             removeButton.className = 'track-button';
             removeButton.addEventListener('click', () => {
+                if (!playlistId) {
+                    console.error('Playlist ID is not set.');
+                    return;
+                }
                 showMessage('楽曲を削除しました！');
                 fetch(`/java/playlist/removeTrack?trackId=${track.id}&playlistId=${playlistId}`)
                     .then(response => response.json())
