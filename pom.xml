@@ -9,12 +9,12 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.example</groupId>
-    <artifactId>PlaylistInfo</artifactId>
+    <artifactId>PlaylistViewer</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>PlaylistInfo</name>
-    <description>PlaylistInfo</description>
+    <name>PlaylistViewer</name>
+    <description>PlaylistViewer</description>
     <properties>
-        <java.version>21</java.version>
+        <java.version>20</java.version>
     </properties>
     <dependencies>
         <dependency>

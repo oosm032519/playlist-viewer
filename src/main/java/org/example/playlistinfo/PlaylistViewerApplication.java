@@ -6,8 +6,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-public class PlaylistInfoApplication {
+public class PlaylistViewerApplication {
     public static void main(String[] args) {
-        SpringApplication.run(PlaylistInfoApplication.class, args);
+        SpringApplication.run(PlaylistViewerApplication.class, args);
     }
 }
