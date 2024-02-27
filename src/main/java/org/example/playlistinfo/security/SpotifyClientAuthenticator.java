@@ -13,21 +13,21 @@ import se.michaelthelin.spotify.requests.authorization.client_credentials.Client
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 
-@Service
-public class ClientCredentials {
+@Service // このクラスをSpringのサービスとして登録
+public class SpotifyClientAuthenticator {
 
-    private static final Logger logger = LoggerFactory.getLogger(ClientCredentials.class);
+    private static final Logger logger = LoggerFactory.getLogger(SpotifyClientAuthenticator.class); // ロギングのためのロガー
 
-    @Value("${spotify.client.id}")
+    @Value("${spotify.client.id}") // application.propertiesからSpotifyのクライアントIDを取得
     private String clientId;
 
-    @Value("${spotify.client.secret}")
+    @Value("${spotify.client.secret}") // application.propertiesからSpotifyのクライアントシークレットを取得
     private String clientSecret;
 
     private SpotifyApi spotifyApi;
     private ClientCredentialsRequest clientCredentialsRequest;
 
-    @PostConstruct
+    @PostConstruct // インスタンス生成後に実行されるメソッド
     public void init() {
         spotifyApi = new SpotifyApi.Builder()
                 .setClientId(clientId)
@@ -36,6 +36,7 @@ public class ClientCredentials {
         clientCredentialsRequest = spotifyApi.clientCredentials().build();
     }
 
+    // Spotifyのクライアント認証を行い、アクセストークンを取得するメソッド
     public String clientCredentials() {
         try {
             final se.michaelthelin.spotify.model_objects.credentials.ClientCredentials clientCredentials = clientCredentialsRequest
@@ -53,7 +54,7 @@ public class ClientCredentials {
         }
     }
 
-    @Bean
+    @Bean // SpotifyApiのインスタンスをSpringのBeanとして登録
     public SpotifyApi spotifyApi() {
         return new SpotifyApi.Builder()
                 .setClientId(clientId)

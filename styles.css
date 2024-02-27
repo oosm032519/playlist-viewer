@@ -2,8 +2,12 @@
 @import "node_modules/tailwindcss/components.css";
 @import "node_modules/tailwindcss/utilities.css";
 
+.bg-black-900 {
+    background-color: #121212;
+}
+
 body.dark-mode {
-    @apply bg-gray-800 text-gray-100;
+    @apply bg-black-900 text-gray-100;
 }
 
 body.dark-mode h1 {
@@ -112,12 +116,12 @@ body {
     left:       0;
     width:      1rem;
     height:     1rem;
-    border:     2px solid gray;
+    border:     2px solid #121212;
     transition: background-color 0.2s;
 }
 
 input[type="radio"]:checked + .radio-button-design {
-    background-color: gray;
+    background-color: #121212;
 }
 
 input[type="text"], button[type="submit"] {
@@ -163,6 +167,7 @@ table {
     width:           100%;
     border-collapse: collapse;
     margin-top:      1rem;
+    padding: 0;
 }
 
 table, th, td {
@@ -176,7 +181,7 @@ th, td {
 }
 
 th {
-    background-color: #4CAF50;
+    background-color: #2EBD59;
     color:            white;
 }
 
@@ -201,19 +206,19 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-    border: 2px solid gray;
+    border: 2px solid #121212;
     transition: border 0.1s ease;
 }
 
 form input[type="text"]:hover {
-    border-color:     #4CAF50;
+    border-color: #2EBD59;
     transition:       border-color 0.3s ease;
 }
 
 .loader {
     border:            16px solid #F3F3F3;
     border-radius:     50%;
-    border-top:        16px solid #4CAF50; /* 緑色に変更 */
+    border-top:        16px solid #2ebd59; /* 緑色に変更 */
     width:             120px;
     height:            120px;
     -webkit-animation: spin 2s linear infinite; /* Safari */
@@ -244,10 +249,10 @@ form input[type="text"]:hover {
 
 h2 {
     font-size:     2em;
-    color:         #4CAF50;
+    color:         #2ebd59;
     text-align:    center;
     padding:       10px;
-    border-bottom: 2px solid #4CAF50;
+    border-bottom: 2px solid #2ebd59;
     margin-bottom: 20px;
 }
 
@@ -265,24 +270,24 @@ th, td {
 
 table {
     background-color: white;
-    color:            black;
+    color:            #121212;
 }
 
 input[type="radio"] + label {
     display:       inline-block;
     padding:       10px 20px;
     margin:        10px;
-    border:        2px solid #4CAF50; /* ボーダーの色 */
+    border:        2px solid #2ebd59; /* ボーダーの色 */
     border-radius: 5px; /* ボーダーの角を丸くする */
     background:    #F2F2F2; /* 背景色 */
-    color:         #4CAF50; /* テキストの色 */
+    color:         #2ebd59; /* テキストの色 */
     transition:    all 0.3s ease; /* アニメーション効果 */
     cursor:        pointer; /* マウスカーソルを手にする */
     width:         110%; /* ボタンの幅 */
 }
 
 input[type="radio"]:checked + label {
-    background: #4CAF50; /* 選択時の背景色 */
+    background: #2EBD59; /* 選択時の背景色 */
     color:      #F2F2F2; /* 選択時のテキストの色 */
 }
 
@@ -301,7 +306,7 @@ input[type="radio"] {
     right:            0; /* Change from left: 0; */
     height:           100%;
     width:            200px;
-    background-color: #333;
+    background-color: #121212;
     padding:          20px;
     box-sizing:       border-box;
     transform:        translateX(100%); /* Change from translateX(-100%); */
@@ -334,7 +339,10 @@ input[type="radio"] {
 #sun-icon {
     left:  auto;
     right: 4rem;
+    top:    auto;
+    bottom: 2rem;
     transition: right 0.5s ease;
+    color:      #FFF;
 }
 
 body {
@@ -353,7 +361,7 @@ body {
 }
 
 .visited-playlists-container h2 {
-    color:         #333;
+    color:         #121212;
     font-size:     24px;
     margin-bottom: 20px;
 }
@@ -369,10 +377,87 @@ body {
 }
 
 .visited-playlists-container table th {
-    background-color: #4CAF50;
+    background-color: #2EBD59;
     color:            white;
 }
 
 .visited-playlists-container table tr:nth-child(even) {
     background-color: #F2F2F2;
+}
+
+.side-menu {
+    position:         fixed;
+    right:            0;
+    top:              0;
+    width:            200px;
+    height:           100vh;
+    background-color: #F8F8F8;
+    padding:          20px;
+    box-shadow:       0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.side-menu {
+    transform:  translateX(100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+.side-menu.open {
+    transform: translateX(0);
+}
+
+body.dark-mode .side-menu {
+    background-color: #121212;
+}
+
+.side-menu {
+    position:         fixed;
+    right:            0;
+    top:              0;
+    width:            300px;
+    height:           100vh;
+    background-color: #121212; /* darker shade of gray */
+    padding:          20px;
+    box-shadow:       0 0 10px rgba(0, 0, 0, 0.1);
+    transition:       transform 0.3s ease-in-out;
+    border-top-left-radius:    30px; /* 左上の角を丸くする */
+    border-bottom-left-radius: 30px; /* 左下の角を丸くする */
+    border-left:               5px solid #000; /* 左側の境界線を黒にする */
+}
+
+.side-menu button {
+    display:          block;
+    width:            100%;
+    padding:          10px;
+    margin-bottom:    10px;
+    background-color: #2EBD59;
+    color:            #121212; /* white */
+    border:           none;
+    border-radius:    20px; /* rounded corners */
+    transition:       background-color 0.3s ease-in-out;
+}
+
+.side-menu button:hover {
+    background-color: #E1B12C; /* gold */
+}
+
+.playlist-table {
+    margin-bottom: 20px; /* Adjust as needed */
+}
+
+.recommendations-table {
+    margin-top: 20px; /* Adjust as needed */
+}
+
+.track-button {
+    background-color: #2ebd59; /* blue */
+    color:            #FFF; /* white */
+    border:           none;
+    border-radius:    5px; /* rounded corners */
+    padding:          10px 20px; /* padding to make the button larger and easier to click */
+    cursor:           pointer; /* change cursor to pointer when hovering over the button */
+    transition:       background-color 0.3s ease-in-out; /* smooth transition effect when hovering over the button */
+}
+
+.track-button:hover {
+    background-color: #2EBD59;
 }

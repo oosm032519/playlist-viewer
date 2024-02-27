@@ -1,6 +1,6 @@
-package org.example.playlistinfo.servise;
+package org.example.playlistinfo.service;
 
-import org.example.playlistinfo.security.ClientCredentials;
+import org.example.playlistinfo.security.SpotifyClientAuthenticator;
 import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,20 +15,22 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-@Service
+@Service // このクラスをSpringのサービスとして登録
 public class SearchPlaylistsService {
 
     private static final Logger logger = LoggerFactory.getLogger(SearchPlaylistsService.class);
 
     private final SpotifyApi spotifyApi;
 
-    public SearchPlaylistsService(final ClientCredentials clientCredentials) {
-        String accessToken = clientCredentials.clientCredentials();
+    // SpotifyClientAuthenticatorを利用してSpotifyApiを初期化
+    public SearchPlaylistsService(final SpotifyClientAuthenticator spotifyClientAuthenticator) {
+        String accessToken = spotifyClientAuthenticator.clientCredentials();
         this.spotifyApi = new SpotifyApi.Builder()
                 .setAccessToken(accessToken)
                 .build();
     }
 
+    // Spotifyでプレイリストを検索するメソッド
     public List<PlaylistSimplified> searchPlaylists(String query) {
         try {
             SearchPlaylistsRequest searchPlaylistsRequest = spotifyApi.searchPlaylists(query).build();
