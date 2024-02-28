@@ -12,8 +12,8 @@ import java.time.Duration;
 public class ThrottingFilter implements Filter, jakarta.servlet.Filter {
 
     private Bucket createNewBucket() {
-        long overdraft = 50;
-        Refill refill = Refill.greedy(10, Duration.ofSeconds(1));
+        long overdraft = 10;
+        Refill refill = Refill.greedy(5, Duration.ofSeconds(1));
         Bandwidth limit = Bandwidth.classic(overdraft, refill);
         return Bucket4j.builder().addLimit(limit).build();
     }
