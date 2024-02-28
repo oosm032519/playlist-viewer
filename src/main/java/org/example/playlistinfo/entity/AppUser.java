@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @Entity
@@ -11,9 +13,16 @@ import lombok.Setter;
 public class AppUser {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue
+    private UUID id;
 
     private String username;
     private String password;
+
+    @PrePersist
+    public void generateId() {
+        if (id == null) {
+            id = UUID.randomUUID();
+        }
+    }
 }

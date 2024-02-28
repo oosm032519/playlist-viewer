@@ -7,20 +7,24 @@ import org.springframework.security.config.annotation.web.configurers.LogoutConf
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 
 @Configuration // このクラスが設定クラスであることを示す
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
+    private final HttpsEnforcer httpsEnforcer;
 
     // コンストラクタ
-    public SecurityConfig(final UserDetailsService userDetailsService) {
+    public SecurityConfig(final UserDetailsService userDetailsService, final HttpsEnforcer httpsEnforcer) {
         this.userDetailsService = userDetailsService;
+        this.httpsEnforcer = httpsEnforcer;
     }
 
     @Bean // SpringのDIコンテナに登録するBeanを定義
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .addFilterBefore(httpsEnforcer, ChannelProcessingFilter.class)
                 .authorizeHttpRequests(authz -> authz
                         // "/login"と"/signup"へのリクエストは認証なしで許可
                         .requestMatchers("/login", "/signup").permitAll()

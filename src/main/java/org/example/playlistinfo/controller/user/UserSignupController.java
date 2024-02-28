@@ -1,7 +1,7 @@
 package org.example.playlistinfo.controller.user;
 
 import org.example.playlistinfo.entity.AppUser;
-import org.example.playlistinfo.repository.AppUserRepository;
+import org.example.playlistinfo.entity.repository.AppUserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;

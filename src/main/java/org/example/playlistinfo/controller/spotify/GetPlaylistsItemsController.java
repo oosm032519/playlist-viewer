@@ -4,7 +4,7 @@ import org.apache.hc.core5.http.ParseException;
 import org.example.playlistinfo.entity.AnnotatedPlaylistTrack;
 import org.example.playlistinfo.security.SpotifyClientAuthenticator;
 import org.example.playlistinfo.entity.UserVisitedPlaylist;
-import org.example.playlistinfo.repository.VisitedPlaylistRepository;
+import org.example.playlistinfo.entity.repository.VisitedPlaylistRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;

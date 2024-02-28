@@ -2,7 +2,7 @@ package org.example.playlistinfo.controller.user;
 
 import org.example.playlistinfo.entity.AppUser;
 import org.example.playlistinfo.entity.UserVisitedPlaylist;
-import org.example.playlistinfo.repository.VisitedPlaylistRepository;
+import org.example.playlistinfo.entity.repository.VisitedPlaylistRepository;
 import org.example.playlistinfo.controller.spotify.GetPlaylistsItemsController;
 import org.example.playlistinfo.service.SearchPlaylistsService;
 import org.springframework.http.HttpStatus;

@@ -1,7 +1,7 @@
 package org.example.playlistinfo.security;
 
 import org.example.playlistinfo.entity.AppUser;
-import org.example.playlistinfo.repository.AppUserRepository;
+import org.example.playlistinfo.entity.repository.AppUserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

@@ -1,4 +1,4 @@
-package org.example.playlistinfo.repository;
+package org.example.playlistinfo.entity.repository;
 
 import org.example.playlistinfo.entity.UserVisitedPlaylist;
 import org.springframework.data.jpa.repository.JpaRepository;

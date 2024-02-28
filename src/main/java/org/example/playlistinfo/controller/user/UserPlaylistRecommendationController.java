@@ -2,7 +2,7 @@ package org.example.playlistinfo.controller.user;
 
 import org.example.playlistinfo.entity.AppUser;
 import org.example.playlistinfo.entity.UserVisitedPlaylist;
-import org.example.playlistinfo.repository.VisitedPlaylistRepository;
+import org.example.playlistinfo.entity.repository.VisitedPlaylistRepository;
 import org.example.playlistinfo.service.GetRecommendations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
