@@ -27,16 +27,21 @@ public class SpotifyCallbackController {
     // Spotifyからのコールバックを処理するエンドポイント
     @GetMapping("/callback")
     public void handleCallback(@RequestParam("code") String code, HttpServletResponse response) {
-        // 認証コードを使用してアクセストークンを取得
-        spotifyAccessTokenService.authorizationCode(code);
-
         try {
-            // ルートURLにリダイレクト
-            response.sendRedirect("/");
-        } catch (IOException e) {
-            // リダイレクトエラーをログに記録し、500エラーを返す
+            // 認証コードを使用してアクセストークンを取得
+            spotifyAccessTokenService.authorizationCode(code);
+
+            // ルートURLにリダイレクトし、成功メッセージをクエリパラメータとして渡す
+            response.sendRedirect("/?loginResult=success");
+        } catch (Exception e) {
+            // リダイレクトエラーをログに記録し、失敗メッセージをクエリパラメータとして渡す
             logger.error("Error occurred while redirecting", e);
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            try {
+                response.sendRedirect("/?loginResult=failure");
+            } catch (IOException ioException) {
+                logger.error("Error occurred while redirecting", ioException);
+                response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            }
         }
     }
 }

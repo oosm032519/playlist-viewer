@@ -38,21 +38,21 @@ public class GetPlaylistsItemsController {
     // IOExceptionをハンドルするメソッド
     @ExceptionHandler(IOException.class)
     public ResponseEntity<String> handleIOException(IOException e) {
-        logger.error("Error occurred while fetching playlist items: ", e);  // エラーログを出力
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while fetching playlist items.");  // エラーレスポンスを返す
+        logger.error("プレイリストアイテムの取得中にエラーが発生しました: ", e);  // エラーログを出力
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("プレイリストアイテムの取得中にエラーが発生しました。");  // エラーレスポンスを返す
     }
 
     // SpotifyWebApiExceptionをハンドルするメソッド
     @ExceptionHandler(SpotifyWebApiException.class)
     public ResponseEntity<String> handleSpotifyWebApiException(SpotifyWebApiException e) {
-        logger.error("Error occurred while interacting with Spotify API: ", e);  // エラーログを出力
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error occurred while interacting with Spotify API.");  // エラーレスポンスを返す
+        logger.error("Spotify APIとのやり取り中にエラーが発生しました: ", e);  // エラーログを出力
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Spotify APIとのやり取り中にエラーが発生しました。");  // エラーレスポンスを返す
     }
 
     // ParseExceptionをハンドルするメソッド
     @ExceptionHandler(ParseException.class)
     public ResponseEntity<String> handleParseException(ParseException e) {
-        logger.error("Error occurred while parsing the response from Spotify API: ", e);  // エラーログを出力
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Error occurred while parsing the response from Spotify API.");  // エラーレスポンスを返す
+        logger.error("Spotify APIからのレスポンスの解析中にエラーが発生しました: ", e);  // エラーログを出力
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Spotify APIからのレスポンスの解析中にエラーが発生しました。");  // エラーレスポンスを返す
     }
 }

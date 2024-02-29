@@ -442,6 +442,22 @@ document.addEventListener('DOMContentLoaded', () => {
     closeButton.addEventListener('click', () => {
         sideMenu.classList.toggle('open');
     });
+    // URLのクエリパラメータを取得
+    const urlParams = new URLSearchParams(window.location.search);
+    const loginResult = urlParams.get('loginResult');
+    // loginResultパラメータが存在する場合、その値に基づいてメッセージを表示
+    if (loginResult) {
+        let message;
+        if (loginResult === 'success') {
+            message = 'Spotifyログインに成功しました';
+        }
+        else if (loginResult === 'failure') {
+            message = 'Spotifyログインに失敗しました';
+        }
+        if (message) {
+            showMessage(message);
+        }
+    }
 });
 // 平均値とアーティスト名を元に推奨曲を取得する関数
 function fetchRecommendedTracks(averageTempo, averageKey, averageDanceability, averageEnergy, averageAcousticness, averageLiveness, averageSpeechiness, averageValence, topFiveArtistNames) {

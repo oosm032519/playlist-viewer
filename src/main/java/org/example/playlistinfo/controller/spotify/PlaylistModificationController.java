@@ -43,9 +43,9 @@ public class PlaylistModificationController {
 
     private ResponseEntity<String> handleException(Exception e) {  // 例外を処理するメソッド
         if (e instanceof SpotifyWebApiException) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Error: " + e.getMessage());  // Spotify APIの例外の場合、403エラーを返す
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("エラー: " + e.getMessage());  // Spotify APIの例外の場合、403エラーを返す
         } else {
-            throw new RuntimeException("Error: " + e.getMessage());  // その他の例外の場合、ランタイムエラーをスロー
+            throw new RuntimeException("エラー: " + e.getMessage());  // その他の例外の場合、ランタイムエラーをスロー
         }
     }
 }
