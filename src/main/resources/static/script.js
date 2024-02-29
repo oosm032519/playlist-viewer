@@ -371,7 +371,15 @@ function fetchUserPlaylists() {
     document.getElementById('loading').classList.remove('hidden');
     // プレイリストを取得するAPIを呼び出す
     fetch('/java/spotify/user/playlists')
-        .then(response => response.json())
+        .then(response => {
+        if (!response.ok) {
+            // エラーレスポンスの場合、エラーメッセージを取得してエラーをスロー
+            return response.text().then(message => {
+                throw new Error(message);
+            });
+        }
+        return response.json();
+    })
         .then(data => {
         const domElements = new DomElements();
         // プレイリストの表示エリアをクリア
@@ -381,7 +389,12 @@ function fetchUserPlaylists() {
         // ローディングアニメーションを非表示にする
         document.getElementById('loading').classList.add('hidden');
     })
-        .catch(error => console.error('There was a problem with the fetch operation: ', error));
+        .catch(error => {
+        // エラーメッセージを表示
+        showMessage(error.message);
+        // ローディングアニメーションを非表示にする
+        document.getElementById('loading').classList.add('hidden');
+    });
 }
 // プレイリスト表示ボタンのクリックイベントに関数を紐付ける
 document.getElementById('show-playlists').addEventListener('click', fetchUserPlaylists);
