@@ -515,36 +515,53 @@ function displayRecommendedTracks(tracks: any[]) {
             const addButton = document.createElement('button');
             addButton.textContent = '+';
             addButton.className = 'track-button';
+            const removeButton = document.createElement('button');
+            removeButton.textContent = '-';
+            removeButton.className = 'track-button';
+            
             addButton.addEventListener('click', () => {
                 if (!playlistId) {
                     console.error('Playlist ID is not set.');
                     return;
                 }
-                showMessage('楽曲を追加しました！');
                 fetch(`/java/playlist/addTrack?trackId=${track.id}&playlistId=${playlistId}`)
-                    .then(response => response.json())
+                    .then(response => {
+                        if (response.ok) {
+                            showMessage('楽曲を追加しました！');
+                            cell.style.backgroundColor = 'lightgreen';
+                        } else {
+                            showMessage('楽曲を追加できませんでした');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         console.log(data);
                     })
-                    .catch(error => console.error('There was a problem with the fetch operation: ', error));
-                cell.style.backgroundColor = 'lightgreen';
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation: ', error);
+                    });
             });
             
-            const removeButton = document.createElement('button');
-            removeButton.textContent = '-';
-            removeButton.className = 'track-button';
             removeButton.addEventListener('click', () => {
                 if (!playlistId) {
                     console.error('Playlist ID is not set.');
                     return;
                 }
-                showMessage('楽曲を削除しました！');
                 fetch(`/java/playlist/removeTrack?trackId=${track.id}&playlistId=${playlistId}`)
-                    .then(response => response.json())
+                    .then(response => {
+                        if (response.ok) {
+                            showMessage('楽曲を削除しました！');
+                        } else {
+                            showMessage('楽曲を削除できませんでした');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         console.log(data);
                     })
-                    .catch(error => console.error('There was a problem with the fetch operation: ', error));
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation: ', error);
+                    });
                 const rowIndex = row.sectionRowIndex;
                 if (rowIndex % 2 === 0) {
                     cell.style.backgroundColor = '#FFF';

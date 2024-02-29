@@ -32,7 +32,7 @@ public class SpotifyAccessTokenService {
 
     // SpotifyApiのインスタンス
     @Getter
-    private SpotifyApi spotifyApi;
+    private static SpotifyApi spotifyApi;
 
     // サービスクラスの初期化処理
     @PostConstruct
@@ -69,4 +69,8 @@ public class SpotifyAccessTokenService {
         return spotifyApi.getAccessToken();
     }
 
+    // リフレッシュトークンを取得する
+    public String getRefreshToken() {
+        return spotifyApi.getRefreshToken();
+    }
 }

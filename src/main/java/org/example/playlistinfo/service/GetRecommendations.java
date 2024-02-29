@@ -21,7 +21,7 @@ import java.util.List;
 public class GetRecommendations {
     private static final Logger logger = LoggerFactory.getLogger(GetRecommendations.class);
 
-    private static SpotifyAccessTokenService spotifyAccessTokenService;
+    public static SpotifyAccessTokenService spotifyAccessTokenService;
 
     // SpotifyAccessTokenServiceを注入
     @Autowired
