@@ -641,20 +641,32 @@ function mode(array: any[]) {
 
 function getTopFiveModes(array: any[]) {
     const frequency = {};
-    let maxFrequency = 0;
     let modes = [];
     
     for (let i in array) {
         frequency[array[i]] = (frequency[array[i]] || 0) + 1;
-        if (frequency[array[i]] > maxFrequency) {
-            maxFrequency = frequency[array[i]];
-            modes = [array[i]];
-        } else if (frequency[array[i]] === maxFrequency) {
-            modes.push(array[i]);
+    }
+
+    const sortedKeys = Object.keys(frequency).sort((a, b) => frequency[b] - frequency[a]);
+    const remainingArtists = sortedKeys.filter(key => frequency[key] === 1);
+
+    for (let key of sortedKeys) {
+        if (modes.length >= 5) break;
+        if (frequency[key] > 1) {
+            modes.push(key);
+        }
+    }
+
+    while (modes.length < 5 && remainingArtists.length > 0) {
+        const randomIndex = Math.floor(Math.random() * remainingArtists.length);
+        const randomArtist = remainingArtists[randomIndex];
+        if (!modes.includes(randomArtist)) {
+            modes.push(randomArtist);
+            remainingArtists.splice(randomIndex, 1);
         }
     }
     
-    return modes.slice(0, 5);
+    return modes;
 }
 
 function showMessage(message: string) {

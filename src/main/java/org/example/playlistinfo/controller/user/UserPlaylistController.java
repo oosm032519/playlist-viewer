@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.specification.PlaylistSimplified;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class UserPlaylistController {
 
     // プレイリストのアイテムを取得するエンドポイント
     @GetMapping("/java/playlist/{playlistId}")
-    public Map<String, Object> getPlaylistItems(@PathVariable String playlistId) throws ParseException, SpotifyWebApiException {
+    public Map<String, Object> getPlaylistItems(@PathVariable String playlistId) throws ParseException, SpotifyWebApiException, IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails principal = (UserDetails) authentication.getPrincipal();
 

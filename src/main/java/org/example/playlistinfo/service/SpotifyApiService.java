@@ -1,35 +1,19 @@
 package org.example.playlistinfo.service;
 
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import se.michaelthelin.spotify.SpotifyApi;
-import se.michaelthelin.spotify.SpotifyHttpManager;
 
-import javax.annotation.PostConstruct;
-
+@Getter
 @Service
 public class SpotifyApiService {
 
-    @Value("${spotify.client.id}")
-    private String clientId;
+    private final SpotifyApi spotifyApi;
 
-    @Value("${spotify.client.secret}")
-    private String clientSecret;
-
-    @Value("${spotify.redirect.uri}")
-    private String redirectUri;
-
-    @Getter
-    private SpotifyApi spotifyApi;
-
-    @PostConstruct
-    public void init() {
-        spotifyApi = new SpotifyApi.Builder()
-                .setClientId(clientId)
-                .setClientSecret(clientSecret)
-                .setRedirectUri(SpotifyHttpManager.makeUri(redirectUri))
-                .build();
+    @Autowired
+    public SpotifyApiService(SpotifyApi spotifyApi) {
+        this.spotifyApi = spotifyApi;
     }
 
     public void setAccessToken(String accessToken) {

@@ -19,7 +19,7 @@ public class SpotifyAccessTokenService {
     private static final Logger logger = LoggerFactory.getLogger(SpotifyAccessTokenService.class);
 
     @Getter
-    private static SpotifyApi spotifyApi;
+    public static SpotifyApi spotifyApi;
 
     private final SpotifyApiService spotifyApiService;
 

@@ -4,6 +4,8 @@ import org.example.playlistinfo.entity.AppUser;
 import org.example.playlistinfo.entity.UserVisitedPlaylist;
 import org.example.playlistinfo.entity.repository.VisitedPlaylistRepository;
 import org.example.playlistinfo.service.GetRecommendations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -26,6 +28,8 @@ public class UserPlaylistRecommendationController {
 
     // 訪問したプレイリストのリポジトリ
     private final VisitedPlaylistRepository visitedPlaylistRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(UserPlaylistRecommendationController.class);
 
     // コンストラクタ
     public UserPlaylistRecommendationController(VisitedPlaylistRepository visitedPlaylistRepository) {
@@ -66,7 +70,7 @@ public class UserPlaylistRecommendationController {
     @GetMapping("/java/recommendations")
     public ResponseEntity<Recommendations> getRecommendations(@RequestParam float tempo, @RequestParam int key, @RequestParam float danceability, @RequestParam float energy, @RequestParam float acousticness, @RequestParam float liveness, @RequestParam float speechiness, @RequestParam float valence, @RequestParam List<String> modeArtistNames) {
         try {
-            System.out.println("modeArtistNames: " + modeArtistNames);
+            logger.info("modeArtistNames: " + modeArtistNames);
             Recommendations recommendations = GetRecommendations.getRecommendationsBasedOnTrackFeatures(tempo, key, danceability, energy, acousticness, liveness, speechiness, valence, modeArtistNames);
             return ResponseEntity.ok(recommendations);
         } catch (Exception e) {
