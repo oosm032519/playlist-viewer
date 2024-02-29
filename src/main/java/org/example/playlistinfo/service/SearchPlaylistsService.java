@@ -1,7 +1,7 @@
 package org.example.playlistinfo.service;
 
-import org.example.playlistinfo.security.SpotifyClientAuthenticator;
 import org.apache.hc.core5.http.ParseException;
+import org.example.playlistinfo.security.SpotifyClientAuthenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

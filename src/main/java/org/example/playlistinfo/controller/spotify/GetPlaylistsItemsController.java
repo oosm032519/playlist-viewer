@@ -3,10 +3,10 @@ package org.example.playlistinfo.controller.spotify;
 import org.apache.hc.core5.http.ParseException;
 import org.example.playlistinfo.entity.AnnotatedPlaylistTrack;
 import org.example.playlistinfo.security.SpotifyClientAuthenticator;
-import org.example.playlistinfo.entity.UserVisitedPlaylist;
-import org.example.playlistinfo.entity.repository.VisitedPlaylistRepository;
+import org.example.playlistinfo.service.UserPlaylistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
-import se.michaelthelin.spotify.model_objects.specification.*;
+import se.michaelthelin.spotify.model_objects.specification.AudioFeatures;
+import se.michaelthelin.spotify.model_objects.specification.Paging;
+import se.michaelthelin.spotify.model_objects.specification.Playlist;
+import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import se.michaelthelin.spotify.requests.data.tracks.GetAudioFeaturesForTrackRequest;
 
@@ -26,101 +29,76 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RestController // このクラスをRESTコントローラとして登録
+@RestController
 public class GetPlaylistsItemsController {
     private static final Logger logger = LoggerFactory.getLogger(GetPlaylistsItemsController.class);
 
     private final SpotifyApi spotifyApi;
-    private final VisitedPlaylistRepository visitedPlaylistRepository;
 
-    // コンストラクタ
-    public GetPlaylistsItemsController(final SpotifyClientAuthenticator spotifyClientAuthenticator, VisitedPlaylistRepository visitedPlaylistRepository) {
+    public GetPlaylistsItemsController(final SpotifyClientAuthenticator spotifyClientAuthenticator) {
         String accessToken = spotifyClientAuthenticator.clientCredentials();
         this.spotifyApi = new SpotifyApi.Builder()
                 .setAccessToken(accessToken)
                 .build();
-        this.visitedPlaylistRepository = visitedPlaylistRepository;
     }
 
-    // プレイリストのアイテムを取得するエンドポイント
     @GetMapping("/playlist/{playlistId}")
     public ResponseEntity<Map<String, Object>> getPlaylistItems(@PathVariable String playlistId) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String username = (authentication != null && authentication.getPrincipal() instanceof UserDetails) ? ((UserDetails) authentication.getPrincipal()).getUsername() : null;
-            logger.info("Username from SecurityContextHolder: {}", username);
-
-            List<AnnotatedPlaylistTrack> playlistTracks = fetchPlaylistTracks(playlistId);
+            String username = getUsernameFromSecurityContext();
+            List<AnnotatedPlaylistTrack> playlistTracks = fetchPlaylistTracks(playlistId, 0, new ArrayList<>());
             Playlist playlist = spotifyApi.getPlaylist(playlistId).build().execute();
-            Map<String, Object> response = new HashMap<>();
-            response.put("tracks", playlistTracks);
-            response.put("name", playlist.getName());
 
-            // ユーザーがログインしている場合、訪問したプレイリストを保存
+            Map<String, Object> response = createResponse(playlistTracks, playlist);
+
             if (username != null) {
-                saveUserPlaylist(username, playlistId, playlist.getName());
+                UserPlaylistService.saveUserPlaylist(username, playlistId, playlist.getName());
             }
-            deletePlaylistsWithNullNames();
+            UserPlaylistService.deletePlaylistsWithNullNames();
 
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("プレイリストの曲の取得中にエラーが発生しました: ", e);
-            return ResponseEntity.badRequest().build();
+        } catch (IOException e) {
+            logger.error("Error occurred while fetching playlist items: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (SpotifyWebApiException | ParseException e) {
+            logger.error("Error occurred while interacting with Spotify API: ", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
-    // プレイリスト名がnullのプレイリストを削除
-    private void deletePlaylistsWithNullNames() {
-        List<UserVisitedPlaylist> playlistsWithNullNames = visitedPlaylistRepository.findByPlaylistNameIsNull();
-        visitedPlaylistRepository.deleteAll(playlistsWithNullNames);
+    private String getUsernameFromSecurityContext() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (authentication != null && authentication.getPrincipal() instanceof UserDetails) ? ((UserDetails) authentication.getPrincipal()).getUsername() : null;
     }
 
-    // ユーザーが訪問したプレイリストを保存
-    private void saveUserPlaylist(String username, String playlistId, String playlistName) {
-        if (playlistName != null) {
-            List<UserVisitedPlaylist> existingPlaylists = visitedPlaylistRepository.findByUsernameAndPlaylistId(username, playlistId);
-            if (existingPlaylists.isEmpty()) {
-                UserVisitedPlaylist userVisitedPlaylist = new UserVisitedPlaylist();
-                userVisitedPlaylist.setUsername(username);
-                userVisitedPlaylist.setPlaylistId(playlistId);
-                userVisitedPlaylist.setPlaylistName(playlistName);
-                visitedPlaylistRepository.save(userVisitedPlaylist);
-            }
+    private Map<String, Object> createResponse(List<AnnotatedPlaylistTrack> playlistTracks, Playlist playlist) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("tracks", playlistTracks);
+        response.put("name", playlist.getName());
+        return response;
+    }
+
+    private List<AnnotatedPlaylistTrack> fetchPlaylistTracks(String playlistId, int offset, List<AnnotatedPlaylistTrack> playlistTracks) throws IOException, SpotifyWebApiException, ParseException {
+        GetPlaylistsItemsRequest getPlaylistsItemsRequest = spotifyApi
+                .getPlaylistsItems(playlistId)
+                .limit(100)
+                .offset(offset)
+                .build();
+
+        Paging<PlaylistTrack> playlistTrackPaging = getPlaylistsItemsRequest.execute();
+
+        for (PlaylistTrack playlistTrack : playlistTrackPaging.getItems()) {
+            String trackId = playlistTrack.getTrack().getId();
+            GetAudioFeaturesForTrackRequest getAudioFeaturesForTrackRequest = spotifyApi.getAudioFeaturesForTrack(trackId)
+                    .build();
+            AudioFeatures audioFeatures = getAudioFeaturesForTrackRequest.execute();
+
+            playlistTracks.add(new AnnotatedPlaylistTrack(playlistTrack, audioFeatures));
         }
-    }
 
-    // プレイリストのトラックを取得
-    private List<AnnotatedPlaylistTrack> fetchPlaylistTracks(String playlistId) {
-        List<AnnotatedPlaylistTrack> playlistTracks = new ArrayList<>();
-        int offset = 0;
-        Paging<PlaylistTrack> playlistTrackPaging;
-
-        do {
-            try {
-                GetPlaylistsItemsRequest getPlaylistsItemsRequest = spotifyApi
-                        .getPlaylistsItems(playlistId)
-                        .limit(100)
-                        .offset(offset)
-                        .build();
-
-                playlistTrackPaging = getPlaylistsItemsRequest.execute();
-
-                for (PlaylistTrack playlistTrack : playlistTrackPaging.getItems()) {
-                    String trackId = playlistTrack.getTrack().getId();
-                    GetAudioFeaturesForTrackRequest getAudioFeaturesForTrackRequest = spotifyApi.getAudioFeaturesForTrack(trackId)
-                            .build();
-                    AudioFeatures audioFeatures = getAudioFeaturesForTrackRequest.execute();
-
-                    playlistTracks.add(new AnnotatedPlaylistTrack(playlistTrack, audioFeatures));
-                }
-
-                offset = playlistTrackPaging.getOffset() + playlistTrackPaging.getItems().length;
-            } catch (IOException | SpotifyWebApiException | ParseException e) {
-                logger.error("プレイリストのページ取得中にエラーが発生しました: ", e);
-                break;
-            }
-
-        } while (playlistTrackPaging.getNext() != null);
+        if (playlistTrackPaging.getNext() != null) {
+            fetchPlaylistTracks(playlistId, playlistTrackPaging.getOffset() + playlistTrackPaging.getItems().length, playlistTracks);
+        }
 
         return playlistTracks;
     }

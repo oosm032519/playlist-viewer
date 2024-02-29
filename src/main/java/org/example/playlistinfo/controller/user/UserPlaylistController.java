@@ -1,5 +1,6 @@
 package org.example.playlistinfo.controller.user;
 
+import org.apache.hc.core5.http.ParseException;
 import org.example.playlistinfo.entity.AppUser;
 import org.example.playlistinfo.entity.UserVisitedPlaylist;
 import org.example.playlistinfo.entity.repository.VisitedPlaylistRepository;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.specification.PlaylistSimplified;
 
 import java.util.HashMap;
@@ -36,7 +38,7 @@ public class UserPlaylistController {
 
     // プレイリストのアイテムを取得するエンドポイント
     @GetMapping("/java/playlist/{playlistId}")
-    public Map<String, Object> getPlaylistItems(@PathVariable String playlistId) {
+    public Map<String, Object> getPlaylistItems(@PathVariable String playlistId) throws ParseException, SpotifyWebApiException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails principal = (UserDetails) authentication.getPrincipal();
 
