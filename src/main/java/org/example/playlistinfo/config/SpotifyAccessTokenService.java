@@ -14,25 +14,26 @@ import se.michaelthelin.spotify.requests.authorization.authorization_code.Author
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 
-@Service
+@Service  // サービスクラスを定義
 public class SpotifyAccessTokenService {
     private static final Logger logger = LoggerFactory.getLogger(SpotifyAccessTokenService.class);
 
-    @Getter
+    @Getter  // getterメソッドを自動生成
     public static SpotifyApi spotifyApi;
 
     private final SpotifyApiService spotifyApiService;
 
-    @Autowired
+    @Autowired  // 依存性注入
     public SpotifyAccessTokenService(SpotifyApiService spotifyApiService) {
         this.spotifyApiService = spotifyApiService;
     }
 
-    @PostConstruct
+    @PostConstruct  // 初期化メソッド
     public void init() {
         spotifyApi = spotifyApiService.getSpotifyApi();
     }
 
+    // 認証コードを使用してアクセストークンを取得
     public void authorizationCode(String code) {
         logger.info("認証コードを取得しました: " + code);
         AuthorizationCodeRequest authorizationCodeRequest = spotifyApi.authorizationCode(code)
@@ -51,10 +52,12 @@ public class SpotifyAccessTokenService {
         }
     }
 
+    // アクセストークンを取得
     public String getAccessToken() {
         return spotifyApi.getAccessToken();
     }
 
+    // リフレッシュトークンを取得
     public String getRefreshToken() {
         return spotifyApi.getRefreshToken();
     }

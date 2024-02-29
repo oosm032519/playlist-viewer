@@ -1,5 +1,6 @@
 package org.example.playlistinfo.config;
 
+// Spotifyの認証関連の設定を行うクラス
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,14 +13,16 @@ import java.net.URI;
 
 @Service
 public class SpotifyAuthorizationUriGenerator {
-    private final SpotifyApiService spotifyApiService;
-    private AuthorizationCodeUriRequest authorizationCodeUriRequest;
+    private final SpotifyApiService spotifyApiService;  // Spotify APIサービス
+    private AuthorizationCodeUriRequest authorizationCodeUriRequest;  // 認証コードURIリクエスト
 
+    // コンストラクタ
     @Autowired
     public SpotifyAuthorizationUriGenerator(SpotifyApiService spotifyApiService) {
         this.spotifyApiService = spotifyApiService;
     }
 
+    // 初期化メソッド
     @PostConstruct
     public void init() {
         SpotifyApi spotifyApi = spotifyApiService.getSpotifyApi();
@@ -29,6 +32,7 @@ public class SpotifyAuthorizationUriGenerator {
         .build();
     }
 
+    // 認証コードURIを取得するメソッド
     public ResponseEntity<String> authorizationCodeUri() {
         final URI uri = authorizationCodeUriRequest.execute();
         return ResponseEntity.ok(uri.toString());
