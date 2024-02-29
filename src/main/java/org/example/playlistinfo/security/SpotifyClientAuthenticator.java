@@ -12,25 +12,26 @@ import org.example.playlistinfo.service.SpotifyApiService;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 
-@Service
+@Service  // サービスクラス
 public class SpotifyClientAuthenticator {
 
     private static final Logger logger = LoggerFactory.getLogger(SpotifyClientAuthenticator.class);
 
-    private final SpotifyApiService spotifyApiService;
-    private ClientCredentialsRequest clientCredentialsRequest;
+    private final SpotifyApiService spotifyApiService;  // Spotify APIサービス
+    private ClientCredentialsRequest clientCredentialsRequest;  // クライアント認証リクエスト
 
-    @Autowired
+    @Autowired  // 依存性注入
     public SpotifyClientAuthenticator(SpotifyApiService spotifyApiService) {
         this.spotifyApiService = spotifyApiService;
     }
 
-    @PostConstruct
+    @PostConstruct  // 初期化メソッド
     public void init() {
         SpotifyApi spotifyApi = spotifyApiService.getSpotifyApi();
         clientCredentialsRequest = spotifyApi.clientCredentials().build();
     }
 
+    // クライアント認証を行うメソッド
     public String clientCredentials() {
         try {
             return executeClientCredentialsRequest();
@@ -40,6 +41,7 @@ public class SpotifyClientAuthenticator {
         }
     }
 
+    // クライアント認証リクエストを実行するプライベートメソッド
     private String executeClientCredentialsRequest() throws IOException, SpotifyWebApiException, org.apache.hc.core5.http.ParseException {
         final se.michaelthelin.spotify.model_objects.credentials.ClientCredentials clientCredentials = clientCredentialsRequest.execute();
 

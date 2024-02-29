@@ -22,25 +22,26 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-@RestController
-@RequestMapping("/java")
+@RestController  // RESTコントローラとして機能するクラス
+@RequestMapping("/java")  // このコントローラのエンドポイントの基本パスを設定
 public class SpotifyAuthorizationController {
 
     private final SpotifyAuthorizationUriGenerator spotifyAuthorizationUriGenerator;
     private final SpotifyAccessTokenService spotifyAccessTokenService;
     private static final Logger logger = LoggerFactory.getLogger(SpotifyAuthorizationController.class);
 
+    // コンストラクタ
     public SpotifyAuthorizationController(SpotifyAuthorizationUriGenerator spotifyAuthorizationUriGenerator, SpotifyAccessTokenService spotifyAccessTokenService) {
         this.spotifyAuthorizationUriGenerator = spotifyAuthorizationUriGenerator;
         this.spotifyAccessTokenService = spotifyAccessTokenService;
     }
 
-    @GetMapping("/authorize")
+    @GetMapping("/authorize")  // 認証コードのURIを取得するエンドポイント
     public ResponseEntity<String> authorize() {
         return spotifyAuthorizationUriGenerator.authorizationCodeUri();
     }
 
-    @GetMapping("/spotify/user/playlists")
+    @GetMapping("/spotify/user/playlists")  // ユーザーのプレイリストを取得するエンドポイント
     public ResponseEntity<List<PlaylistSimplified>> getUserPlaylists() {
         String accessToken = spotifyAccessTokenService.getAccessToken();
         SpotifyApi spotifyApi = new SpotifyApi.Builder()
@@ -57,8 +58,8 @@ public class SpotifyAuthorizationController {
             final Paging<PlaylistSimplified> playlistSimplifiedPaging = getListOfUsersPlaylistsRequest.execute();
             return ResponseEntity.ok(Arrays.asList(playlistSimplifiedPaging.getItems()));
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            logger.error("Error: " + e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            logger.error("Error: " + e.getMessage(), e);  // エラーログを出力
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // エラーが発生した場合、500エラーを返す
         }
     }
 }

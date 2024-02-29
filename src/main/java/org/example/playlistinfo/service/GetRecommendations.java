@@ -14,17 +14,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Service  // サービスクラスを表すアノテーション
 public class GetRecommendations {
     private static final Logger logger = LoggerFactory.getLogger(GetRecommendations.class);
 
-    private static SpotifyApiService spotifyApiService;
+    private static SpotifyApiService spotifyApiService;  // Spotify APIサービス
 
-    @Autowired
+    @Autowired  // 依存性注入
     public GetRecommendations(SpotifyApiService spotifyApiService) {
         GetRecommendations.spotifyApiService = spotifyApiService;
     }
 
+    // アーティスト名からトップ5のアーティストIDを取得
     private static List<String> getTopFiveArtistIdsFromNames(List<String> artistNames) throws IOException, SpotifyWebApiException, ParseException {
         SpotifyApi spotifyApi = spotifyApiService.getSpotifyApi();
         List<String> artistIds = new ArrayList<>();
@@ -45,6 +46,7 @@ public class GetRecommendations {
         return artistIds;
     }
 
+    // トラックの特徴に基づいておすすめを取得
     public static Recommendations getRecommendationsBasedOnTrackFeatures(float tempo, int key, float danceability, float energy, float acousticness, float liveness, float speechiness, float valence, List<String> modeArtistNames) throws IOException, SpotifyWebApiException, ParseException {
         SpotifyApi spotifyApi = spotifyApiService.getSpotifyApi();
         List<String> modeArtistIds = getTopFiveArtistIdsFromNames(modeArtistNames);

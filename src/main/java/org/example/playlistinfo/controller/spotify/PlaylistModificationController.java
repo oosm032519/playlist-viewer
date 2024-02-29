@@ -12,40 +12,40 @@ import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
 import java.io.IOException;
 
-@RestController
+@RestController  // RESTコントローラーとして機能
 public class PlaylistModificationController {
-    private final SpotifyService spotifyService;
+    private final SpotifyService spotifyService;  // Spotifyサービス
 
-    @Autowired
+    @Autowired  // Spotifyサービスの自動注入
     public PlaylistModificationController(SpotifyService spotifyService) {
         this.spotifyService = spotifyService;
     }
 
-    @GetMapping("/java/playlist/addTrack")
+    @GetMapping("/java/playlist/addTrack")  // トラックをプレイリストに追加するエンドポイント
     public ResponseEntity<String> addTrackToPlaylist(@RequestParam String trackId, @RequestParam String playlistId) {
         try {
-            String response = spotifyService.addTrackToPlaylist(trackId, playlistId);
-            return ResponseEntity.ok(response);
+            String response = spotifyService.addTrackToPlaylist(trackId, playlistId);  // トラックをプレイリストに追加
+            return ResponseEntity.ok(response);  // 成功した場合、レスポンスを返す
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            return handleException(e);
+            return handleException(e);  // 例外を処理
         }
     }
 
-    @GetMapping("/java/playlist/removeTrack")
+    @GetMapping("/java/playlist/removeTrack")  // トラックをプレイリストから削除するエンドポイント
     public ResponseEntity<String> removeTrackFromPlaylist(@RequestParam String trackId, @RequestParam String playlistId) {
         try {
-            String response = spotifyService.removeTrackFromPlaylist(trackId, playlistId);
-            return ResponseEntity.ok(response);
+            String response = spotifyService.removeTrackFromPlaylist(trackId, playlistId);  // トラックをプレイリストから削除
+            return ResponseEntity.ok(response);  // 成功した場合、レスポンスを返す
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            return handleException(e);
+            return handleException(e);  // 例外を処理
         }
     }
 
-    private ResponseEntity<String> handleException(Exception e) {
+    private ResponseEntity<String> handleException(Exception e) {  // 例外を処理するメソッド
         if (e instanceof SpotifyWebApiException) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Error: " + e.getMessage());  // Spotify APIの例外の場合、403エラーを返す
         } else {
-            throw new RuntimeException("Error: " + e.getMessage());
+            throw new RuntimeException("Error: " + e.getMessage());  // その他の例外の場合、ランタイムエラーをスロー
         }
     }
 }

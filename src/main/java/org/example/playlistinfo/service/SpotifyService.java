@@ -23,23 +23,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service
+@Service  // SpotifyのAPIを利用するためのサービスクラス
 public class SpotifyService {
     private final SpotifyApi spotifyApi;
     private final UserPlaylistService userPlaylistService;
 
-    @Autowired
+    @Autowired  // コンストラクタインジェクション
     public SpotifyService(SpotifyApi spotifyApi, UserPlaylistService userPlaylistService) {
         this.spotifyApi = spotifyApi;
         this.userPlaylistService = userPlaylistService;
     }
 
+    // プレイリストのトラックを取得するメソッド
     public List<AnnotatedPlaylistTrack> fetchPlaylistTracks(String playlistId) throws IOException, SpotifyWebApiException, ParseException {
         List<AnnotatedPlaylistTrack> playlistTracks = new ArrayList<>();
         int offset = 0;
         Paging<PlaylistTrack> playlistTrackPaging;
 
         do {
+            // プレイリストのアイテムを取得するリクエストを作成
             GetPlaylistsItemsRequest getPlaylistsItemsRequest = spotifyApi
                     .getPlaylistsItems(playlistId)
                     .limit(100)
@@ -48,6 +50,7 @@ public class SpotifyService {
 
             playlistTrackPaging = getPlaylistsItemsRequest.execute();
 
+            // 各トラックのオーディオ特性を取得し、AnnotatedPlaylistTrackオブジェクトを作成
             for (PlaylistTrack playlistTrack : playlistTrackPaging.getItems()) {
                 String trackId = playlistTrack.getTrack().getId();
                 GetAudioFeaturesForTrackRequest getAudioFeaturesForTrackRequest = spotifyApi.getAudioFeaturesForTrack(trackId)
@@ -63,6 +66,7 @@ public class SpotifyService {
         return playlistTracks;
     }
 
+    // プレイリストのトラックを取得し、レスポンスを作成するメソッド
     public Map<String, Object> fetchPlaylistTracksAndCreateResponse(String playlistId, String username) throws IOException, SpotifyWebApiException, ParseException {
         List<AnnotatedPlaylistTrack> playlistTracks = fetchPlaylistTracks(playlistId);
         Playlist playlist = spotifyApi.getPlaylist(playlistId).build().execute();
@@ -71,6 +75,7 @@ public class SpotifyService {
         response.put("tracks", playlistTracks);
         response.put("name", playlist.getName());
 
+        // ユーザー名がnullでない場合、ユーザーのプレイリストを保存
         if (username != null) {
             userPlaylistService.saveUserPlaylist(username, playlistId, playlist.getName());
         }
@@ -79,6 +84,7 @@ public class SpotifyService {
         return response;
     }
 
+    // プレイリストにトラックを追加するメソッド
     public String addTrackToPlaylist(String trackId, String playlistId) throws IOException, SpotifyWebApiException, ParseException {
         AddItemsToPlaylistRequest addItemsToPlaylistRequest = spotifyApi
                 .addItemsToPlaylist(playlistId, new String[]{"spotify:track:" + trackId})
@@ -87,6 +93,7 @@ public class SpotifyService {
         return "Track added successfully";
     }
 
+    // プレイリストからトラックを削除するメソッド
     public String removeTrackFromPlaylist(String trackId, String playlistId) throws IOException, SpotifyWebApiException, ParseException {
         JsonArray tracks = JsonParser.parseString("[{\"uri\":\"spotify:track:" + trackId + "\"}]").getAsJsonArray();
         RemoveItemsFromPlaylistRequest removeItemsFromPlaylistRequest = spotifyApi

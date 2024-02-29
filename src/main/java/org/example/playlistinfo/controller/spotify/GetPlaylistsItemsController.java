@@ -16,38 +16,43 @@ import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import java.io.IOException;
 import java.util.Map;
 
-@RestController
+@RestController  // RESTコントローラとしてクラスを宣言
 public class GetPlaylistsItemsController {
     private static final Logger logger = LoggerFactory.getLogger(GetPlaylistsItemsController.class);
 
-    private final SpotifyService spotifyService;
+    private final SpotifyService spotifyService;  // Spotifyサービス
 
+    // Spotifyサービスを引数に取るコンストラクタ
     public GetPlaylistsItemsController(SpotifyService spotifyService) {
         this.spotifyService = spotifyService;
     }
 
+    // プレイリストIDをパスパラメータとして取り、プレイリストのアイテムを取得するエンドポイント
     @GetMapping("/playlist/{playlistId}")
     public ResponseEntity<Map<String, Object>> getPlaylistItems(@PathVariable String playlistId) throws IOException, SpotifyWebApiException, ParseException {
-        String username = SecurityUtils.getUsernameFromSecurityContext();
-        Map<String, Object> response = spotifyService.fetchPlaylistTracksAndCreateResponse(playlistId, username);
-        return ResponseEntity.ok(response);
+        String username = SecurityUtils.getUsernameFromSecurityContext();  // セキュリティコンテキストからユーザ名を取得
+        Map<String, Object> response = spotifyService.fetchPlaylistTracksAndCreateResponse(playlistId, username);  // プレイリストのトラックを取得し、レスポンスを作成
+        return ResponseEntity.ok(response);  // レスポンスを返す
     }
 
+    // IOExceptionをハンドルするメソッド
     @ExceptionHandler(IOException.class)
     public ResponseEntity<String> handleIOException(IOException e) {
-        logger.error("Error occurred while fetching playlist items: ", e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while fetching playlist items.");
+        logger.error("Error occurred while fetching playlist items: ", e);  // エラーログを出力
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while fetching playlist items.");  // エラーレスポンスを返す
     }
 
+    // SpotifyWebApiExceptionをハンドルするメソッド
     @ExceptionHandler(SpotifyWebApiException.class)
     public ResponseEntity<String> handleSpotifyWebApiException(SpotifyWebApiException e) {
-        logger.error("Error occurred while interacting with Spotify API: ", e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error occurred while interacting with Spotify API.");
+        logger.error("Error occurred while interacting with Spotify API: ", e);  // エラーログを出力
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error occurred while interacting with Spotify API.");  // エラーレスポンスを返す
     }
 
+    // ParseExceptionをハンドルするメソッド
     @ExceptionHandler(ParseException.class)
     public ResponseEntity<String> handleParseException(ParseException e) {
-        logger.error("Error occurred while parsing the response from Spotify API: ", e);
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Error occurred while parsing the response from Spotify API.");
+        logger.error("Error occurred while parsing the response from Spotify API: ", e);  // エラーログを出力
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Error occurred while parsing the response from Spotify API.");  // エラーレスポンスを返す
     }
 }

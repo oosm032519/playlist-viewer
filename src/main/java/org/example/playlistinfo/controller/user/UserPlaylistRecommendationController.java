@@ -22,21 +22,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RestController
+@RestController  // ユーザーのプレイリストとレコメンド楽曲に関するコントローラー
 public class UserPlaylistRecommendationController {
 
-    private final VisitedPlaylistRepository visitedPlaylistRepository;
-    private static final Logger logger = LoggerFactory.getLogger(UserPlaylistRecommendationController.class);
+    private final VisitedPlaylistRepository visitedPlaylistRepository;  // 訪問したプレイリストのリポジトリ
+    private static final Logger logger = LoggerFactory.getLogger(UserPlaylistRecommendationController.class);  // ロガー
 
+    // コンストラクタ
     public UserPlaylistRecommendationController(VisitedPlaylistRepository visitedPlaylistRepository) {
         this.visitedPlaylistRepository = visitedPlaylistRepository;
     }
 
+    // ユーザーのプレイリストを取得
     @GetMapping("/user/playlists")
     public List<UserVisitedPlaylist> getUserPlaylists(@AuthenticationPrincipal AppUser appUser) {
         return visitedPlaylistRepository.findByUsername(appUser.getUsername());
     }
 
+    // 訪問したプレイリストを取得
     @GetMapping("/java/user/visited-playlists")
     public ResponseEntity<List<Map<String, String>>> getVisitedPlaylists() {
         String username = getAuthenticatedUsername();
@@ -48,6 +51,7 @@ public class UserPlaylistRecommendationController {
         return ResponseEntity.ok(createResponse(userVisitedPlaylists));
     }
 
+    // レコメンド楽曲を取得
     @GetMapping("/java/recommendations")
     public ResponseEntity<Recommendations> getRecommendations(@RequestParam float tempo, @RequestParam int key, @RequestParam float danceability, @RequestParam float energy, @RequestParam float acousticness, @RequestParam float liveness, @RequestParam float speechiness, @RequestParam float valence, @RequestParam List<String> modeArtistNames) {
         try {
@@ -59,6 +63,7 @@ public class UserPlaylistRecommendationController {
         }
     }
 
+    // 認証されたユーザー名を取得
     private String getAuthenticatedUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication.getPrincipal() == null) {
@@ -67,6 +72,7 @@ public class UserPlaylistRecommendationController {
         return ((UserDetails) authentication.getPrincipal()).getUsername();
     }
 
+    // レスポンスを作成
     private List<Map<String, String>> createResponse(List<UserVisitedPlaylist> userVisitedPlaylists) {
         List<Map<String, String>> response = new ArrayList<>();
         for (UserVisitedPlaylist userVisitedPlaylist : userVisitedPlaylists) {
