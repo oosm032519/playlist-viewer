@@ -7,29 +7,24 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Optional;
 
-@Service // このクラスをSpringのサービスとして登録
+@Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final AppUserRepository appUserRepository;
+    private final UserDetailsConverter userDetailsConverter;
 
-    // AppUserRepositoryを注入するコンストラクタ
-    public UserDetailsServiceImpl(AppUserRepository appUserRepository) {
+    public UserDetailsServiceImpl(AppUserRepository appUserRepository, UserDetailsConverter userDetailsConverter) {
         this.appUserRepository = appUserRepository;
+        this.userDetailsConverter = userDetailsConverter;
     }
 
     @Override
-    // ユーザー名に基づいてユーザー詳細をロードするメソッド
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        AppUser appUser = appUserRepository.findByUsername(username);
+        Optional<AppUser> optionalAppUser = Optional.ofNullable(appUserRepository.findByUsername(username));
 
-        // ユーザーが見つからない場合は例外をスロー
-        if (appUser == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
-
-        // 見つかったユーザーをSpring SecurityのUserオブジェクトに変換
-        return new org.springframework.security.core.userdetails.User(appUser.getUsername(), appUser.getPassword(), new ArrayList<>());
+        return optionalAppUser.map(userDetailsConverter::convert)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }

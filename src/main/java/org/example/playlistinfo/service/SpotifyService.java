@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import org.apache.hc.core5.http.ParseException;
 import org.example.playlistinfo.entity.AnnotatedPlaylistTrack;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
@@ -25,9 +26,12 @@ import java.util.Map;
 @Service
 public class SpotifyService {
     private final SpotifyApi spotifyApi;
+    private final UserPlaylistService userPlaylistService;
 
-    public SpotifyService(SpotifyApi spotifyApi) {
+    @Autowired
+    public SpotifyService(SpotifyApi spotifyApi, UserPlaylistService userPlaylistService) {
         this.spotifyApi = spotifyApi;
+        this.userPlaylistService = userPlaylistService;
     }
 
     public List<AnnotatedPlaylistTrack> fetchPlaylistTracks(String playlistId) throws IOException, SpotifyWebApiException, ParseException {
@@ -68,9 +72,9 @@ public class SpotifyService {
         response.put("name", playlist.getName());
 
         if (username != null) {
-            UserPlaylistService.saveUserPlaylist(username, playlistId, playlist.getName());
+            userPlaylistService.saveUserPlaylist(username, playlistId, playlist.getName());
         }
-        UserPlaylistService.deletePlaylistsWithNullNames();
+        userPlaylistService.deletePlaylistsWithNullNames();
 
         return response;
     }

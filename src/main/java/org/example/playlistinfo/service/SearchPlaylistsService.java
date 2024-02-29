@@ -12,6 +12,7 @@ import se.michaelthelin.spotify.model_objects.specification.PlaylistSimplified;
 import se.michaelthelin.spotify.requests.data.search.simplified.SearchPlaylistsRequest;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,9 +37,15 @@ public class SearchPlaylistsService {
             SearchPlaylistsRequest searchPlaylistsRequest = spotifyApi.searchPlaylists(query).build();
             Paging<PlaylistSimplified> playlistSimplifiedPaging = searchPlaylistsRequest.execute();
             return Arrays.asList(playlistSimplifiedPaging.getItems());
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            logger.error("プレイリストの検索中にエラーが発生しました: ", e);
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            logger.error("An I/O error occurred while searching for playlists: ", e);
+            throw new UncheckedIOException(e);
+        } catch (SpotifyWebApiException e) {
+            logger.error("An error occurred with the Spotify Web API while searching for playlists: ", e);
+            throw new IllegalStateException("An error occurred with the Spotify Web API", e);
+        } catch (ParseException e) {
+            logger.error("An error occurred while parsing the response from the Spotify Web API: ", e);
+            throw new IllegalArgumentException("An error occurred while parsing the response from the Spotify Web API", e);
         }
     }
 }

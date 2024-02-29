@@ -1,88 +1,75 @@
 package org.example.playlistinfo.controller.user;
 
 import org.apache.hc.core5.http.ParseException;
+import org.example.playlistinfo.controller.spotify.GetPlaylistsItemsController;
 import org.example.playlistinfo.entity.AppUser;
 import org.example.playlistinfo.entity.UserVisitedPlaylist;
-import org.example.playlistinfo.entity.repository.VisitedPlaylistRepository;
-import org.example.playlistinfo.controller.spotify.GetPlaylistsItemsController;
 import org.example.playlistinfo.service.SearchPlaylistsService;
+import org.example.playlistinfo.service.VisitedPlaylistService;
+import org.example.playlistinfo.utils.AuthenticationUtil;
+import org.example.playlistinfo.utils.ResponseUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.specification.PlaylistSimplified;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/java")
 public class UserPlaylistController {
 
     private final GetPlaylistsItemsController getPlaylistsItemsController;
     private final SearchPlaylistsService searchPlaylistsService;
-    private final VisitedPlaylistRepository visitedPlaylistRepository;
+    private final VisitedPlaylistService visitedPlaylistService;
 
-    // コンストラクタ
-    public UserPlaylistController(GetPlaylistsItemsController getPlaylistsItemsController, SearchPlaylistsService searchPlaylistsService, VisitedPlaylistRepository visitedPlaylistRepository) {
+    public UserPlaylistController(GetPlaylistsItemsController getPlaylistsItemsController, SearchPlaylistsService searchPlaylistsService, VisitedPlaylistService visitedPlaylistService) {
         this.getPlaylistsItemsController = getPlaylistsItemsController;
         this.searchPlaylistsService = searchPlaylistsService;
-        this.visitedPlaylistRepository = visitedPlaylistRepository;
+        this.visitedPlaylistService = visitedPlaylistService;
     }
 
-    // プレイリストのアイテムを取得するエンドポイント
-    @GetMapping("/java/playlist/{playlistId}")
-    public Map<String, Object> getPlaylistItems(@PathVariable String playlistId) throws ParseException, SpotifyWebApiException, IOException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails principal = (UserDetails) authentication.getPrincipal();
-
-        Map<String, Object> playlistItems = getPlaylistsItemsController.getPlaylistItems(playlistId).getBody();
-
-        // ユーザーがログインしている場合、訪問したプレイリストを保存
-        if (principal != null) {
-            UserVisitedPlaylist userVisitedPlaylist = new UserVisitedPlaylist();
-            userVisitedPlaylist.setPlaylistId(playlistId);
-            userVisitedPlaylist.setUsername(principal.getUsername());
-            visitedPlaylistRepository.save(userVisitedPlaylist);
+    @GetMapping("/playlist/{playlistId}")
+    public ResponseEntity<Map<String, Object>> getPlaylistItems(@PathVariable String playlistId) throws ParseException, SpotifyWebApiException, IOException {
+        ResponseEntity<Map<String, Object>> playlistItems = getPlaylistsItemsController.getPlaylistItems(playlistId);
+        if (playlistItems.getStatusCode() == HttpStatus.OK) {
+            saveUserVisitedPlaylist(playlistId);
         }
-
         return playlistItems;
     }
 
-    // プレイリストを検索するエンドポイント
-    @GetMapping("/java/search/{query}")
+    @GetMapping("/search/{query}")
     public List<PlaylistSimplified> searchPlaylists(@PathVariable String query) {
         return searchPlaylistsService.searchPlaylists(query);
     }
 
-    // ユーザーが訪問したプレイリストを取得するエンドポイント
-    @GetMapping("/java/user/playlists")
+    @GetMapping("/user/playlists")
     public ResponseEntity<List<UserVisitedPlaylist>> getUserPlaylists(@AuthenticationPrincipal AppUser appUser) {
         if (appUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
-        List<UserVisitedPlaylist> userVisitedPlaylists = visitedPlaylistRepository.findByUsername(appUser.getUsername());
+        List<UserVisitedPlaylist> userVisitedPlaylists = visitedPlaylistService.findByUsername(appUser.getUsername());
         return ResponseEntity.ok(userVisitedPlaylists);
     }
 
-    // 現在のユーザー情報を取得するエンドポイント
-    @GetMapping("/java/user")
+    @GetMapping("/user")
     public ResponseEntity<Map<String, Object>> getCurrentUser(@AuthenticationPrincipal AppUser appUser) {
-        Map<String, Object> response = new HashMap<>();
-        if (appUser != null) {
-            response.put("id", appUser.getId());
-            response.put("username", appUser.getUsername());
-        } else {
-            response.put("message", "未ログイン");
+        return createUserResponse(appUser);
+    }
+
+    private void saveUserVisitedPlaylist(String playlistId) {
+        String username = AuthenticationUtil.getAuthenticatedUsername();
+        if (username != null) {
+            visitedPlaylistService.saveVisitedPlaylist(playlistId, username);
         }
+    }
+
+    private ResponseEntity<Map<String, Object>> createUserResponse(AppUser appUser) {
+        Map<String, Object> response = ResponseUtil.createResponse(appUser);
         return ResponseEntity.ok(response);
     }
 }

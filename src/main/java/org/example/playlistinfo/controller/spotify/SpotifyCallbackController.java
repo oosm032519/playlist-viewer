@@ -1,7 +1,7 @@
 package org.example.playlistinfo.controller.spotify;
 
 import org.example.playlistinfo.config.SpotifyAccessTokenService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,27 +12,25 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@RestController // REST APIのコントローラー
+@RestController
 public class SpotifyCallbackController {
 
-    private final SpotifyAccessTokenService spotifyAccessTokenService; // Spotifyのアクセストークンを管理するサービス
-    private static final Logger logger = LoggerFactory.getLogger(SpotifyCallbackController.class); // ロギングのためのロガー
+    private final SpotifyAccessTokenService spotifyAccessTokenService;
+    private static final Logger logger = LoggerFactory.getLogger(SpotifyCallbackController.class);
 
-    // コンストラクタ
-    @Autowired
     public SpotifyCallbackController(SpotifyAccessTokenService spotifyAccessTokenService) {
         this.spotifyAccessTokenService = spotifyAccessTokenService;
     }
 
-    // Spotifyからのコールバックを処理するエンドポイント
     @GetMapping("/callback")
     public void handleCallback(@RequestParam("code") String code, HttpServletResponse response) {
-        spotifyAccessTokenService.authorizationCode(code); // 認証コードを使用してアクセストークンを取得
+        spotifyAccessTokenService.authorizationCode(code);
 
         try {
-            response.sendRedirect("/"); // ホームページにリダイレクト
+            response.sendRedirect("/");
         } catch (IOException e) {
-            logger.error("Error occurred while redirecting", e); // リダイレクト中にエラーが発生した場合、エラーメッセージをログに出力
+            logger.error("Error occurred while redirecting", e);
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
     }
 }

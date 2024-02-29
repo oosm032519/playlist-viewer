@@ -7,40 +7,52 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-// ユーザーのサインアップを処理するコントローラー
 @Controller
 public class UserSignupController {
 
     private final AppUserRepository appUserRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    // コンストラクタ
     public UserSignupController(AppUserRepository appUserRepository, BCryptPasswordEncoder passwordEncoder) {
         this.appUserRepository = appUserRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    // サインアップリクエストを処理するメソッド
     @PostMapping("/signup")
     public String signup(@RequestParam("username") String username, @RequestParam("password") String password) {
-        // ユーザー名とパスワードが空でないことを確認
-        if (username.isEmpty() || password.isEmpty()) {
+        if (!validateInput(username, password)) {
             return "redirect:/signup?error";
         }
 
-        // 既に存在するユーザー名でないことを確認
-        AppUser existingAppUser = appUserRepository.findByUsername(username);
-        if (existingAppUser != null) {
+        if (!createUser(username, password)) {
             return "redirect:/signup?error";
         }
 
-        // 新しいユーザーを作成し、パスワードをエンコードして保存
+        return "redirect:/login";
+    }
+
+    protected boolean validateInput(String username, String password) {
+        return isNotEmpty(username) && isNotEmpty(password) && isUsernameAvailable(username);
+    }
+
+    protected boolean isNotEmpty(String input) {
+        return !input.isEmpty();
+    }
+
+    protected boolean isUsernameAvailable(String username) {
+        return appUserRepository.findByUsername(username) == null;
+    }
+
+    protected boolean createUser(String username, String password) {
+        AppUser appUser = createAppUser(username, password);
+        appUserRepository.save(appUser);
+        return true;
+    }
+
+    protected AppUser createAppUser(String username, String password) {
         AppUser appUser = new AppUser();
         appUser.setUsername(username);
         appUser.setPassword(passwordEncoder.encode(password));
-        appUserRepository.save(appUser);
-
-        // ユーザーをログインページにリダイレクト
-        return "redirect:/login";
+        return appUser;
     }
 }

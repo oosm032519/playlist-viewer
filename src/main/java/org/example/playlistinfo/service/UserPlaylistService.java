@@ -9,28 +9,40 @@ import java.util.List;
 
 @Service
 public class UserPlaylistService {
-    private static VisitedPlaylistRepository visitedPlaylistRepository;
+    private final VisitedPlaylistRepository visitedPlaylistRepository;
 
     @Autowired
     public UserPlaylistService(VisitedPlaylistRepository visitedPlaylistRepository) {
-        UserPlaylistService.visitedPlaylistRepository = visitedPlaylistRepository;
+        this.visitedPlaylistRepository = visitedPlaylistRepository;
     }
 
-    public static void saveUserPlaylist(String username, String playlistId, String playlistName) {
-        if (playlistName != null) {
-            List<UserVisitedPlaylist> existingPlaylists = visitedPlaylistRepository.findByUsernameAndPlaylistId(username, playlistId);
-            if (existingPlaylists.isEmpty()) {
-                UserVisitedPlaylist userVisitedPlaylist = new UserVisitedPlaylist();
-                userVisitedPlaylist.setUsername(username);
-                userVisitedPlaylist.setPlaylistId(playlistId);
-                userVisitedPlaylist.setPlaylistName(playlistName);
-                visitedPlaylistRepository.save(userVisitedPlaylist);
-            }
+    public void saveUserPlaylist(String username, String playlistId, String playlistName) {
+        if (playlistName == null) {
+            return;
         }
+
+        List<UserVisitedPlaylist> existingPlaylists = findPlaylistsByUsernameAndPlaylistId(username, playlistId);
+        if (!existingPlaylists.isEmpty()) {
+            return;
+        }
+
+        UserVisitedPlaylist userVisitedPlaylist = new UserVisitedPlaylist();
+        userVisitedPlaylist.setUsername(username);
+        userVisitedPlaylist.setPlaylistId(playlistId);
+        userVisitedPlaylist.setPlaylistName(playlistName);
+        visitedPlaylistRepository.save(userVisitedPlaylist);
     }
 
-    public static void deletePlaylistsWithNullNames() {
-        List<UserVisitedPlaylist> playlistsWithNullNames = visitedPlaylistRepository.findByPlaylistNameIsNull();
+    public void deletePlaylistsWithNullNames() {
+        List<UserVisitedPlaylist> playlistsWithNullNames = findPlaylistsByNullName();
         visitedPlaylistRepository.deleteAll(playlistsWithNullNames);
+    }
+
+    public List<UserVisitedPlaylist> findPlaylistsByUsernameAndPlaylistId(String username, String playlistId) {
+        return visitedPlaylistRepository.findByUsernameAndPlaylistId(username, playlistId);
+    }
+
+    public List<UserVisitedPlaylist> findPlaylistsByNullName() {
+        return visitedPlaylistRepository.findByPlaylistNameIsNull();
     }
 }
