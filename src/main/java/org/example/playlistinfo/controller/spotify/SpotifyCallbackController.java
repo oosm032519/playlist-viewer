@@ -15,7 +15,6 @@ import java.io.IOException;
 // Spotifyのコールバックを処理するコントローラ
 @RestController
 public class SpotifyCallbackController {
-
     private final SpotifyAccessTokenService spotifyAccessTokenService;
     private static final Logger logger = LoggerFactory.getLogger(SpotifyCallbackController.class);
 
