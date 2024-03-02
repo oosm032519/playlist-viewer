@@ -2,8 +2,9 @@
   "compilerOptions": {
     "target": "es6",
     "module": "esnext",
-    "outDir": "./src/main/resources/static",
+    "outDir": "./src/dist",
     "sourceMap": true,
+    "noImplicitAny": true,
     "lib": [
       "es2015",
       "dom",

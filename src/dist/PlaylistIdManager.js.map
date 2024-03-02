@@ -1,0 +1,1 @@
+{"version":3,"file":"PlaylistIdManager.js","sourceRoot":"","sources":["../main/typescript/PlaylistIdManager.ts"],"names":[],"mappings":"AAAA,MAAM,OAAO,iBAAiB;IAK1B;QAFA,qBAAgB,GAAa,EAAE,CAAC;IAET,CAAC;IAEjB,MAAM,CAAC,WAAW;QACrB,IAAI,CAAC,iBAAiB,CAAC,QAAQ,EAAE,CAAC;YAC9B,iBAAiB,CAAC,QAAQ,GAAG,IAAI,iBAAiB,EAAE,CAAC;QACzD,CAAC;QACD,OAAO,iBAAiB,CAAC,QAAQ,CAAC;IACtC,CAAC;CACJ"}
