@@ -8,61 +8,39 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { UIManager } from './uiManager';
-import { Track } from './track';
+import { PlaylistIdManager } from './playlistIdManager';
+import { TrackTable } from './trackTable';
+import { TrackManager } from './trackManager';
 export class PlaylistManager {
-    // ユーザーのプレイリストを取得する
-    fetchUserPlaylists() {
-        try {
-            const uiManager = new UIManager();
-            uiManager.showLoadingAnimation(); // ローディングアニメーションを表示
-            const playlistManager = new PlaylistManager();
-            playlistManager.fetchPlaylistsFromAPI().then(data => {
-                playlistManager.displayPlaylists(data); // プレイリストを表示
-            }).catch(error => {
-                const uiManager = new UIManager();
-                uiManager.showMessage(error.message); // エラーメッセージを表示
-            }).finally(() => {
-                const uiManager = new UIManager();
-                uiManager.hideLoadingAnimation(); // ローディングアニメーションを非表示にする
-            });
-        }
-        catch (error) {
-            const uiManager = new UIManager();
-            uiManager.showMessage(error.message); // エラーメッセージを表示
-        }
+    constructor() {
+        this.uiManager = new UIManager();
+        this.playlistIdManager = PlaylistIdManager.getInstance();
+        this.trackManager = new TrackManager();
+        // ユーザーのプレイリストを取得する
+        this.fetchUserPlaylists = () => this.fetchDataAndUpdateUI(() => this.fetchPlaylistsFromAPI(), (data) => this.uiManager.displayPlaylists(data));
+        // プレイリストの詳細を取得し表示する
+        this.fetchAndDisplayPlaylistDetails = (playlist) => this.fetchDataAndUpdateUI(() => this.fetchPlaylistDuplicate(playlist.id), (data) => this.uiManager.displayPlaylistDetails(playlist, data));
+        // プレイリストフォームの送信イベントハンドラ
+        this.handlePlaylistFormSubmit = this.createFormSubmitHandler('playlistId', this.fetchPlaylistData.bind(this));
+        // 検索フォームの送信イベントハンドラ
+        this.handleSearchFormSubmit = this.createFormSubmitHandler('searchQuery', this.fetchSearchData.bind(this));
+        this.uiManager = new UIManager();
     }
-    // プレイリストを表示する
-    displayPlaylists(data) {
-        const uiManager = new UIManager();
-        uiManager.playlistTracksDiv.innerHTML = '';
-        if (Array.isArray(data)) {
-            uiManager.createSearchResultsTable(data); // 検索結果のテーブルを作成
-        }
-        else {
-            console.error('Expected data to be an array but received', data);
-        }
-    }
-    // プレイリストの詳細を取得し表示する
-    fetchAndDisplayPlaylistDetails(playlist) {
-        document.getElementById('loading').classList.remove('hidden'); // ローディングアニメーションを表示
-        fetch(`/java/playlist/${playlist.id}`)
-            .then(response => response.json())
-            .then(data => {
-            const uiManager = new UIManager();
-            uiManager.playlistTracksDiv.innerHTML = '';
-            const playlistNameElement = document.createElement('h2');
-            playlistNameElement.textContent = `${playlist.name}`;
-            uiManager.playlistTracksDiv.appendChild(playlistNameElement); // プレイリスト名を表示
-            if (data && Array.isArray(data.tracks)) {
-                const tracks = data.tracks.map((item) => new Track(item.playlistTrack.track, item.audioFeatures));
-                uiManager.createDomTable(tracks); // テーブルを作成
+    // データ取得とUI更新の共通処理
+    fetchDataAndUpdateUI(fetchData, updateUI) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                this.uiManager.showLoadingAnimation();
+                const data = yield fetchData();
+                updateUI(data);
             }
-            else {
-                console.error('Expected data.tracks to be an array but received', data);
+            catch (error) {
+                this.uiManager.showMessage(error.message);
             }
-            document.getElementById('loading').classList.add('hidden'); // ローディングアニメーションを非表示にする
-        })
-            .catch(error => console.error('There was a problem with the fetch operation: ', error));
+            finally {
+                this.uiManager.hideLoadingAnimation();
+            }
+        });
     }
     // APIからプレイリストを取得する非同期関数
     fetchPlaylistsFromAPI() {
@@ -75,31 +53,149 @@ export class PlaylistManager {
             return response.json();
         });
     }
+    // プレイリストの詳細を取得する
+    fetchPlaylistDuplicate(playlistId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield fetch(`/java/playlist/${playlistId}`);
+            if (!response.ok) {
+                throw new Error('There was a problem with the fetch operation');
+            }
+            return yield response.json();
+        });
+    }
     // ユーザーが訪れたプレイリストを取得する非同期関数
     fetchVisitedPlaylists() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // '/java/user/visited-playlists'エンドポイントからデータを取得
-                const response = yield fetch('/java/user/visited-playlists', { credentials: 'include' });
-                // レスポンスがOKでない場合、エラーをスロー
-                this.checkResponseStatus(response);
-                const data = yield response.json(); // レスポンスをJSONに変換
-                // 訪れたプレイリストを表示するためのdiv要素を取得
-                const visitedPlaylistsDiv = document.getElementById('visitedPlaylists');
-                // UIManagerインスタンスを作成
-                const uiManager = new UIManager();
-                // テーブルを作成してdiv要素に追加
-                uiManager.createUITable(visitedPlaylistsDiv, data);
+                const data = yield this.fetchDataFromEndpoint('/java/user/visited-playlists');
+                this.createAndDisplayTable(data);
             }
             catch (error) {
                 console.error('There was a problem with the fetch operation: ', error);
             }
         });
     }
+    fetchDataFromEndpoint(endpoint) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield fetch(endpoint, { credentials: 'include' });
+            this.checkResponseStatus(response);
+            return yield response.json();
+        });
+    }
+    createAndDisplayTable(data) {
+        const visitedPlaylistsDiv = document.getElementById('visitedPlaylists');
+        this.uiManager.createUITable(visitedPlaylistsDiv, data);
+    }
     // レスポンスのステータスをチェックする関数
     checkResponseStatus(response) {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    }
+    // APIからデータを取得する
+    fetchDataFromAPI(url, handler) {
+        this.resetPlaylistTrackIds();
+        this.prepareUIForDataFetching();
+        fetch(url)
+            .then(TrackTable.handleResponse)
+            .then(handler.bind(this))
+            .catch(TrackTable.handleError)
+            .finally(() => {
+            this.uiManager.hideLoadingAnimation();
+        });
+    }
+    // プレイリストのトラックIDをリセットする
+    resetPlaylistTrackIds() {
+        this.playlistIdManager.playlistTrackIds = [];
+    }
+    // データ取得のためのUIを準備する
+    prepareUIForDataFetching() {
+        this.uiManager.clearAllTables();
+        this.uiManager.showLoadingAnimation();
+    }
+    // プレイリストデータを取得する
+    fetchPlaylistData(playlistId) {
+        this.fetchDataFromAPI(`/java/playlist/${playlistId}`, this.handlePlaylistData);
+    }
+    // 検索データを取得する
+    fetchSearchData(searchQuery) {
+        this.fetchDataFromAPI(`/java/search/${searchQuery}`, this.handleSearchData);
+    }
+    // プレイリストの詳細を取得・表示する
+    fetchPlaylistDetails(result) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const url = `/java/playlist/${result.id}`;
+            const data = yield this.fetchData(url);
+            this.uiManager.validateData(data);
+            return data;
+        });
+    }
+    fetchData(url) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield fetch(url);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch data from ${url}`);
+            }
+            return yield response.json();
+        });
+    }
+    fetchAndDisplayPlaylistDetailsUI(result) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.uiManager.toggleLoadingAnimation();
+            this.playlistIdManager.playlistId = result.id;
+            try {
+                yield this.handlePlaylistDetails(result);
+            }
+            catch (error) {
+                console.error(error.message);
+                this.uiManager.showMessage(`Error: ${error.message}`);
+            }
+            finally {
+                this.uiManager.toggleLoadingAnimation();
+            }
+        });
+    }
+    handlePlaylistDetails(result) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = yield this.fetchPlaylistDetails(result);
+            this.uiManager.displayPlaylistDetails(result, data);
+        });
+    }
+    // 共通の処理を行うメソッド
+    handleFormSubmit(event, inputId, fetchData) {
+        event.preventDefault();
+        const inputElement = this.uiManager.getElementById(inputId);
+        const inputValue = inputElement.value;
+        fetchData(inputValue);
+    }
+    // フォーム送信イベントハンドラを作成するメソッド
+    createFormSubmitHandler(inputId, fetchData) {
+        return (event) => {
+            this.handleFormSubmit(event, inputId, fetchData);
+        };
+    }
+    // プレイリストデータの処理
+    handlePlaylistData(data) {
+        this.uiManager.clearAllTables();
+        this.processPlaylistData(data);
+        this.uiManager.hideLoadingAnimation();
+    }
+    // 検索データの処理
+    handleSearchData(data) {
+        this.uiManager.clearAllTables();
+        this.uiManager.createSearchResultsTable(data);
+        this.uiManager.hideLoadingAnimation();
+    }
+    // プレイリストデータの処理
+    processPlaylistData(data) {
+        if (this.uiManager.isValidData(data)) {
+            const tracks = this.trackManager.createTracks(data);
+            this.uiManager.createDomTable(tracks);
+            this.trackManager.calculateAverageAndMode(tracks);
+            this.uiManager.displayPlaylistName(data.name);
+        }
+        else {
+            console.error('Expected data.tracks to be an array but received', data);
         }
     }
 }

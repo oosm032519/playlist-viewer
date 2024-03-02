@@ -4,6 +4,7 @@ export class PageInitializer {
     constructor() {
         this.uiManager = new UIManager();
         this.playlistManager = new PlaylistManager();
+        this.initializePage();
     }
     initializePage() {
         this.setupUIManager();
@@ -14,8 +15,8 @@ export class PageInitializer {
         this.uiManager.togglePlaylistSearchOption();
         this.uiManager.toggleSideMenu();
         this.uiManager.displayLoginResultMessage();
-        this.uiManager.addSubmitEventToForm('playlistForm', this.uiManager.handlePlaylistFormSubmit);
-        this.uiManager.addSubmitEventToForm('searchForm', this.uiManager.handleSearchFormSubmit);
+        this.uiManager.addSubmitEventToForm('playlistForm', this.playlistManager.handlePlaylistFormSubmit.bind(this.playlistManager));
+        this.uiManager.addSubmitEventToForm('searchForm', this.playlistManager.handleSearchFormSubmit.bind(this.playlistManager));
     }
     fetchVisitedPlaylists() {
         this.playlistManager.fetchVisitedPlaylists();
@@ -23,7 +24,6 @@ export class PageInitializer {
 }
 // ページ読み込み完了時の処理
 document.addEventListener('DOMContentLoaded', () => {
-    const pageInitializer = new PageInitializer();
-    pageInitializer.initializePage();
+    new PageInitializer();
 });
 //# sourceMappingURL=pageInitializer.js.map

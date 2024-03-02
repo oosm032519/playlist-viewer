@@ -1,61 +1,41 @@
-import {UIManager} from './uiManager'
-import {Track} from './track'
+import {PlaylistSimplified, UIManager} from './uiManager'
+import {PlaylistIdManager} from './playlistIdManager'
+import {TrackTable} from './trackTable'
+import {TrackManager} from './trackManager'
 
 export class PlaylistManager {
-    // ユーザーのプレイリストを取得する
-    fetchUserPlaylists() {
+    private uiManager = new UIManager();
+    private playlistIdManager = PlaylistIdManager.getInstance();
+    private trackManager = new TrackManager();
+    
+    constructor() {
+        this.uiManager = new UIManager();
+    }
+
+    // データ取得とUI更新の共通処理
+    async fetchDataAndUpdateUI(fetchData: () => Promise<any>, updateUI: (data: any) => void) {
         try {
-            const uiManager = new UIManager();
-            uiManager.showLoadingAnimation();  // ローディングアニメーションを表示
-            const playlistManager = new PlaylistManager();
-            playlistManager.fetchPlaylistsFromAPI().then(data => {  // APIからプレイリストを取得
-                playlistManager.displayPlaylists(data);  // プレイリストを表示
-            }).catch(error => {
-                const uiManager = new UIManager();
-                uiManager.showMessage(error.message);  // エラーメッセージを表示
-            }).finally(() => {
-                const uiManager = new UIManager();
-                uiManager.hideLoadingAnimation();  // ローディングアニメーションを非表示にする
-            });
+            this.uiManager.showLoadingAnimation();
+            const data = await fetchData();
+            updateUI(data);
         } catch (error) {
-            const uiManager = new UIManager();
-            uiManager.showMessage(error.message);  // エラーメッセージを表示
+            this.uiManager.showMessage(error.message);
+        } finally {
+            this.uiManager.hideLoadingAnimation();
         }
     }
-    
-    // プレイリストを表示する
-    displayPlaylists(data: any) {
-        const uiManager = new UIManager();
-        uiManager.playlistTracksDiv.innerHTML = '';
-        if (Array.isArray(data)) {
-            uiManager.createSearchResultsTable(data);  // 検索結果のテーブルを作成
-        } else {
-            console.error('Expected data to be an array but received', data);
-        }
-    }
-    
+
+    // ユーザーのプレイリストを取得する
+    fetchUserPlaylists = () => this.fetchDataAndUpdateUI(
+        () => this.fetchPlaylistsFromAPI(),
+        (data) => this.uiManager.displayPlaylists(data)
+    );
+
     // プレイリストの詳細を取得し表示する
-    fetchAndDisplayPlaylistDetails(playlist: any) {
-        document.getElementById('loading').classList.remove('hidden');  // ローディングアニメーションを表示
-        fetch(`/java/playlist/${playlist.id}`)
-            .then(response => response.json())
-            .then(data => {
-                const uiManager = new UIManager();
-                uiManager.playlistTracksDiv.innerHTML = '';
-                const playlistNameElement = document.createElement('h2');
-                playlistNameElement.textContent = `${playlist.name}`;
-                uiManager.playlistTracksDiv.appendChild(playlistNameElement);  // プレイリスト名を表示
-                
-                if (data && Array.isArray(data.tracks)) {
-                    const tracks = data.tracks.map((item: any) => new Track(item.playlistTrack.track, item.audioFeatures));
-                    uiManager.createDomTable(tracks);  // テーブルを作成
-                } else {
-                    console.error('Expected data.tracks to be an array but received', data);
-                }
-                document.getElementById('loading').classList.add('hidden');  // ローディングアニメーションを非表示にする
-            })
-            .catch(error => console.error('There was a problem with the fetch operation: ', error));
-    }
+    fetchAndDisplayPlaylistDetails = (playlist: any) => this.fetchDataAndUpdateUI(
+        () => this.fetchPlaylistDuplicate(playlist.id),
+        (data) => this.uiManager.displayPlaylistDetails(playlist, data)
+    );
     
     // APIからプレイリストを取得する非同期関数
     async fetchPlaylistsFromAPI() {
@@ -67,34 +47,156 @@ export class PlaylistManager {
         return response.json();
     }
     
+    // プレイリストの詳細を取得する
+    async fetchPlaylistDuplicate(playlistId: string) {
+        const response = await fetch(`/java/playlist/${playlistId}`);
+        if (!response.ok) {
+            throw new Error('There was a problem with the fetch operation');
+        }
+        return await response.json();
+    }
+    
     // ユーザーが訪れたプレイリストを取得する非同期関数
     async fetchVisitedPlaylists() {
         try {
-            // '/java/user/visited-playlists'エンドポイントからデータを取得
-            const response = await fetch('/java/user/visited-playlists', {credentials: 'include'});
-            
-            // レスポンスがOKでない場合、エラーをスロー
-            this.checkResponseStatus(response);
-            
-            const data = await response.json();  // レスポンスをJSONに変換
-            
-            // 訪れたプレイリストを表示するためのdiv要素を取得
-            const visitedPlaylistsDiv = document.getElementById('visitedPlaylists');
-            
-            // UIManagerインスタンスを作成
-            const uiManager = new UIManager();
-            
-            // テーブルを作成してdiv要素に追加
-            uiManager.createUITable(visitedPlaylistsDiv, data);
+            const data = await this.fetchDataFromEndpoint('/java/user/visited-playlists');
+            this.createAndDisplayTable(data);
         } catch (error) {
             console.error('There was a problem with the fetch operation: ', error);
         }
+    }
+    
+    async fetchDataFromEndpoint(endpoint: string) {
+        const response = await fetch(endpoint, {credentials: 'include'});
+        this.checkResponseStatus(response);
+        return await response.json();
+    }
+    
+    createAndDisplayTable(data: any) {
+        const visitedPlaylistsDiv = document.getElementById('visitedPlaylists');
+        this.uiManager.createUITable(visitedPlaylistsDiv, data);
     }
     
     // レスポンスのステータスをチェックする関数
     checkResponseStatus(response: Response) {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    }
+
+    // APIからデータを取得する
+    fetchDataFromAPI(url: string, handler: (data: any) => void): void {
+        this.resetPlaylistTrackIds();
+        this.prepareUIForDataFetching();
+        
+        fetch(url)
+            .then(TrackTable.handleResponse)
+            .then(handler.bind(this))
+            .catch(TrackTable.handleError)
+            .finally(() => {
+                this.uiManager.hideLoadingAnimation();
+            });
+    }
+
+    // プレイリストのトラックIDをリセットする
+    resetPlaylistTrackIds(): void {
+        this.playlistIdManager.playlistTrackIds = [];
+    }
+
+    // データ取得のためのUIを準備する
+    prepareUIForDataFetching(): void {
+        this.uiManager.clearAllTables();
+        this.uiManager.showLoadingAnimation();
+    }
+    
+    // プレイリストデータを取得する
+    fetchPlaylistData(playlistId: string): void {
+        this.fetchDataFromAPI(`/java/playlist/${playlistId}`, this.handlePlaylistData);
+    }
+    
+    // 検索データを取得する
+    fetchSearchData(searchQuery: string): void {
+        this.fetchDataFromAPI(`/java/search/${searchQuery}`, this.handleSearchData);
+    }
+    
+    // プレイリストの詳細を取得・表示する
+    async fetchPlaylistDetails(result: PlaylistSimplified): Promise<any> {
+        const url = `/java/playlist/${result.id}`;
+        const data = await this.fetchData(url);
+        this.uiManager.validateData(data);
+        return data;
+    }
+    
+    async fetchData(url: string): Promise<any> {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch data from ${url}`);
+        }
+        return await response.json();
+    }
+    
+    async fetchAndDisplayPlaylistDetailsUI(result: PlaylistSimplified): Promise<void> {
+        this.uiManager.toggleLoadingAnimation();
+        this.playlistIdManager.playlistId = result.id;
+        try {
+            await this.handlePlaylistDetails(result);
+        } catch (error) {
+            console.error(error.message);
+            this.uiManager.showMessage(`Error: ${error.message}`);
+        } finally {
+            this.uiManager.toggleLoadingAnimation();
+        }
+    }
+    
+    private async handlePlaylistDetails(result: PlaylistSimplified): Promise<void> {
+        const data = await this.fetchPlaylistDetails(result);
+        this.uiManager.displayPlaylistDetails(result, data);
+    }
+
+    // 共通の処理を行うメソッド
+    handleFormSubmit(event: Event, inputId: string, fetchData: (id: string) => void): void {
+        event.preventDefault();
+        const inputElement = this.uiManager.getElementById(inputId) as HTMLInputElement;
+        const inputValue = inputElement.value;
+        fetchData(inputValue);
+    }
+
+    // フォーム送信イベントハンドラを作成するメソッド
+    createFormSubmitHandler(inputId: string, fetchData: (id: string) => void): (event: Event) => void {
+        return (event: Event) => {
+            this.handleFormSubmit(event, inputId, fetchData);
+        };
+    }
+
+    // プレイリストフォームの送信イベントハンドラ
+    handlePlaylistFormSubmit = this.createFormSubmitHandler('playlistId', this.fetchPlaylistData.bind(this));
+
+    // 検索フォームの送信イベントハンドラ
+    handleSearchFormSubmit = this.createFormSubmitHandler('searchQuery', this.fetchSearchData.bind(this));
+    
+    // プレイリストデータの処理
+    handlePlaylistData(data: any): void {
+        this.uiManager.clearAllTables();
+        this.processPlaylistData(data);
+        this.uiManager.hideLoadingAnimation();
+    }
+    
+    // 検索データの処理
+    handleSearchData(data: any): void {
+        this.uiManager.clearAllTables();
+        this.uiManager.createSearchResultsTable(data);
+        this.uiManager.hideLoadingAnimation();
+    }
+    
+    // プレイリストデータの処理
+    processPlaylistData(data: any): void {
+        if (this.uiManager.isValidData(data)) {
+            const tracks = this.trackManager.createTracks(data);
+            this.uiManager.createDomTable(tracks);
+            this.trackManager.calculateAverageAndMode(tracks);
+            this.uiManager.displayPlaylistName(data.name);
+        } else {
+            console.error('Expected data.tracks to be an array but received', data);
         }
     }
 }

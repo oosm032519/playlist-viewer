@@ -1,17 +1,15 @@
 import {UIManager} from './uiManager'
 import {PlaylistManager} from './playlistManager'
 
-
 export class PageInitializer {
-    private uiManager: UIManager;
-    private playlistManager: PlaylistManager;
-    
+    private uiManager = new UIManager();
+    private playlistManager = new PlaylistManager();
+
     constructor() {
-        this.uiManager = new UIManager();
-        this.playlistManager = new PlaylistManager();
+        this.initializePage();
     }
     
-    initializePage() {
+    private initializePage() {
         this.setupUIManager();
         this.fetchVisitedPlaylists();
     }
@@ -21,8 +19,8 @@ export class PageInitializer {
         this.uiManager.togglePlaylistSearchOption();
         this.uiManager.toggleSideMenu();
         this.uiManager.displayLoginResultMessage();
-        this.uiManager.addSubmitEventToForm('playlistForm', this.uiManager.handlePlaylistFormSubmit);
-        this.uiManager.addSubmitEventToForm('searchForm', this.uiManager.handleSearchFormSubmit);
+        this.uiManager.addSubmitEventToForm('playlistForm', this.playlistManager.handlePlaylistFormSubmit.bind(this.playlistManager));
+        this.uiManager.addSubmitEventToForm('searchForm', this.playlistManager.handleSearchFormSubmit.bind(this.playlistManager));
     }
     
     private fetchVisitedPlaylists() {
@@ -32,6 +30,5 @@ export class PageInitializer {
 
 // ページ読み込み完了時の処理
 document.addEventListener('DOMContentLoaded', () => {
-    const pageInitializer = new PageInitializer();
-    pageInitializer.initializePage();
+    new PageInitializer();
 });
