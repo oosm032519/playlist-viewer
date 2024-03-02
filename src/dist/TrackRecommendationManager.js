@@ -80,6 +80,7 @@ export class TrackRecommendationManager {
         const button = document.createElement('button');
         button.textContent = isAddButton ? '+' : '-';
         button.className = 'track-button';
+        const uiManager = new UIManager();
         button.addEventListener('click', () => __awaiter(this, void 0, void 0, function* () {
             if (!playlistId) {
                 console.error('Playlist ID is not set.');
@@ -89,21 +90,24 @@ export class TrackRecommendationManager {
             const successMessage = isAddButton ? '楽曲を追加しました！' : '楽曲を削除しました！';
             const errorMessage = isAddButton ? '楽曲を追加できませんでした' : '楽曲を削除できませんでした';
             try {
-                const response = yield fetch(`/java/playlist/${endpoint}?trackId=${track.id}&playlistId=${playlistId}`);
-                if (!response.ok) {
-                    throw new Error(errorMessage);
-                }
-                const uiManager = new UIManager();
+                yield this.fetchTrack(`/java/playlist/${endpoint}?trackId=${track.id}&playlistId=${playlistId}`);
                 uiManager.showMessage(successMessage);
                 cell.style.backgroundColor = isAddButton ? 'lightgreen' : (row.sectionRowIndex % 2 === 0 ? '#FFF' : '#F2F2F2');
             }
             catch (error) {
                 console.error('There was a problem with the fetch operation: ', error);
-                const uiManager = new UIManager();
                 uiManager.showMessage(errorMessage);
             }
         }));
         return button;
+    }
+    fetchTrack(url) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield fetch(url);
+            if (!response.ok) {
+                throw new Error('There was a problem with the fetch operation');
+            }
+        });
     }
     // ヘッダー行を作成する関数
     createHeaderRow() {

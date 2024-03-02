@@ -73,36 +73,40 @@ export class TrackRecommendationManager {
         return trackRecommendationManager.createTrackButton(track, playlistId, cell, row, false);
     }
     
-    // トラックボタンを作成する関数
-    createTrackButton(track: any, playlistId: string, cell: HTMLElement, row: HTMLTableRowElement, isAddButton: boolean) {
-        const button = document.createElement('button');
-        button.textContent = isAddButton ? '+' : '-';
-        button.className = 'track-button';
-        button.addEventListener('click', async () => {
-            if (!playlistId) {
-                console.error('Playlist ID is not set.');
-                return;
-            }
-            const endpoint = isAddButton ? 'addTrack' : 'removeTrack';
-            const successMessage = isAddButton ? '楽曲を追加しました！' : '楽曲を削除しました！';
-            const errorMessage = isAddButton ? '楽曲を追加できませんでした' : '楽曲を削除できませんでした';
-            
-            try {
-                const response = await fetch(`/java/playlist/${endpoint}?trackId=${track.id}&playlistId=${playlistId}`);
-                if (!response.ok) {
-                    throw new Error(errorMessage);
-                }
-                const uiManager = new UIManager();
-                uiManager.showMessage(successMessage);
-                cell.style.backgroundColor = isAddButton ? 'lightgreen' : (row.sectionRowIndex % 2 === 0 ? '#FFF' : '#F2F2F2');
-            } catch (error) {
-                console.error('There was a problem with the fetch operation: ', error);
-                const uiManager = new UIManager();
-                uiManager.showMessage(errorMessage);
-            }
-        });
-        return button;
+// トラックボタンを作成する関数
+createTrackButton(track: any, playlistId: string, cell: HTMLElement, row: HTMLTableRowElement, isAddButton: boolean) {
+    const button = document.createElement('button');
+    button.textContent = isAddButton ? '+' : '-';
+    button.className = 'track-button';
+    const uiManager = new UIManager();
+
+    button.addEventListener('click', async () => {
+        if (!playlistId) {
+            console.error('Playlist ID is not set.');
+            return;
+        }
+        const endpoint = isAddButton ? 'addTrack' : 'removeTrack';
+        const successMessage = isAddButton ? '楽曲を追加しました！' : '楽曲を削除しました！';
+        const errorMessage = isAddButton ? '楽曲を追加できませんでした' : '楽曲を削除できませんでした';
+        
+        try {
+            await this.fetchTrack(`/java/playlist/${endpoint}?trackId=${track.id}&playlistId=${playlistId}`);
+            uiManager.showMessage(successMessage);
+            cell.style.backgroundColor = isAddButton ? 'lightgreen' : (row.sectionRowIndex % 2 === 0 ? '#FFF' : '#F2F2F2');
+        } catch (error) {
+            console.error('There was a problem with the fetch operation: ', error);
+            uiManager.showMessage(errorMessage);
+        }
+    });
+    return button;
+}
+
+async fetchTrack(url: string) {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error('There was a problem with the fetch operation');
     }
+}
     
     // ヘッダー行を作成する関数
     createHeaderRow(): HTMLTableRowElement {

@@ -1,24 +1,26 @@
-import {PlaylistManager} from './PlaylistManager'
-import {PlaylistIdManager} from './PlaylistIdManager'
 import {TrackRecommendationManager} from './TrackRecommendationManager'
+import {PlaylistIdManager} from './PlaylistIdManager'
 import {Track} from './Track'
+import {PlaylistManager} from './PlaylistManager'
 
 export class TableManager {
+    // テーブルの幅をチェックする関数
     checkTableWidth() {
-    // 全てのテーブルを取得
-    const tables = document.querySelectorAll('table');
-    tables.forEach((table) => {
-        // テーブルの幅がウィンドウの幅より大きい場合
-        if (table.offsetWidth > window.innerWidth) {
-            // スクロールバーを表示
-            table.style.overflowX = 'scroll';
-        } else {
-            // スクロールバーを非表示
-            table.style.overflowX = 'auto';
-        }
-    });
+        // 全てのテーブルを取得
+        const tables = document.querySelectorAll('table');
+        tables.forEach((table) => {
+            // テーブルの幅がウィンドウの幅より大きい場合
+            if (table.offsetWidth > window.innerWidth) {
+                // スクロールバーを表示
+                table.style.overflowX = 'scroll';
+            } else {
+                // スクロールバーを非表示
+                table.style.overflowX = 'auto';
+            }
+        });
     }
     
+    // visitedPlaylistsDivからテーブルを取得する関数
     getTable(visitedPlaylistsDiv: HTMLElement): HTMLTableElement {
         let table = visitedPlaylistsDiv.querySelector('table');
         if (!table) {
@@ -28,6 +30,7 @@ export class TableManager {
         return table;
     }
     
+    // テーブルヘッダーを作成する関数
     createTableHeader(): HTMLTableSectionElement {
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
@@ -38,6 +41,7 @@ export class TableManager {
         return thead;
     }
     
+    // テーブルボディを作成する関数
     createTableBody(table: HTMLTableElement, data: any): HTMLTableSectionElement {
         let tableBody = table.querySelector('tbody');
         if (!tableBody) {
@@ -46,13 +50,14 @@ export class TableManager {
         }
         
         data.forEach((playlist: any) => {
-            const row = tableManager.createTableRow(playlist);
+            const row = this.createTableRow(playlist);
             tableBody.appendChild(row);
         });
         
         return tableBody;
     }
     
+    // テーブル行を作成する関数
     createTableRow(playlist: any) {
         const row = document.createElement('tr');
         const nameCell = document.createElement('td');
@@ -63,6 +68,7 @@ export class TableManager {
         return row;
     }
     
+    // レコメンド曲のデータを処理する関数
     processRecommendationData(data: any) {
         const trackRecommendationManager = new TrackRecommendationManager();
         trackRecommendationManager.logResponseData(data);
@@ -78,8 +84,6 @@ export class TableManager {
     }
     
     // 推奨曲を表示する関数
-    
-    
     displayRecommendedTracks(tracks: any[]) {
         const table = document.createElement('table');
         table.classList.add('recommendations-table');
@@ -94,7 +98,7 @@ export class TableManager {
         trackRecommendationManager.appendTableToDOM(table);
     }
     
-    
+    // トラックの合計値を計算する関数
     calculateSum(tracks: Track[]) {
         let totalTempo = 0;
         let totalAcousticness = 0;
@@ -137,7 +141,7 @@ export class TableManager {
         };
     }
     
-    
+    // 平均値を計算する関数
     calculateAverage(sum: any, length: number) {
         return {
             averageTempo: sum.totalTempo / length,
@@ -150,19 +154,16 @@ export class TableManager {
         };
     }
     
-    
+    // 最頻値を計算する関数
     calculateMode(sum: any) {
         return {
-            modeKey: tableManager.mode(sum.keys),
-            modeMode: tableManager.mode(sum.modes),
-            topFiveArtistNames: tableManager.getTopFiveMostFrequentValues(sum.artistNames)
+            modeKey: this.mode(sum.keys),
+            modeMode: this.mode(sum.modes),
+            topFiveArtistNames: this.getTopFiveMostFrequentValues(sum.artistNames)
         };
     }
-
-
-// 配列の最頻値を取得する関数
     
-    
+    // 配列の最頻値を取得する関数
     mode(array: any[]) {
         return array.sort((a, b) =>
             array.filter(v => v === a).length
@@ -170,7 +171,7 @@ export class TableManager {
         ).pop();
     }
     
-    
+    // 頻度マップを作成する関数
     createFrequencyMap(array: any[]): Record<string, number> {
         const frequency: Record<string, number> = {};
         for (const item of array) {
@@ -179,13 +180,13 @@ export class TableManager {
         return frequency;
     }
     
-    
+    // 最頻値を取得する関数
     getMostFrequentValues(frequency: Record<string, number>, count: number): string[] {
         const sortedKeys = [...Object.keys(frequency)].sort((a, b) => frequency[b] - frequency[a]);
         return sortedKeys.filter(key => frequency[key] > 1).slice(0, count);
     }
     
-    
+    // 配列からランダムな値を取得する関数
     getRandomValues(array: string[], count: number): string[] {
         let values: any[] = [];
         while (values.length < count && array.length > 0) {
@@ -199,18 +200,16 @@ export class TableManager {
         return values;
     }
     
-    
+    // 最頻値のトップ5を取得する関数
     getTopFiveMostFrequentValues(array: string[]): string[] {
-        const tableManager = new TableManager();
-        const frequency = tableManager.createFrequencyMap(array);
+        const frequency = this.createFrequencyMap(array);
         const modesCount = 5;
-        let modes = tableManager.getMostFrequentValues(frequency, modesCount);
+        let modes = this.getMostFrequentValues(frequency, modesCount);
         const remainingArtists = Object.keys(frequency).filter(key => frequency[key] === 1);
         const additionalModesCount = modesCount - modes.length;
-        const additionalModes = tableManager.getRandomValues(remainingArtists, additionalModesCount);
+        const additionalModes = this.getRandomValues(remainingArtists, additionalModesCount);
         return [...modes, ...additionalModes];
     }
-
 }
 const tableManager = new TableManager;
 window.addEventListener('resize', tableManager.checkTableWidth);

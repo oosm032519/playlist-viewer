@@ -13,39 +13,48 @@ import { TrackManager } from './TrackManager';
 import { Track } from './Track';
 export class DomElements {
     constructor() {
+        // プレイリストフォームの送信イベントハンドラ
         this.handlePlaylistFormSubmit = (event) => {
-            // プレイリストフォームの送信イベントハンドラ
             event.preventDefault();
             const playlistIdManager = PlaylistIdManager.getInstance();
             playlistIdManager.playlistId = this.playlistIdInput.value;
             this.fetchPlaylistData(playlistIdManager.playlistId);
         };
     }
+    // IDに基づいてHTML要素を取得する
     getElementById(id) {
         return document.getElementById(id);
     }
+    // プレイリストフォームを取得する
     get playlistForm() {
         return this.getElementById('playlistForm');
     }
+    // プレイリストID入力を取得する
     get playlistIdInput() {
         return this.getElementById('playlistId');
     }
+    // プレイリストトラックDivを取得する
     get playlistTracksDiv() {
         return this.getElementById('playlistTracks');
     }
+    // 検索フォームを取得する
     get searchForm() {
         return this.getElementById('searchForm');
     }
+    // 検索クエリ入力を取得する
     get searchQueryInput() {
         return this.getElementById('searchQuery');
     }
+    // 検索結果Divを取得する
     get searchResultsDiv() {
         return this.getElementById('searchResults');
     }
+    // フォームに送信イベントを追加する
     addSubmitEventToForm(formId, handler) {
         const form = this.getElementById(formId);
         form.addEventListener('submit', handler.bind(this));
     }
+    // APIからデータを取得する
     fetchDataFromAPI(url, handler) {
         const playlistIdManager = PlaylistIdManager.getInstance();
         playlistIdManager.playlistTrackIds = [];
@@ -56,31 +65,34 @@ export class DomElements {
             .then(handler.bind(this))
             .catch(TrackTable.handleError);
     }
+    // プレイリストデータを取得する
     fetchPlaylistData(playlistId) {
         this.fetchDataFromAPI(`/java/playlist/${playlistId}`, this.handlePlaylistData);
     }
+    // 検索データを取得する
     fetchSearchData(searchQuery) {
         this.fetchDataFromAPI(`/java/search/${searchQuery}`, this.handleSearchData);
     }
+    // 検索フォームの送信イベントハンドラ
     handleSearchFormSubmit(event) {
-        // 検索フォームの送信イベントハンドラ
         event.preventDefault();
         const playlistIdManager = PlaylistIdManager.getInstance();
         playlistIdManager.playlistId = this.searchQueryInput.value;
         this.fetchSearchData(playlistIdManager.playlistId);
     }
+    // プレイリストデータの処理
     handlePlaylistData(data) {
-        // プレイリストデータの処理
         this.clearAllTables();
         this.processPlaylistData(data);
         this.hideLoadingAnimation();
     }
+    // 検索データの処理
     handleSearchData(data) {
-        // 検索データの処理
         this.clearAllTables();
         this.createSearchResultsTable(data);
         this.hideLoadingAnimation();
     }
+    // プレイリストデータの処理
     processPlaylistData(data) {
         if (this.isValidData(data)) {
             const tracks = this.createTracks(data);
@@ -93,9 +105,11 @@ export class DomElements {
             console.error('Expected data.tracks to be an array but received', data);
         }
     }
+    // データが有効かどうかを確認する
     isValidData(data) {
         return data && Array.isArray(data.tracks);
     }
+    // トラックを作成する
     createTracks(data) {
         return data.tracks.map((item) => {
             const playlistIdManager = PlaylistIdManager.getInstance();
@@ -103,8 +117,8 @@ export class DomElements {
             return new Track(item.playlistTrack.track, item.audioFeatures);
         });
     }
+    // プレイリスト名を表示する
     displayPlaylistName(name) {
-        // プレイリスト名の表示
         if (name) {
             console.log(`Playlist name: ${name}`);
             const playlistNameElement = document.createElement('h2');
@@ -112,26 +126,26 @@ export class DomElements {
             this.playlistTracksDiv.insertBefore(playlistNameElement, this.playlistTracksDiv.firstChild);
         }
     }
+    // ローディングアニメーションを表示する
     showLoadingAnimation() {
-        // ローディングアニメーションの表示
         document.getElementById('loading').classList.remove('hidden');
     }
+    // ローディングアニメーションを非表示にする
     hideLoadingAnimation() {
-        // ローディングアニメーションの非表示
         document.getElementById('loading').classList.add('hidden');
     }
+    // すべてのテーブルをクリアする
     clearAllTables() {
-        // すべてのテーブルのクリア
         this.playlistTracksDiv.innerHTML = '';
         this.searchResultsDiv.innerHTML = '';
     }
+    // テーブルを作成する
     createTable(tracks) {
-        // テーブルの作成
         this.clearAllTables();
         const trackTable = new TrackTable(tracks);
         this.playlistTracksDiv.appendChild(trackTable.createTable());
     }
-    // 検索結果を表示するテーブルを作成する関数
+    // 検索結果を表示するテーブルを作成する
     createSearchResultsTable(results) {
         this.clearAllTables();
         if (!Array.isArray(results)) {
@@ -145,7 +159,7 @@ export class DomElements {
         });
         this.searchResultsDiv.appendChild(table);
     }
-    // 検索結果の各行を作成する関数
+    // 検索結果の各行を作成する
     createTableRow(result) {
         const row = document.createElement('tr');
         const td = document.createElement('td');
@@ -154,7 +168,7 @@ export class DomElements {
         row.appendChild(td);
         return row;
     }
-    // プレイリストの詳細を取得・表示する関数
+    // プレイリストの詳細を取得・表示する
     fetchPlaylistDetails(result) {
         return __awaiter(this, void 0, void 0, function* () {
             const response = yield fetch(`/java/playlist/${result.id}`);

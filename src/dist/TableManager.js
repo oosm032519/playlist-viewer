@@ -1,7 +1,8 @@
-import { PlaylistManager } from './PlaylistManager';
-import { PlaylistIdManager } from './PlaylistIdManager';
 import { TrackRecommendationManager } from './TrackRecommendationManager';
+import { PlaylistIdManager } from './PlaylistIdManager';
+import { PlaylistManager } from './PlaylistManager';
 export class TableManager {
+    // テーブルの幅をチェックする関数
     checkTableWidth() {
         // 全てのテーブルを取得
         const tables = document.querySelectorAll('table');
@@ -17,6 +18,7 @@ export class TableManager {
             }
         });
     }
+    // visitedPlaylistsDivからテーブルを取得する関数
     getTable(visitedPlaylistsDiv) {
         let table = visitedPlaylistsDiv.querySelector('table');
         if (!table) {
@@ -25,6 +27,7 @@ export class TableManager {
         }
         return table;
     }
+    // テーブルヘッダーを作成する関数
     createTableHeader() {
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
@@ -34,6 +37,7 @@ export class TableManager {
         thead.appendChild(headerRow);
         return thead;
     }
+    // テーブルボディを作成する関数
     createTableBody(table, data) {
         let tableBody = table.querySelector('tbody');
         if (!tableBody) {
@@ -41,11 +45,12 @@ export class TableManager {
             table.appendChild(tableBody);
         }
         data.forEach((playlist) => {
-            const row = tableManager.createTableRow(playlist);
+            const row = this.createTableRow(playlist);
             tableBody.appendChild(row);
         });
         return tableBody;
     }
+    // テーブル行を作成する関数
     createTableRow(playlist) {
         const row = document.createElement('tr');
         const nameCell = document.createElement('td');
@@ -55,6 +60,7 @@ export class TableManager {
         row.addEventListener('click', () => playlistManager.fetchAndDisplayPlaylistDetails(playlist));
         return row;
     }
+    // レコメンド曲のデータを処理する関数
     processRecommendationData(data) {
         const trackRecommendationManager = new TrackRecommendationManager();
         trackRecommendationManager.logResponseData(data);
@@ -81,6 +87,7 @@ export class TableManager {
         rows.forEach(row => table.appendChild(row));
         trackRecommendationManager.appendTableToDOM(table);
     }
+    // トラックの合計値を計算する関数
     calculateSum(tracks) {
         let totalTempo = 0;
         let totalAcousticness = 0;
@@ -120,6 +127,7 @@ export class TableManager {
             playlistTrackIds
         };
     }
+    // 平均値を計算する関数
     calculateAverage(sum, length) {
         return {
             averageTempo: sum.totalTempo / length,
@@ -131,11 +139,12 @@ export class TableManager {
             averageValence: sum.totalValence / length,
         };
     }
+    // 最頻値を計算する関数
     calculateMode(sum) {
         return {
-            modeKey: tableManager.mode(sum.keys),
-            modeMode: tableManager.mode(sum.modes),
-            topFiveArtistNames: tableManager.getTopFiveMostFrequentValues(sum.artistNames)
+            modeKey: this.mode(sum.keys),
+            modeMode: this.mode(sum.modes),
+            topFiveArtistNames: this.getTopFiveMostFrequentValues(sum.artistNames)
         };
     }
     // 配列の最頻値を取得する関数
@@ -143,6 +152,7 @@ export class TableManager {
         return array.sort((a, b) => array.filter(v => v === a).length
             - array.filter(v => v === b).length).pop();
     }
+    // 頻度マップを作成する関数
     createFrequencyMap(array) {
         const frequency = {};
         for (const item of array) {
@@ -150,10 +160,12 @@ export class TableManager {
         }
         return frequency;
     }
+    // 最頻値を取得する関数
     getMostFrequentValues(frequency, count) {
         const sortedKeys = [...Object.keys(frequency)].sort((a, b) => frequency[b] - frequency[a]);
         return sortedKeys.filter(key => frequency[key] > 1).slice(0, count);
     }
+    // 配列からランダムな値を取得する関数
     getRandomValues(array, count) {
         let values = [];
         while (values.length < count && array.length > 0) {
@@ -166,14 +178,14 @@ export class TableManager {
         }
         return values;
     }
+    // 最頻値のトップ5を取得する関数
     getTopFiveMostFrequentValues(array) {
-        const tableManager = new TableManager();
-        const frequency = tableManager.createFrequencyMap(array);
+        const frequency = this.createFrequencyMap(array);
         const modesCount = 5;
-        let modes = tableManager.getMostFrequentValues(frequency, modesCount);
+        let modes = this.getMostFrequentValues(frequency, modesCount);
         const remainingArtists = Object.keys(frequency).filter(key => frequency[key] === 1);
         const additionalModesCount = modesCount - modes.length;
-        const additionalModes = tableManager.getRandomValues(remainingArtists, additionalModesCount);
+        const additionalModes = this.getRandomValues(remainingArtists, additionalModesCount);
         return [...modes, ...additionalModes];
     }
 }

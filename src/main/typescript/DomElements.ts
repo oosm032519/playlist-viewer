@@ -9,39 +9,48 @@ export interface PlaylistSimplified {
 }
 
 export class DomElements {
+    // IDに基づいてHTML要素を取得する
     getElementById(id: string): HTMLElement {
         return document.getElementById(id);
     }
     
+    // プレイリストフォームを取得する
     get playlistForm(): HTMLFormElement {
         return this.getElementById('playlistForm') as HTMLFormElement;
     }
     
+    // プレイリストID入力を取得する
     get playlistIdInput(): HTMLInputElement {
         return this.getElementById('playlistId') as HTMLInputElement;
     }
     
+    // プレイリストトラックDivを取得する
     get playlistTracksDiv(): HTMLDivElement {
         return this.getElementById('playlistTracks') as HTMLDivElement;
     }
     
+    // 検索フォームを取得する
     get searchForm(): HTMLFormElement {
         return this.getElementById('searchForm') as HTMLFormElement;
     }
     
+    // 検索クエリ入力を取得する
     get searchQueryInput(): HTMLInputElement {
         return this.getElementById('searchQuery') as HTMLInputElement;
     }
     
+    // 検索結果Divを取得する
     get searchResultsDiv(): HTMLDivElement {
         return this.getElementById('searchResults') as HTMLDivElement;
     }
     
+    // フォームに送信イベントを追加する
     addSubmitEventToForm(formId: string, handler: (event: Event) => void): void {
         const form = this.getElementById(formId) as HTMLFormElement;
         form.addEventListener('submit', handler.bind(this));
     }
     
+    // APIからデータを取得する
     fetchDataFromAPI(url: string, handler: (data: any) => void): void {
         const playlistIdManager = PlaylistIdManager.getInstance();
         playlistIdManager.playlistTrackIds = [];
@@ -53,44 +62,47 @@ export class DomElements {
             .catch(TrackTable.handleError);
     }
     
+    // プレイリストデータを取得する
     fetchPlaylistData(playlistId: string): void {
         this.fetchDataFromAPI(`/java/playlist/${playlistId}`, this.handlePlaylistData);
     }
     
+    // 検索データを取得する
     fetchSearchData(searchQuery: string): void {
         this.fetchDataFromAPI(`/java/search/${searchQuery}`, this.handleSearchData);
     }
     
+    // プレイリストフォームの送信イベントハンドラ
     handlePlaylistFormSubmit = (event: Event): void => {
-        // プレイリストフォームの送信イベントハンドラ
         event.preventDefault();
         const playlistIdManager = PlaylistIdManager.getInstance();
         playlistIdManager.playlistId = this.playlistIdInput.value;
         this.fetchPlaylistData(playlistIdManager.playlistId);
     }
     
+    // 検索フォームの送信イベントハンドラ
     handleSearchFormSubmit(event: Event): void {
-        // 検索フォームの送信イベントハンドラ
         event.preventDefault();
         const playlistIdManager = PlaylistIdManager.getInstance();
         playlistIdManager.playlistId = this.searchQueryInput.value;
         this.fetchSearchData(playlistIdManager.playlistId);
     }
     
+    // プレイリストデータの処理
     handlePlaylistData(data: any): void {
-        // プレイリストデータの処理
         this.clearAllTables();
         this.processPlaylistData(data);
         this.hideLoadingAnimation();
     }
     
+    // 検索データの処理
     handleSearchData(data: any): void {
-        // 検索データの処理
         this.clearAllTables();
         this.createSearchResultsTable(data);
         this.hideLoadingAnimation();
     }
     
+    // プレイリストデータの処理
     processPlaylistData(data: any): void {
         if (this.isValidData(data)) {
             const tracks = this.createTracks(data);
@@ -103,10 +115,12 @@ export class DomElements {
         }
     }
     
+    // データが有効かどうかを確認する
     isValidData(data: any): boolean {
         return data && Array.isArray(data.tracks);
     }
     
+    // トラックを作成する
     createTracks(data: any): Track[] {
         return data.tracks.map((item: any) => {
             const playlistIdManager = PlaylistIdManager.getInstance();
@@ -115,8 +129,8 @@ export class DomElements {
         });
     }
     
+    // プレイリスト名を表示する
     displayPlaylistName(name: string): void {
-        // プレイリスト名の表示
         if (name) {
             console.log(`Playlist name: ${name}`);
             const playlistNameElement = document.createElement('h2');
@@ -125,30 +139,30 @@ export class DomElements {
         }
     }
     
+    // ローディングアニメーションを表示する
     showLoadingAnimation(): void {
-        // ローディングアニメーションの表示
         document.getElementById('loading').classList.remove('hidden');
     }
     
+    // ローディングアニメーションを非表示にする
     hideLoadingAnimation(): void {
-        // ローディングアニメーションの非表示
         document.getElementById('loading').classList.add('hidden');
     }
     
+    // すべてのテーブルをクリアする
     clearAllTables(): void {
-        // すべてのテーブルのクリア
         this.playlistTracksDiv.innerHTML = '';
         this.searchResultsDiv.innerHTML = '';
     }
     
+    // テーブルを作成する
     createTable(tracks: Track[]): void {
-        // テーブルの作成
         this.clearAllTables();
         const trackTable = new TrackTable(tracks);
         this.playlistTracksDiv.appendChild(trackTable.createTable());
     }
 
-// 検索結果を表示するテーブルを作成する関数
+    // 検索結果を表示するテーブルを作成する
     createSearchResultsTable(results: Record<string, any>): void {
         this.clearAllTables();
         if (!Array.isArray(results)) {
@@ -163,7 +177,7 @@ export class DomElements {
         this.searchResultsDiv.appendChild(table);
     }
     
-    // 検索結果の各行を作成する関数
+    // 検索結果の各行を作成する
     createTableRow(result: PlaylistSimplified): HTMLTableRowElement {
         const row = document.createElement('tr');
         const td = document.createElement('td');
@@ -173,7 +187,7 @@ export class DomElements {
         return row;
     }
     
-    // プレイリストの詳細を取得・表示する関数
+    // プレイリストの詳細を取得・表示する
     async fetchPlaylistDetails(result: PlaylistSimplified): Promise<any> {
         const response = await fetch(`/java/playlist/${result.id}`);
         if (!response.ok) {
