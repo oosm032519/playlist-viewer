@@ -1,5 +1,5 @@
-import {Track} from './Track'
-import {DescriptionManager} from './DescriptionManager'
+import {Track} from './track'
+import {DescriptionManager} from './descriptionManager'
 
 export class TrackTable {
     tracks: Track[];  // トラックの配列を保持するプロパティ

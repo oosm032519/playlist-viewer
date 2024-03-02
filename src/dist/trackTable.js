@@ -1,4 +1,4 @@
-import { DescriptionManager } from './DescriptionManager';
+import { DescriptionManager } from './descriptionManager';
 export class TrackTable {
     constructor(tracks) {
         this.tracks = tracks;
@@ -108,4 +108,4 @@ export class TrackTable {
         return table;
     }
 }
-//# sourceMappingURL=TrackTable.js.map
+//# sourceMappingURL=trackTable.js.map

@@ -7,10 +7,46 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { PlaylistIdManager } from './PlaylistIdManager';
-import { DomElements } from './DomElements';
-import { UIManager } from './UIManager';
-export class TrackRecommendationManager {
+import { UIManager } from './uiManager';
+import { PlaylistIdManager } from './playlistIdManager';
+export class TrackManager {
+    // トラックの平均値と最頻値を計算する
+    calculateAverageAndMode(tracks) {
+        const uiManager = new UIManager();
+        // 合計値を計算する
+        const sum = uiManager.calculateSum(tracks);
+        // 平均値を計算する
+        const average = uiManager.calculateAverage(sum, tracks.length);
+        // 最頻値を計算する
+        const mode = uiManager.calculateMode(sum);
+        // 平均値と最頻値をログに出力する
+        console.log(`Average Tempo: ${average.averageTempo}`);
+        console.log(`Average Acousticness: ${average.averageAcousticness}`);
+        console.log(`Average Danceability: ${average.averageDanceability}`);
+        console.log(`Average Energy: ${average.averageEnergy}`);
+        console.log(`Average Liveness: ${average.averageLiveness}`);
+        console.log(`Average Speechiness: ${average.averageSpeechiness}`);
+        console.log(`Average Valence: ${average.averageValence}`);
+        console.log(`Mode Key: ${mode.modeKey}`);
+        console.log(`Mode Mode: ${mode.modeMode}`);
+        console.log(`Top Five Artist Names: ${mode.topFiveArtistNames}`);
+        console.log(`Playlist Track IDs: ${sum.playlistTrackIds}`);
+        // レコメンドトラックを取得する
+        const trackManager = new TrackManager();
+        trackManager.fetchRecommendedTracks(average.averageTempo, mode.modeKey, average.averageDanceability, average.averageEnergy, average.averageAcousticness, average.averageLiveness, average.averageSpeechiness, average.averageValence, mode.topFiveArtistNames);
+    }
+    // レコメンドトラックを取得する非同期関数
+    fetchRecommendedTracks(averageTempo, averageKey, averageDanceability, averageEnergy, averageAcousticness, averageLiveness, averageSpeechiness, averageValence, topFiveArtistNames) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // アーティスト名をパラメータに変換する
+            const artistNamesParam = topFiveArtistNames.join(',');
+            const uiManager = new UIManager();
+            // APIからレコメンドトラックを取得する
+            const data = yield this.fetchRecommendationsFromAPI(averageTempo, averageKey, averageDanceability, averageEnergy, averageAcousticness, averageLiveness, averageSpeechiness, averageValence, artistNamesParam);
+            // レコメンドトラックのデータを処理する
+            uiManager.processRecommendationData(data);
+        });
+    }
     // APIからレコメンドトラックを取得する非同期関数
     fetchRecommendationsFromAPI(averageTempo, averageKey, averageDanceability, averageEnergy, averageAcousticness, averageLiveness, averageSpeechiness, averageValence, artistNamesParam) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -45,11 +81,10 @@ export class TrackRecommendationManager {
     // ペアの行を作成する関数
     createRowForPair(pair, playlistId) {
         const row = document.createElement('tr');
-        const trackRecommendationManager = new TrackRecommendationManager();
         pair.forEach((track) => {
-            const cell = trackRecommendationManager.createCellForTrack(track);
-            const addButton = trackRecommendationManager.createAddButton(track, playlistId, cell);
-            const removeButton = trackRecommendationManager.createRemoveButton(track, playlistId, cell, row);
+            const cell = this.createCellForTrack(track);
+            const addButton = this.createAddButton(track, playlistId, cell);
+            const removeButton = this.createRemoveButton(track, playlistId, cell, row);
             row.appendChild(cell);
             row.appendChild(addButton);
             row.appendChild(removeButton);
@@ -67,13 +102,11 @@ export class TrackRecommendationManager {
     }
     // 追加ボタンを作成する関数
     createAddButton(track, playlistId, cell) {
-        const trackRecommendationManager = new TrackRecommendationManager();
-        return trackRecommendationManager.createTrackButton(track, playlistId, cell, null, true);
+        return this.createTrackButton(track, playlistId, cell, null, true);
     }
     // 削除ボタンを作成する関数
     createRemoveButton(track, playlistId, cell, row) {
-        const trackRecommendationManager = new TrackRecommendationManager();
-        return trackRecommendationManager.createTrackButton(track, playlistId, cell, row, false);
+        return this.createTrackButton(track, playlistId, cell, row, false);
     }
     // トラックボタンを作成する関数
     createTrackButton(track, playlistId, cell, row, isAddButton) {
@@ -119,13 +152,12 @@ export class TrackRecommendationManager {
     }
     // トラックペアの行を作成する関数
     createRowsForTrackPairs(trackPairs, playlistId) {
-        const trackRecommendationManager = new TrackRecommendationManager();
-        return trackPairs.map(pair => trackRecommendationManager.createRowForPair(pair, playlistId));
+        return trackPairs.map(pair => this.createRowForPair(pair, playlistId));
     }
     // テーブルをDOMに追加する関数
     appendTableToDOM(table) {
-        const domElements = new DomElements();
-        domElements.playlistTracksDiv.appendChild(table);
+        const uiManager = new UIManager();
+        uiManager.playlistTracksDiv.appendChild(table);
     }
 }
-//# sourceMappingURL=TrackRecommendationManager.js.map
+//# sourceMappingURL=trackManager.js.map

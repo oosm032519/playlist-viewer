@@ -6,4 +6,4 @@ export class Track {
         this.audioFeatures = audioFeatures;
     }
 }
-//# sourceMappingURL=Track.js.map
+//# sourceMappingURL=track.js.map

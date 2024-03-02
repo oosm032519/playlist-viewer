@@ -9,4 +9,4 @@ export class PlaylistIdManager {
         return PlaylistIdManager.instance;
     }
 }
-//# sourceMappingURL=PlaylistIdManager.js.map
+//# sourceMappingURL=playlistIdManager.js.map

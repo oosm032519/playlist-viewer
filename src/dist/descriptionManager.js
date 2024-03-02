@@ -10,4 +10,4 @@ export class DescriptionManager {
         };
     }
 }
-//# sourceMappingURL=DescriptionManager.js.map
+//# sourceMappingURL=descriptionManager.js.map

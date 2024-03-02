@@ -1089,7 +1089,7 @@ input[type="radio"] {
   transition:       transform 0.5s ease;
 }
 
-#clock-icon {
+#visited-playlists {
   right: 1rem;
   transition: right 0.5s ease;
 }
