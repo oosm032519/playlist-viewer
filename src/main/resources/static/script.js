@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 const descriptions = {
     'Acousticness': 'アコースティック感。1に近いほどアコースティック。',
     'Danceability': '踊りやすさ。1に近いほど踊りやすい。',
@@ -9,51 +18,45 @@ const descriptions = {
 let playlistId;
 let playlistTrackIds = [];
 class DomElements {
+    getElementById(id) {
+        return document.getElementById(id);
+    }
     get playlistForm() {
-        return document.getElementById('playlistForm');
+        return this.getElementById('playlistForm');
     }
     get playlistIdInput() {
-        return document.getElementById('playlistId');
+        return this.getElementById('playlistId');
     }
     get playlistTracksDiv() {
-        return document.getElementById('playlistTracks');
+        return this.getElementById('playlistTracks');
     }
     get searchForm() {
-        return document.getElementById('searchForm');
+        return this.getElementById('searchForm');
     }
     get searchQueryInput() {
-        return document.getElementById('searchQuery');
+        return this.getElementById('searchQuery');
     }
     get searchResultsDiv() {
-        return document.getElementById('searchResults');
+        return this.getElementById('searchResults');
     }
-    fetchData() {
-        // プレイリストフォームの送信イベントにハンドラを設定
-        this.playlistForm.addEventListener('submit', this.handlePlaylistFormSubmit.bind(this));
+    addSubmitEventToForm(formId, handler) {
+        const form = this.getElementById(formId);
+        form.addEventListener('submit', handler.bind(this));
     }
-    fetchSearchResults() {
-        // 検索フォームの送信イベントにハンドラを設定
-        this.searchForm.addEventListener('submit', this.handleSearchFormSubmit.bind(this));
-    }
-    fetchPlaylistData(playlistId) {
-        // プレイリストデータの取得
+    fetchDataFromAPI(url, handler) {
         playlistTrackIds = [];
         this.clearAllTables();
         this.showLoadingAnimation();
-        fetch(`/java/playlist/${playlistId}`)
+        fetch(url)
             .then(TrackTable.handleResponse)
-            .then(this.handlePlaylistData.bind(this))
+            .then(handler.bind(this))
             .catch(TrackTable.handleError);
     }
+    fetchPlaylistData(playlistId) {
+        this.fetchDataFromAPI(`/java/playlist/${playlistId}`, this.handlePlaylistData);
+    }
     fetchSearchData(searchQuery) {
-        // 検索データの取得
-        playlistTrackIds = [];
-        this.clearAllTables();
-        this.showLoadingAnimation();
-        fetch(`/java/search/${searchQuery}`)
-            .then(response => response.json())
-            .then(this.handleSearchData.bind(this))
-            .catch(error => console.error('There was a problem with the fetch operation: ', error));
+        this.fetchDataFromAPI(`/java/search/${searchQuery}`, this.handleSearchData);
     }
     handlePlaylistFormSubmit(event) {
         // プレイリストフォームの送信イベントハンドラ
@@ -80,21 +83,24 @@ class DomElements {
         this.hideLoadingAnimation();
     }
     processPlaylistData(data) {
-        // プレイリストデータの詳細な処理
-        if (data && Array.isArray(data.tracks)) {
-            const tracks = data.tracks.map((item) => {
-                playlistTrackIds.push(item.playlistTrack.track.id);
-                return new Track(item.playlistTrack.track, item.audioFeatures);
-            });
+        if (this.isValidData(data)) {
+            const tracks = this.createTracks(data);
             this.createTable(tracks);
             calculateAverageAndMode(tracks);
             this.displayPlaylistName(data.name);
-            console.log(`Playlist ID: ${playlistId}`);
-            console.log(`Playlist Track IDs: ${playlistTrackIds}`);
         }
         else {
             console.error('Expected data.tracks to be an array but received', data);
         }
+    }
+    isValidData(data) {
+        return data && Array.isArray(data.tracks);
+    }
+    createTracks(data) {
+        return data.tracks.map((item) => {
+            playlistTrackIds.push(item.playlistTrack.track.id);
+            return new Track(item.playlistTrack.track, item.audioFeatures);
+        });
     }
     displayPlaylistName(name) {
         // プレイリスト名の表示
@@ -124,40 +130,63 @@ class DomElements {
         const trackTable = new TrackTable(tracks);
         this.playlistTracksDiv.appendChild(trackTable.createTable());
     }
+    // 検索結果を表示するテーブルを作成する関数
     createSearchResultsTable(results) {
-        // 検索結果テーブルの作成
         this.clearAllTables();
         const table = document.createElement('table');
         results.forEach(result => {
-            const row = document.createElement('tr');
-            const td = document.createElement('td');
-            td.textContent = result.name;
-            td.addEventListener('click', () => {
-                document.getElementById('loading').classList.remove('hidden');
-                playlistId = result.id;
-                fetch(`/java/playlist/${result.id}`)
-                    .then(response => response.json())
-                    .then(data => {
-                    this.playlistTracksDiv.innerHTML = '';
-                    const playlistNameElement = document.createElement('h2');
-                    playlistNameElement.textContent = `${result.name}`;
-                    this.playlistTracksDiv.appendChild(playlistNameElement);
-                    if (data && Array.isArray(data.tracks)) {
-                        const tracks = data.tracks.map((item) => new Track(item.playlistTrack.track, item.audioFeatures));
-                        this.createTable(tracks);
-                        calculateAverageAndMode(tracks);
-                    }
-                    else {
-                        console.error('Expected data.tracks to be an array but received', data);
-                    }
-                    document.getElementById('loading').classList.add('hidden');
-                })
-                    .catch(error => console.error('There was a problem with the fetch operation: ', error));
-            });
-            row.appendChild(td);
+            const row = this.createTableRow(result);
             table.appendChild(row);
         });
         this.searchResultsDiv.appendChild(table);
+    }
+    // 検索結果の各行を作成する関数
+    createTableRow(result) {
+        const row = document.createElement('tr');
+        const td = document.createElement('td');
+        td.textContent = result.name;
+        td.addEventListener('click', () => this.fetchAndDisplayPlaylistDetails(result));
+        row.appendChild(td);
+        return row;
+    }
+    // プレイリストの詳細を取得・表示する関数
+    fetchPlaylistDetails(result) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield fetch(`/java/playlist/${result.id}`);
+            if (!response.ok) {
+                throw new Error('There was a problem with the fetch operation');
+            }
+            const data = yield response.json();
+            if (!data || !Array.isArray(data.tracks)) {
+                throw new Error('Expected data.tracks to be an array but received ' + data);
+            }
+            return data;
+        });
+    }
+    displayPlaylistDetails(result, data) {
+        this.playlistTracksDiv.innerHTML = '';
+        const playlistNameElement = document.createElement('h2');
+        playlistNameElement.textContent = `${result.name}`;
+        this.playlistTracksDiv.appendChild(playlistNameElement);
+        const tracks = data.tracks.map((item) => new Track(item.playlistTrack.track, item.audioFeatures));
+        this.createTable(tracks);
+        calculateAverageAndMode(tracks);
+    }
+    fetchAndDisplayPlaylistDetails(result) {
+        return __awaiter(this, void 0, void 0, function* () {
+            document.getElementById('loading').classList.remove('hidden');
+            playlistId = result.id;
+            try {
+                const data = yield this.fetchPlaylistDetails(result);
+                this.displayPlaylistDetails(result, data);
+            }
+            catch (error) {
+                console.error(error.message);
+            }
+            finally {
+                document.getElementById('loading').classList.add('hidden');
+            }
+        });
     }
 }
 class Track {
@@ -185,40 +214,50 @@ class TrackTable {
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
         ['Track Name', 'Artist Name', 'BPM', 'Key', 'Mode', 'Acousticness', 'Danceability', 'Energy', /* 'Instrumentalness', */ 'Liveness', 'Speechiness', 'Valence'].forEach((text, index) => {
-            const th = document.createElement('th');
-            th.textContent = text;
-            if (descriptions[text]) {
-                th.title = descriptions[text];
-            }
-            // クリックイベントの追加
-            th.addEventListener('click', (event) => {
-                const element = event.target;
-                // ソート順の切り替え
-                if (element.classList.contains('asc')) {
-                    element.classList.replace('asc', 'desc');
-                }
-                else if (element.classList.contains('desc')) {
-                    element.classList.replace('desc', 'asc');
-                }
-                else {
-                    element.classList.add('asc');
-                }
-                // 他の列のソート順をリセット
-                Array.from(element.parentNode.children)
-                    .filter(e => e !== element)
-                    .forEach(e => e.classList.remove('asc', 'desc'));
-                // 行のソート
-                const table = th.closest('table');
-                const tbody = table.querySelector('tbody');
-                const sortOrder = th.classList.contains('asc') ? -1 : 1;
-                const rows = Array.from(tbody.rows);
-                rows.sort((a, b) => TrackTable.sortRows(a, b, index, sortOrder));
-                rows.forEach(row => tbody.appendChild(row));
-            });
+            const th = this.createHeaderCell(text, index);
             headerRow.appendChild(th);
         });
         thead.appendChild(headerRow);
         return thead;
+    }
+    createHeaderCell(text, index) {
+        const th = document.createElement('th');
+        th.textContent = text;
+        if (descriptions[text]) {
+            th.title = descriptions[text];
+        }
+        th.addEventListener('click', (event) => this.handleHeaderCellClick(event, index));
+        return th;
+    }
+    handleHeaderCellClick(event, index) {
+        const element = event.target;
+        this.toggleSortOrder(element);
+        this.resetSortOrderForOtherColumns(element);
+        this.sortRows(element, index);
+    }
+    toggleSortOrder(element) {
+        if (element.classList.contains('asc')) {
+            element.classList.replace('asc', 'desc');
+        }
+        else if (element.classList.contains('desc')) {
+            element.classList.replace('desc', 'asc');
+        }
+        else {
+            element.classList.add('asc');
+        }
+    }
+    resetSortOrderForOtherColumns(element) {
+        Array.from(element.parentNode.children)
+            .filter(e => e !== element)
+            .forEach(e => e.classList.remove('asc', 'desc'));
+    }
+    sortRows(element, index) {
+        const table = element.closest('table');
+        const tbody = table.querySelector('tbody');
+        const sortOrder = element.classList.contains('asc') ? -1 : 1;
+        const rows = Array.from(tbody.rows);
+        rows.sort((a, b) => TrackTable.sortRows(a, b, index, sortOrder));
+        rows.forEach(row => tbody.appendChild(row));
     }
     static sortRows(a, b, columnIndex, sortOrder) {
         const cellA = TrackTable.getSortValue(a.cells[columnIndex].textContent, columnIndex);
@@ -283,65 +322,76 @@ function checkTableWidth() {
     });
 }
 checkTableWidth();
+function createTable(visitedPlaylistsDiv, data) {
+    let table = getTable(visitedPlaylistsDiv);
+    table.appendChild(createTableHeader());
+    table.appendChild(createTableBody(table, data));
+    visitedPlaylistsDiv.classList.add('hidden');
+}
+function getTable(visitedPlaylistsDiv) {
+    let table = visitedPlaylistsDiv.querySelector('table');
+    if (!table) {
+        table = document.createElement('table');
+        visitedPlaylistsDiv.appendChild(table);
+    }
+    return table;
+}
+function createTableHeader() {
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    const headerCell = document.createElement('th');
+    headerCell.textContent = "参照履歴";
+    headerRow.appendChild(headerCell);
+    thead.appendChild(headerRow);
+    return thead;
+}
+function createTableBody(table, data) {
+    let tableBody = table.querySelector('tbody');
+    if (!tableBody) {
+        tableBody = document.createElement('tbody');
+        table.appendChild(tableBody);
+    }
+    data.forEach((playlist) => {
+        const row = createTableRow(playlist);
+        tableBody.appendChild(row);
+    });
+    return tableBody;
+}
+function createTableRow(playlist) {
+    const row = document.createElement('tr');
+    const nameCell = document.createElement('td');
+    nameCell.textContent = playlist.name;
+    row.appendChild(nameCell);
+    row.addEventListener('click', () => fetchAndDisplayPlaylistDetails(playlist));
+    return row;
+}
+function fetchAndDisplayPlaylistDetails(playlist) {
+    document.getElementById('loading').classList.remove('hidden');
+    fetch(`/java/playlist/${playlist.id}`)
+        .then(response => response.json())
+        .then(data => {
+        const domElements = new DomElements();
+        domElements.playlistTracksDiv.innerHTML = '';
+        const playlistNameElement = document.createElement('h2');
+        playlistNameElement.textContent = `${playlist.name}`;
+        domElements.playlistTracksDiv.appendChild(playlistNameElement);
+        if (data && Array.isArray(data.tracks)) {
+            const tracks = data.tracks.map((item) => new Track(item.playlistTrack.track, item.audioFeatures));
+            domElements.createTable(tracks);
+        }
+        else {
+            console.error('Expected data.tracks to be an array but received', data);
+        }
+        document.getElementById('loading').classList.add('hidden');
+    })
+        .catch(error => console.error('There was a problem with the fetch operation: ', error));
+}
 function fetchVisitedPlaylists() {
-    // ユーザーの訪問したプレイリストを取得
     fetch('/java/user/visited-playlists', { credentials: 'include' })
         .then(response => response.json())
         .then(data => {
         const visitedPlaylistsDiv = document.getElementById('visitedPlaylists');
-        let table = visitedPlaylistsDiv.querySelector('table');
-        if (!table) {
-            // テーブルが存在しない場合、新たに作成
-            table = document.createElement('table');
-            visitedPlaylistsDiv.appendChild(table);
-        }
-        // テーブルヘッダーの作成
-        const thead = document.createElement('thead');
-        const headerRow = document.createElement('tr');
-        const headerCell = document.createElement('th');
-        headerCell.textContent = "参照履歴";
-        headerRow.appendChild(headerCell);
-        thead.appendChild(headerRow);
-        table.appendChild(thead);
-        let tableBody = table.querySelector('tbody');
-        if (!tableBody) {
-            // テーブルボディが存在しない場合、新たに作成
-            tableBody = document.createElement('tbody');
-            table.appendChild(tableBody);
-        }
-        data.forEach(playlist => {
-            // 各プレイリストに対して行を作成
-            const row = document.createElement('tr');
-            const nameCell = document.createElement('td');
-            nameCell.textContent = playlist.name;
-            row.appendChild(nameCell);
-            // 行がクリックされたときのイベントリスナーを設定
-            row.addEventListener('click', () => {
-                document.getElementById('loading').classList.remove('hidden');
-                // プレイリストの詳細を取得
-                fetch(`/java/playlist/${playlist.id}`)
-                    .then(response => response.json())
-                    .then(data => {
-                    const domElements = new DomElements();
-                    domElements.playlistTracksDiv.innerHTML = '';
-                    const playlistNameElement = document.createElement('h2');
-                    playlistNameElement.textContent = `${playlist.name}`;
-                    domElements.playlistTracksDiv.appendChild(playlistNameElement);
-                    // プレイリストのトラックを取得し、テーブルを作成
-                    if (data && Array.isArray(data.tracks)) {
-                        const tracks = data.tracks.map((item) => new Track(item.playlistTrack.track, item.audioFeatures));
-                        domElements.createTable(tracks);
-                    }
-                    else {
-                        console.error('Expected data.tracks to be an array but received', data);
-                    }
-                    document.getElementById('loading').classList.add('hidden');
-                })
-                    .catch(error => console.error('There was a problem with the fetch operation: ', error));
-            });
-            tableBody.appendChild(row);
-        });
-        visitedPlaylistsDiv.classList.add('hidden');
+        createTable(visitedPlaylistsDiv, data);
     });
 }
 document.getElementById('clock-icon').addEventListener('click', function () {
@@ -367,44 +417,59 @@ document.getElementById('spotify-login').addEventListener('click', function () {
 });
 // ユーザーのプレイリストを取得する関数
 function fetchUserPlaylists() {
-    // ローディングアニメーションを表示
-    document.getElementById('loading').classList.remove('hidden');
-    // プレイリストを取得するAPIを呼び出す
-    fetch('/java/spotify/user/playlists')
-        .then(response => {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            showLoadingAnimation();
+            const data = yield fetchPlaylistsFromAPI();
+            displayPlaylists(data);
+        }
+        catch (error) {
+            showMessage(error.message);
+        }
+        finally {
+            hideLoadingAnimation();
+        }
+    });
+}
+// APIからプレイリストを取得する関数
+function fetchPlaylistsFromAPI() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch('/java/spotify/user/playlists');
         if (!response.ok) {
-            // エラーレスポンスの場合、エラーメッセージを取得してエラーをスロー
-            return response.text().then(message => {
-                throw new Error(message);
-            });
+            const message = yield response.text();
+            throw new Error(message);
         }
         return response.json();
-    })
-        .then(data => {
-        const domElements = new DomElements();
-        // プレイリストの表示エリアをクリア
-        domElements.playlistTracksDiv.innerHTML = '';
-        // プレイリストを表示
-        domElements.createSearchResultsTable(data);
-        // ローディングアニメーションを非表示にする
-        document.getElementById('loading').classList.add('hidden');
-    })
-        .catch(error => {
-        // エラーメッセージを表示
-        showMessage(error.message);
-        // ローディングアニメーションを非表示にする
-        document.getElementById('loading').classList.add('hidden');
     });
+}
+// プレイリストを表示する関数
+function displayPlaylists(data) {
+    const domElements = new DomElements();
+    domElements.playlistTracksDiv.innerHTML = '';
+    domElements.createSearchResultsTable(data);
+}
+// ローディングアニメーションを表示する関数
+function showLoadingAnimation() {
+    document.getElementById('loading').classList.remove('hidden');
+}
+// ローディングアニメーションを非表示にする関数
+function hideLoadingAnimation() {
+    document.getElementById('loading').classList.add('hidden');
 }
 // プレイリスト表示ボタンのクリックイベントに関数を紐付ける
 document.getElementById('show-playlists').addEventListener('click', fetchUserPlaylists);
 // ページ読み込み完了時の処理
 document.addEventListener('DOMContentLoaded', () => {
     const domElements = new DomElements();
-    // データの取得と検索結果の取得を行う
-    domElements.fetchData();
-    domElements.fetchSearchResults();
-    // ダークモードとライトモードの切り替え処理
+    domElements.addSubmitEventToForm('playlistForm', domElements.handlePlaylistFormSubmit);
+    domElements.addSubmitEventToForm('searchForm', domElements.handleSearchFormSubmit);
+    toggleDarkLightMode();
+    togglePlaylistSearchOption();
+    fetchVisitedPlaylists();
+    toggleSideMenu();
+    displayLoginResultMessage();
+});
+function toggleDarkLightMode() {
     const sunIcon = document.getElementById('sun-icon');
     sunIcon.style.transition = 'transform 0.5s';
     sunIcon.addEventListener('click', () => {
@@ -413,7 +478,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const rotationDegree = document.body.classList.contains('dark-mode') ? 180 : 0;
         sunIcon.style.transform = `rotate(${rotationDegree}deg)`;
     });
-    // プレイリストIDオプションと検索クエリオプションの切り替え処理
+}
+function togglePlaylistSearchOption() {
     const playlistIdOption = document.getElementById('playlistIdOption');
     const searchQueryOption = document.getElementById('searchQueryOption');
     const playlistForm = document.getElementById('playlistForm');
@@ -430,9 +496,8 @@ document.addEventListener('DOMContentLoaded', () => {
             playlistForm.classList.add('hidden');
         }
     });
-    // 訪問したプレイリストの取得
-    fetchVisitedPlaylists();
-    // サイドメニューの開閉処理
+}
+function toggleSideMenu() {
     const openButton = document.getElementById('open');
     const closeButton = document.getElementById('close');
     const sideMenu = document.querySelector('.side-menu');
@@ -442,10 +507,10 @@ document.addEventListener('DOMContentLoaded', () => {
     closeButton.addEventListener('click', () => {
         sideMenu.classList.toggle('open');
     });
-    // URLのクエリパラメータを取得
+}
+function displayLoginResultMessage() {
     const urlParams = new URLSearchParams(window.location.search);
     const loginResult = urlParams.get('loginResult');
-    // loginResultパラメータが存在する場合、その値に基づいてメッセージを表示
     if (loginResult) {
         let message;
         if (loginResult === 'success') {
@@ -458,154 +523,134 @@ document.addEventListener('DOMContentLoaded', () => {
             showMessage(message);
         }
     }
-});
-// 平均値とアーティスト名を元に推奨曲を取得する関数
-function fetchRecommendedTracks(averageTempo, averageKey, averageDanceability, averageEnergy, averageAcousticness, averageLiveness, averageSpeechiness, averageValence, topFiveArtistNames) {
-    // アーティスト名をカンマ区切りの文字列に変換
-    const artistNamesParam = topFiveArtistNames.join(',');
-    // 推奨曲を取得するAPIを呼び出す
-    fetch(`/java/recommendations?tempo=${averageTempo}&key=${averageKey}&danceability=${averageDanceability}&energy=${averageEnergy}&acousticness=${averageAcousticness}&liveness=${averageLiveness}&speechiness=${averageSpeechiness}&valence=${averageValence}&modeArtistNames=${artistNamesParam}`)
-        .then(response => response.json())
-        .then(data => {
-        // レスポンスデータをログに出力
-        console.log("Response data:", data);
-        if (data.tracks) {
-            // プレイリストに基づいた推奨曲をログに出力
-            console.log("Recommended tracks based on the playlist:");
-            // プレイリストに含まれない曲をフィルタリング
-            const filteredTracks = data.tracks.filter((track) => !playlistTrackIds.includes(track.id));
-            // 各曲の名前とアーティスト名をログに出力
-            filteredTracks.forEach((track) => {
-                console.log(`- ${track.name} by ${track.artists[0].name}`);
-            });
-            // プレイリストの曲IDをログに出力
-            console.log(playlistTrackIds);
-            // 推奨曲を表示
-            displayRecommendedTracks(filteredTracks);
-        }
-        else {
-            // レスポンスに曲が含まれていない場合、ログに出力
-            console.log("No tracks found in the response.");
-        }
-    })
-        .catch(error => console.error('There was a problem with the fetch operation: ', error));
 }
-// 推奨曲を表示する関数
-function displayRecommendedTracks(tracks) {
-    // テーブルを作成
-    const table = document.createElement('table');
-    table.classList.add('recommendations-table');
-    // ヘッダーロウを作成
-    const headerRow = document.createElement('tr');
-    const headerCell = document.createElement('th');
-    headerCell.textContent = "Recommended Tracks";
-    headerRow.appendChild(headerCell);
-    table.appendChild(headerRow);
-    // 曲をペアに分割
+function fetchRecommendedTracks(averageTempo, averageKey, averageDanceability, averageEnergy, averageAcousticness, averageLiveness, averageSpeechiness, averageValence, topFiveArtistNames) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const artistNamesParam = topFiveArtistNames.join(',');
+        const data = yield fetchRecommendationsFromAPI(averageTempo, averageKey, averageDanceability, averageEnergy, averageAcousticness, averageLiveness, averageSpeechiness, averageValence, artistNamesParam);
+        processRecommendationData(data);
+    });
+}
+function fetchRecommendationsFromAPI(averageTempo, averageKey, averageDanceability, averageEnergy, averageAcousticness, averageLiveness, averageSpeechiness, averageValence, artistNamesParam) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch(`/java/recommendations?tempo=${averageTempo}&key=${averageKey}&danceability=${averageDanceability}&energy=${averageEnergy}&acousticness=${averageAcousticness}&liveness=${averageLiveness}&speechiness=${averageSpeechiness}&valence=${averageValence}&modeArtistNames=${artistNamesParam}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch recommendations');
+        }
+        return response.json();
+    });
+}
+function processRecommendationData(data) {
+    logResponseData(data);
+    if (data.tracks) {
+        const filteredTracks = data.tracks.filter((track) => !playlistTrackIds.includes(track.id));
+        logRecommendedTracks(filteredTracks);
+        displayRecommendedTracks(filteredTracks);
+    }
+    else {
+        console.log("No tracks found in the response.");
+    }
+}
+function logResponseData(data) {
+    console.log("Response data:", data);
+}
+function logRecommendedTracks(tracks) {
+    console.log("Recommended tracks based on the playlist:");
+    tracks.forEach((track) => {
+        console.log(`- ${track.name} by ${track.artists[0].name}`);
+    });
+    console.log(playlistTrackIds);
+}
+function createTrackPairs(tracks) {
     const trackPairs = [];
     for (let i = 0; i < tracks.length; i += 2) {
         trackPairs.push(tracks.slice(i, i + 2));
     }
-    // 各ペアに対して行を作成
-    trackPairs.forEach((pair) => {
-        const row = document.createElement('tr');
-        pair.forEach((track) => {
-            // セルを作成し、曲名とアーティスト名を設定
-            const cell = document.createElement('td');
-            cell.textContent = `${track.name} by ${track.artists[0].name}`;
-            // セルがクリックされたときにSpotifyで曲を開くイベントリスナーを設定
-            cell.addEventListener('click', () => {
-                window.open(`https://open.spotify.com/track/${track.id}`, '_blank');
-            });
-            // 追加ボタンと削除ボタンを作成
-            const addButton = document.createElement('button');
-            addButton.textContent = '+';
-            addButton.className = 'track-button';
-            const removeButton = document.createElement('button');
-            removeButton.textContent = '-';
-            removeButton.className = 'track-button';
-            // 追加ボタンがクリックされたときのイベントリスナーを設定
-            addButton.addEventListener('click', () => {
-                // プレイリストIDが設定されていない場合、エラーメッセージをログに出力
-                if (!playlistId) {
-                    console.error('Playlist ID is not set.');
-                    return;
-                }
-                // 曲をプレイリストに追加するAPIを呼び出す
-                fetch(`/java/playlist/addTrack?trackId=${track.id}&playlistId=${playlistId}`)
-                    .then(response => {
-                    // レスポンスが成功した場合、メッセージを表示し、セルの背景色を変更
-                    if (response.ok) {
-                        showMessage('楽曲を追加しました！');
-                        cell.style.backgroundColor = 'lightgreen';
-                    }
-                    else {
-                        // レスポンスが失敗した場合、メッセージを表示
-                        showMessage('楽曲を追加できませんでした');
-                    }
-                    return response.json();
-                })
-                    .then(data => {
-                    // レスポンスデータをログに出力
-                    console.log(data);
-                })
-                    .catch(error => {
-                    // フェッチ操作で問題が発生した場合、エラーメッセージをログに出力
-                    console.error('There was a problem with the fetch operation: ', error);
-                });
-            });
-            // 削除ボタンがクリックされたときのイベントリスナーを設定
-            removeButton.addEventListener('click', () => {
-                // プレイリストIDが設定されていない場合、エラーメッセージをログに出力
-                if (!playlistId) {
-                    console.error('Playlist ID is not set.');
-                    return;
-                }
-                // 曲をプレイリストから削除するAPIを呼び出す
-                fetch(`/java/playlist/removeTrack?trackId=${track.id}&playlistId=${playlistId}`)
-                    .then(response => {
-                    // レスポンスが成功した場合、メッセージを表示
-                    if (response.ok) {
-                        showMessage('楽曲を削除しました！');
-                    }
-                    else {
-                        // レスポンスが失敗した場合、メッセージを表示
-                        showMessage('楽曲を削除できませんでした');
-                    }
-                    return response.json();
-                })
-                    .then(data => {
-                    // レスポンスデータをログに出力
-                    console.log(data);
-                })
-                    .catch(error => {
-                    // フェッチ操作で問題が発生した場合、エラーメッセージをログに出力
-                    console.error('There was a problem with the fetch operation: ', error);
-                });
-                // セルの背景色を元に戻す
-                const rowIndex = row.sectionRowIndex;
-                if (rowIndex % 2 === 0) {
-                    cell.style.backgroundColor = '#FFF';
-                }
-                else {
-                    cell.style.backgroundColor = '#F2F2F2';
-                }
-            });
-            // セルとボタンを行に追加
-            row.appendChild(cell);
-            row.appendChild(addButton);
-            row.appendChild(removeButton);
-        });
-        // 行をテーブルに追加
-        table.appendChild(row);
+    return trackPairs;
+}
+function createRowForPair(pair, playlistId) {
+    const row = document.createElement('tr');
+    pair.forEach((track) => {
+        const cell = createCellForTrack(track);
+        const addButton = createAddButton(track, playlistId, cell);
+        const removeButton = createRemoveButton(track, playlistId, cell, row);
+        row.appendChild(cell);
+        row.appendChild(addButton);
+        row.appendChild(removeButton);
     });
-    // テーブルをDOMに追加
+    return row;
+}
+function createCellForTrack(track) {
+    const cell = document.createElement('td');
+    cell.textContent = `${track.name} by ${track.artists[0].name}`;
+    cell.addEventListener('click', () => {
+        window.open(`https://open.spotify.com/track/${track.id}`, '_blank');
+    });
+    return cell;
+}
+function createTrackButton(track, playlistId, cell, row, isAddButton) {
+    const button = document.createElement('button');
+    button.textContent = isAddButton ? '+' : '-';
+    button.className = 'track-button';
+    button.addEventListener('click', () => {
+        if (!playlistId) {
+            console.error('Playlist ID is not set.');
+            return;
+        }
+        const endpoint = isAddButton ? 'addTrack' : 'removeTrack';
+        const successMessage = isAddButton ? '楽曲を追加しました！' : '楽曲を削除しました！';
+        const errorMessage = isAddButton ? '楽曲を追加できませんでした' : '楽曲を削除できませんでした';
+        fetch(`/java/playlist/${endpoint}?trackId=${track.id}&playlistId=${playlistId}`)
+            .then(response => {
+            if (response.ok) {
+                showMessage(successMessage);
+                cell.style.backgroundColor = isAddButton ? 'lightgreen' : (row.sectionRowIndex % 2 === 0 ? '#FFF' : '#F2F2F2');
+            }
+            else {
+                showMessage(errorMessage);
+            }
+            return response.json();
+        })
+            .then(data => {
+            console.log(data);
+        })
+            .catch(error => {
+            console.error('There was a problem with the fetch operation: ', error);
+        });
+    });
+    return button;
+}
+function createAddButton(track, playlistId, cell) {
+    return createTrackButton(track, playlistId, cell, null, true);
+}
+function createRemoveButton(track, playlistId, cell, row) {
+    return createTrackButton(track, playlistId, cell, row, false);
+}
+function createHeaderRow() {
+    const headerRow = document.createElement('tr');
+    const headerCell = document.createElement('th');
+    headerCell.textContent = "Recommended Tracks";
+    headerRow.appendChild(headerCell);
+    return headerRow;
+}
+function createRowsForTrackPairs(trackPairs, playlistId) {
+    return trackPairs.map(pair => createRowForPair(pair, playlistId));
+}
+function appendTableToDOM(table) {
     const domElements = new DomElements();
     domElements.playlistTracksDiv.appendChild(table);
 }
-// トラックの平均値と最頻値を計算する関数
-function calculateAverageAndMode(tracks) {
-    // 各特性の合計値を初期化
+// 推奨曲を表示する関数
+function displayRecommendedTracks(tracks) {
+    const table = document.createElement('table');
+    table.classList.add('recommendations-table');
+    table.appendChild(createHeaderRow());
+    const trackPairs = createTrackPairs(tracks);
+    const rows = createRowsForTrackPairs(trackPairs, playlistId);
+    rows.forEach(row => table.appendChild(row));
+    appendTableToDOM(table);
+}
+function calculateSum(tracks) {
     let totalTempo = 0;
     let totalAcousticness = 0;
     let totalDanceability = 0;
@@ -613,13 +658,10 @@ function calculateAverageAndMode(tracks) {
     let totalLiveness = 0;
     let totalSpeechiness = 0;
     let totalValence = 0;
-    // アーティスト名、キー、モードの配列を初期化
     let artistNames = [];
     let keys = [];
     let modes = [];
-    // プレイリストのトラックIDを初期化
-    playlistTrackIds = [];
-    // 各トラックに対して特性の合計値を計算し、アーティスト名、キー、モードを配列に追加
+    let playlistTrackIds = [];
     tracks.forEach(track => {
         totalTempo += track.audioFeatures.tempo;
         totalAcousticness += track.audioFeatures.acousticness;
@@ -633,83 +675,118 @@ function calculateAverageAndMode(tracks) {
         modes.push(track.audioFeatures.mode);
         playlistTrackIds.push(track.id);
     });
-    // 各特性の平均値を計算
-    const averageTempo = totalTempo / tracks.length;
-    const averageAcousticness = totalAcousticness / tracks.length;
-    const averageDanceability = totalDanceability / tracks.length;
-    const averageEnergy = totalEnergy / tracks.length;
-    const averageLiveness = totalLiveness / tracks.length;
-    const averageSpeechiness = totalSpeechiness / tracks.length;
-    const averageValence = totalValence / tracks.length;
-    // アーティスト名の上位5つを取得
-    const topFiveArtistNames = getTopFiveModes(artistNames);
-    // キーとモードの最頻値を取得
-    const modeKey = mode(keys);
-    const modeMode = mode(modes);
-    // 各特性の平均値と最頻値をログに出力
-    console.log(`Average Tempo: ${averageTempo}`);
-    console.log(`Average Acousticness: ${averageAcousticness}`);
-    console.log(`Average Danceability: ${averageDanceability}`);
-    console.log(`Average Energy: ${averageEnergy}`);
-    console.log(`Average Liveness: ${averageLiveness}`);
-    console.log(`Average Speechiness: ${averageSpeechiness}`);
-    console.log(`Average Valence: ${averageValence}`);
-    console.log(`Mode Key: ${modeKey}`);
-    console.log(`Mode Mode: ${modeMode}`);
-    console.log(`Top Five Artist Names: ${topFiveArtistNames}`);
-    console.log(`Playlist Track IDs: ${playlistTrackIds}`);
-    // 推奨曲を取得
-    fetchRecommendedTracks(averageTempo, modeKey, averageDanceability, averageEnergy, averageAcousticness, averageLiveness, averageSpeechiness, averageValence, topFiveArtistNames);
+    return {
+        totalTempo,
+        totalAcousticness,
+        totalDanceability,
+        totalEnergy,
+        totalLiveness,
+        totalSpeechiness,
+        totalValence,
+        artistNames,
+        keys,
+        modes,
+        playlistTrackIds
+    };
+}
+function calculateAverage(sum, length) {
+    return {
+        averageTempo: sum.totalTempo / length,
+        averageAcousticness: sum.totalAcousticness / length,
+        averageDanceability: sum.totalDanceability / length,
+        averageEnergy: sum.totalEnergy / length,
+        averageLiveness: sum.totalLiveness / length,
+        averageSpeechiness: sum.totalSpeechiness / length,
+        averageValence: sum.totalValence / length,
+    };
+}
+function calculateMode(sum) {
+    return {
+        modeKey: mode(sum.keys),
+        modeMode: mode(sum.modes),
+        topFiveArtistNames: getTopFiveMostFrequentValues(sum.artistNames)
+    };
+}
+function calculateAverageAndMode(tracks) {
+    const sum = calculateSum(tracks);
+    const average = calculateAverage(sum, tracks.length);
+    const mode = calculateMode(sum);
+    console.log(`Average Tempo: ${average.averageTempo}`);
+    console.log(`Average Acousticness: ${average.averageAcousticness}`);
+    console.log(`Average Danceability: ${average.averageDanceability}`);
+    console.log(`Average Energy: ${average.averageEnergy}`);
+    console.log(`Average Liveness: ${average.averageLiveness}`);
+    console.log(`Average Speechiness: ${average.averageSpeechiness}`);
+    console.log(`Average Valence: ${average.averageValence}`);
+    console.log(`Mode Key: ${mode.modeKey}`);
+    console.log(`Mode Mode: ${mode.modeMode}`);
+    console.log(`Top Five Artist Names: ${mode.topFiveArtistNames}`);
+    console.log(`Playlist Track IDs: ${sum.playlistTrackIds}`);
+    fetchRecommendedTracks(average.averageTempo, mode.modeKey, average.averageDanceability, average.averageEnergy, average.averageAcousticness, average.averageLiveness, average.averageSpeechiness, average.averageValence, mode.topFiveArtistNames);
 }
 // 配列の最頻値を取得する関数
 function mode(array) {
     return array.sort((a, b) => array.filter(v => v === a).length
         - array.filter(v => v === b).length).pop();
 }
-// 配列の上位5つの最頻値を取得する関数
-function getTopFiveModes(array) {
+function createFrequencyMap(array) {
     const frequency = {};
-    let modes = [];
-    // 各要素の出現回数を計算
-    for (let i in array) {
-        frequency[array[i]] = (frequency[array[i]] || 0) + 1;
+    for (const item of array) {
+        frequency[item] = (frequency[item] || 0) + 1;
     }
-    // 出現回数順に要素をソート
-    const sortedKeys = Object.keys(frequency).sort((a, b) => frequency[b] - frequency[a]);
-    const remainingArtists = sortedKeys.filter(key => frequency[key] === 1);
-    // 上位5つの最頻値を取得
-    for (let key of sortedKeys) {
-        if (modes.length >= 5)
-            break;
-        if (frequency[key] > 1) {
-            modes.push(key);
-        }
-    }
-    // 最頻値が5つ未満の場合、ランダムに要素を追加
-    while (modes.length < 5 && remainingArtists.length > 0) {
-        const randomIndex = Math.floor(Math.random() * remainingArtists.length);
-        const randomArtist = remainingArtists[randomIndex];
-        if (!modes.includes(randomArtist)) {
-            modes.push(randomArtist);
-            remainingArtists.splice(randomIndex, 1);
-        }
-    }
-    return modes;
+    return frequency;
 }
-// メッセージを表示する関数
-function showMessage(message) {
+function getMostFrequentValues(frequency, count) {
+    const sortedKeys = [...Object.keys(frequency)].sort((a, b) => frequency[b] - frequency[a]);
+    return sortedKeys.filter(key => frequency[key] > 1).slice(0, count);
+}
+function getRandomValues(array, count) {
+    let values = [];
+    while (values.length < count && array.length > 0) {
+        const randomIndex = Math.floor(Math.random() * array.length);
+        const randomValue = array[randomIndex];
+        if (!values.includes(randomValue)) {
+            values = [...values, randomValue];
+            array.splice(randomIndex, 1);
+        }
+    }
+    return values;
+}
+function getTopFiveMostFrequentValues(array) {
+    const frequency = createFrequencyMap(array);
+    const modesCount = 5;
+    let modes = getMostFrequentValues(frequency, modesCount);
+    const remainingArtists = Object.keys(frequency).filter(key => frequency[key] === 1);
+    const additionalModesCount = modesCount - modes.length;
+    const additionalModes = getRandomValues(remainingArtists, additionalModesCount);
+    return [...modes, ...additionalModes];
+}
+function createMessageElement(message) {
     const messageDiv = document.createElement('div');
     messageDiv.textContent = message;
-    messageDiv.style.position = 'fixed';
-    messageDiv.style.bottom = '20px';
-    messageDiv.style.right = '20px';
-    messageDiv.style.padding = '10px';
-    messageDiv.style.backgroundColor = '#2EBD59';
-    messageDiv.style.color = 'white';
-    messageDiv.style.borderRadius = '5px';
-    document.body.appendChild(messageDiv);
+    return messageDiv;
+}
+function applyStylesToElement(element, styles) {
+    Object.assign(element.style, styles);
+}
+function removeElementAfterDelay(element, delay) {
     setTimeout(() => {
-        document.body.removeChild(messageDiv);
-    }, 3000);
+        document.body.removeChild(element);
+    }, delay);
+}
+function showMessage(message) {
+    const messageDiv = createMessageElement(message);
+    const styles = {
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        padding: '10px',
+        backgroundColor: '#2EBD59',
+        color: 'white',
+        borderRadius: '5px'
+    };
+    applyStylesToElement(messageDiv, styles);
+    document.body.appendChild(messageDiv);
+    removeElementAfterDelay(messageDiv, 3000);
 }
 //# sourceMappingURL=script.js.map
