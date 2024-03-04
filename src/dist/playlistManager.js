@@ -7,33 +7,36 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { UIManager } from './uiManager';
 import { PlaylistIdManager } from './playlistIdManager';
 import { TrackTable } from './trackTable';
 import { TrackManager } from './trackManager';
 import { MessageManager } from './MessageManager';
 import { LoadingAnimationManager } from './loadingAnimationManager';
 import { TableManager } from './tableManager';
+import { PlaylistDisplayManager } from './playlistDisplayManager';
+import { ValidationManager } from './validationManager';
+import { ElementManager } from './elementManager';
 export class PlaylistManager {
     constructor() {
         this.tableManager = new TableManager();
-        this.uiManager = new UIManager();
         this.playlistIdManager = PlaylistIdManager.getInstance();
         this.trackManager = new TrackManager();
         this.messageManager = new MessageManager();
         this.loadingAnimationManager = new LoadingAnimationManager();
+        this.playlistDisplayManager = new PlaylistDisplayManager();
+        this.validationManager = new ValidationManager();
+        this.elementManager = new ElementManager();
         // ユーザーのプレイリストを取得する
-        this.fetchUserPlaylists = () => this.fetchDataAndUpdateUI(() => this.fetchPlaylistsFromAPI(), (data) => this.uiManager.displayPlaylists(data));
+        this.fetchUserPlaylists = () => this.fetchDataAndUpdateUI(() => this.fetchPlaylistsFromAPI(), (data) => this.playlistDisplayManager.displayPlaylists(data));
         // プレイリストの詳細を取得し表示する
         this.fetchAndDisplayPlaylistDetails = (playlist) => this.fetchDataAndUpdateUI(() => {
             this.playlistIdManager.playlistId = playlist.id;
             return this.fetchPlaylistDuplicate(playlist.id);
-        }, (data) => this.uiManager.displayPlaylistDetails(playlist, data));
+        }, (data) => this.playlistDisplayManager.displayPlaylistDetails(playlist, data));
         // プレイリストフォームの送信イベントハンドラ
         this.handlePlaylistFormSubmit = this.createFormSubmitHandler('playlistId', this.fetchPlaylistData.bind(this));
         // 検索フォームの送信イベントハンドラ
         this.handleSearchFormSubmit = this.createFormSubmitHandler('searchQuery', this.fetchSearchData.bind(this));
-        this.uiManager = new UIManager();
     }
     // データ取得とUI更新の共通処理
     fetchDataAndUpdateUI(fetchData, updateUI) {
@@ -141,7 +144,7 @@ export class PlaylistManager {
             const url = `/java/playlist/${result.id}`;
             this.playlistIdManager.playlistId = result.id;
             const data = yield this.fetchData(url);
-            this.uiManager.validateData(data);
+            this.validationManager.validateData(data);
             return data;
         });
     }
@@ -173,14 +176,14 @@ export class PlaylistManager {
     handlePlaylistDetails(result) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = yield this.fetchPlaylistDetails(result);
-            this.uiManager.displayPlaylistDetails(result, data);
+            this.playlistDisplayManager.displayPlaylistDetails(result, data);
         });
     }
     // フォーム送信イベントハンドラを作成するメソッド
     createFormSubmitHandler(inputId, fetchData) {
         return (event) => {
             event.preventDefault();
-            const inputElement = this.uiManager.getElementById(inputId);
+            const inputElement = this.elementManager.getElementById(inputId);
             const inputValue = inputElement.value.trim(); // 空白を削除
             if (inputValue) { // 入力が空でないことを確認
                 fetchData(inputValue);
@@ -210,11 +213,11 @@ export class PlaylistManager {
     }
     // プレイリストデータの処理
     processPlaylistData(data) {
-        if (this.uiManager.isValidData(data)) {
+        if (this.validationManager.isValidData(data)) {
             const tracks = this.trackManager.createTracks(data);
             this.tableManager.createDomTable(tracks);
             this.trackManager.calculateAverageAndMode(tracks);
-            this.uiManager.displayPlaylistName(data.name);
+            this.playlistDisplayManager.displayPlaylistName(data.name);
         }
         else {
             console.error('Expected data.tracks to be an array but received', data);

@@ -1,22 +1,23 @@
-import {PlaylistSimplified, UIManager} from './uiManager'
+import {PlaylistSimplified} from './playlistSimplified'
 import {PlaylistIdManager} from './playlistIdManager'
 import {TrackTable} from './trackTable'
 import {TrackManager} from './trackManager'
 import {MessageManager} from './MessageManager'
 import {LoadingAnimationManager} from './loadingAnimationManager'
 import {TableManager} from './tableManager'
+import {PlaylistDisplayManager} from './playlistDisplayManager'
+import {ValidationManager} from './validationManager'
+import {ElementManager} from './elementManager'
 
 export class PlaylistManager {
     private tableManager = new TableManager();
-    private uiManager = new UIManager();
     private playlistIdManager = PlaylistIdManager.getInstance();
     private trackManager = new TrackManager();
     private messageManager = new MessageManager();
     private loadingAnimationManager = new LoadingAnimationManager();
-    
-    constructor() {
-        this.uiManager = new UIManager();
-    }
+    private playlistDisplayManager = new PlaylistDisplayManager()
+    private validationManager = new ValidationManager();
+    private elementManager = new ElementManager();
 
     // データ取得とUI更新の共通処理
     async fetchDataAndUpdateUI(fetchData: () => Promise<any>, updateUI: (data: any) => void) {
@@ -34,7 +35,7 @@ export class PlaylistManager {
     // ユーザーのプレイリストを取得する
     fetchUserPlaylists = () => this.fetchDataAndUpdateUI(
         () => this.fetchPlaylistsFromAPI(),
-        (data) => this.uiManager.displayPlaylists(data)
+        (data) => this.playlistDisplayManager.displayPlaylists(data)
     );
 
     // プレイリストの詳細を取得し表示する
@@ -43,7 +44,7 @@ export class PlaylistManager {
             this.playlistIdManager.playlistId = playlist.id;
             return this.fetchPlaylistDuplicate(playlist.id)
         },
-        (data) => this.uiManager.displayPlaylistDetails(playlist, data)
+        (data) => this.playlistDisplayManager.displayPlaylistDetails(playlist, data)
     );
     
     // APIからプレイリストを取得する非同期関数
@@ -138,7 +139,7 @@ export class PlaylistManager {
         const url = `/java/playlist/${result.id}`;
         this.playlistIdManager.playlistId = result.id;
         const data = await this.fetchData(url);
-        this.uiManager.validateData(data);
+        this.validationManager.validateData(data);
         return data;
     }
     
@@ -165,14 +166,14 @@ export class PlaylistManager {
     
     private async handlePlaylistDetails(result: PlaylistSimplified): Promise<void> {
         const data = await this.fetchPlaylistDetails(result);
-        this.uiManager.displayPlaylistDetails(result, data);
+        this.playlistDisplayManager.displayPlaylistDetails(result, data);
     }
 
 // フォーム送信イベントハンドラを作成するメソッド
     createFormSubmitHandler(inputId: string, fetchData: (id: string) => void): (event: Event) => void {
         return (event: Event) => {
             event.preventDefault();
-            const inputElement = this.uiManager.getElementById(inputId) as HTMLInputElement;
+            const inputElement = this.elementManager.getElementById(inputId) as HTMLInputElement;
             const inputValue = inputElement.value.trim();  // 空白を削除
             if (inputValue) {  // 入力が空でないことを確認
                 fetchData(inputValue);
@@ -209,11 +210,11 @@ export class PlaylistManager {
     
     // プレイリストデータの処理
     processPlaylistData(data: any): void {
-        if (this.uiManager.isValidData(data)) {
+        if (this.validationManager.isValidData(data)) {
             const tracks = this.trackManager.createTracks(data);
             this.tableManager.createDomTable(tracks);
             this.trackManager.calculateAverageAndMode(tracks);
-            this.uiManager.displayPlaylistName(data.name);
+            this.playlistDisplayManager.displayPlaylistName(data.name);
         } else {
             console.error('Expected data.tracks to be an array but received', data);
         }

@@ -8,14 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Track } from './track';
-import { UIManager } from './uiManager';
 import { PlaylistIdManager } from './playlistIdManager';
 import { MessageManager } from './MessageManager';
+import { ElementManager } from './elementManager';
+import { TrackDisplayManager } from './trackDisplayManager';
 export class TrackManager {
     constructor() {
-        this.uiManager = new UIManager();
         this.playlistIdManager = PlaylistIdManager.getInstance();
         this.messageManager = new MessageManager();
+        this.elementManager = new ElementManager();
+        this.trackDisplayManager = new TrackDisplayManager();
     }
     calculateAverageAndMode(tracks) {
         const sum = this.calculateSum(tracks);
@@ -182,7 +184,7 @@ export class TrackManager {
     }
     // テーブルをDOMに追加する関数
     appendTableToDOM(table) {
-        this.uiManager.playlistTracksDiv.appendChild(table);
+        this.elementManager.playlistTracksDiv.appendChild(table);
     }
     // トラックの合計値を計算する関数
     calculateSum(tracks) {
@@ -303,7 +305,7 @@ export class TrackManager {
         if (data.tracks) {
             const filteredTracks = data.tracks.filter((track) => !playlistIdManager.playlistTrackIds.includes(track.id));
             trackManager.logRecommendedTracks(filteredTracks);
-            this.uiManager.displayRecommendedTracks(filteredTracks);
+            this.trackDisplayManager.displayRecommendedTracks(filteredTracks);
         }
         else {
             console.log("No tracks found in the response.");

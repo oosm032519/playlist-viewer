@@ -1,12 +1,15 @@
 import {Track} from './track'
-import {UIManager} from './uiManager'
 import {PlaylistIdManager} from './playlistIdManager'
 import {MessageManager} from './MessageManager'
+import {ElementManager} from './elementManager'
+import {TrackDisplayManager} from './trackDisplayManager'
+
 
 export class TrackManager {
-    private uiManager = new UIManager();
     private playlistIdManager = PlaylistIdManager.getInstance();
     private messageManager = new MessageManager();
+    private elementManager = new ElementManager();
+    private trackDisplayManager = new TrackDisplayManager();
     
     calculateAverageAndMode(tracks: Track[]) {
         const sum = this.calculateSum(tracks);
@@ -190,7 +193,7 @@ export class TrackManager {
     
     // テーブルをDOMに追加する関数
     appendTableToDOM(table: HTMLTableElement) {
-        this.uiManager.playlistTracksDiv.appendChild(table);
+        this.elementManager.playlistTracksDiv.appendChild(table);
     }
     
     // トラックの合計値を計算する関数
@@ -326,7 +329,7 @@ export class TrackManager {
         if (data.tracks) {
             const filteredTracks = data.tracks.filter((track: any) => !playlistIdManager.playlistTrackIds.includes(track.id));
             trackManager.logRecommendedTracks(filteredTracks);
-            this.uiManager.displayRecommendedTracks(filteredTracks);
+            this.trackDisplayManager.displayRecommendedTracks(filteredTracks);
         } else {
             console.log("No tracks found in the response.");
         }

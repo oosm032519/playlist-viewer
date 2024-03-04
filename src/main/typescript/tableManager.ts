@@ -1,9 +1,11 @@
 import {PlaylistManager} from './playlistManager'
 import {Track} from './track'
 import {TrackTable} from './trackTable'
-import {PlaylistSimplified, UIManager} from './uiManager'
+import {PlaylistSimplified} from './playlistSimplified'
+import {ElementManager} from './elementManager'
 
 export class TableManager {
+    private elementManager = new ElementManager();
     
     // テーブルの幅をチェックする関数
     checkTableWidth() {
@@ -63,28 +65,26 @@ export class TableManager {
     
     // すべてのテーブルをクリアする
     clearAllTables(): void {
-        const uiManager = new UIManager();
-        uiManager.playlistTracksDiv.innerHTML = '';
-        uiManager.searchResultsDiv.innerHTML = '';
+        const elementManager = new ElementManager();
+        elementManager.playlistTracksDiv.innerHTML = '';
+        elementManager.searchResultsDiv.innerHTML = '';
     }
     
     // テーブルを作成する
     createDomTable(tracks: Track[]): void {
-        const uiManager = new UIManager();
         this.clearAllTables();
         const trackTable = new TrackTable(tracks);
-        uiManager.playlistTracksDiv.appendChild(trackTable.createTable());
+        this.elementManager.playlistTracksDiv.appendChild(trackTable.createTable());
     }
     
     createSearchResultsTable(results: Record<string, any>): void {
-        const uiManager = new UIManager();
         this.clearAllTables();
         if (!Array.isArray(results)) {
             console.error('Expected results to be an array but received', results);
             return;
         }
         const table = this.createTableFromResults(results);
-        uiManager.searchResultsDiv.appendChild(table);
+        this.elementManager.searchResultsDiv.appendChild(table);
     }
     
     createTableFromResults(results: Record<string, any>[]): HTMLTableElement {
@@ -99,12 +99,11 @@ export class TableManager {
     
     // 検索結果の各行を作成する
     createDomTableRow(result: PlaylistSimplified): HTMLTableRowElement {
-        const uiManager = new UIManager();
         const row = document.createElement('tr');
         row.classList.add('odd:bg-white', 'even:bg-gray-100', 'hover:bg-gray-200', 'transition-colors', 'duration-300', 'ease-in-out');
         const td = this.createTableCell(result.name);
         const playlistManager = new PlaylistManager();
-        uiManager.addClickListener(td, () => playlistManager.fetchAndDisplayPlaylistDetailsUI(result));
+        this.elementManager.addClickListener(td, () => playlistManager.fetchAndDisplayPlaylistDetailsUI(result));
         row.appendChild(td);
         return row;
     }
