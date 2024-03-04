@@ -2,7 +2,7 @@ import {PlaylistManager} from './playlistManager'
 import {PageInitializer} from './pageInitializer'
 import {ToggleVisitedPlaylists} from './toggleVisitedPlaylists'
 import {SpotifyAuthorizer} from './spotifyAuthorizer'
-import {TableManager} from './TableManager'
+import {TableManager} from './tableManager'
 
 class Main {
     private toggleVisitedPlaylists: ToggleVisitedPlaylists;

@@ -1,0 +1,1 @@
+{"version":3,"file":"descriptionManager.js","sourceRoot":"","sources":["../../main/typescript/descriptionManager.ts"],"names":[],"mappings":"AAAA,MAAM,OAAO,kBAAkB;IAA/B;QACI,iBAAY,GAA2B;YACnC,cAAc,EAAE,2BAA2B;YAC3C,cAAc,EAAE,oBAAoB;YACpC,QAAQ,EAAE,kBAAkB;YAC5B,UAAU,EAAE,oBAAoB;YAChC,aAAa,EAAE,8BAA8B;YAC7C,SAAS,EAAE,gBAAgB;SAC9B,CAAC;IACN,CAAC;CAAA"}

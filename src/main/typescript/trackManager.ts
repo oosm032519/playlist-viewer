@@ -18,7 +18,7 @@ export class TrackManager {
     async fetchRecommendedTracks(average: any, mode: any) {
         const artistNamesParam = mode.topFiveArtistNames.join(',');
         const data = await this.fetchRecommendationsFromAPI(average, mode, artistNamesParam);
-        this.uiManager.processRecommendationData(data);
+        this.processRecommendationData(data);
     }
     
     async fetchRecommendationsFromAPI(average: any, mode: any, artistNamesParam: string) {
@@ -316,5 +316,19 @@ export class TrackManager {
             this.playlistIdManager.playlistTrackIds.push(item.playlistTrack.track.id);
             return new Track(item.playlistTrack.track, item.audioFeatures);
         });
+    }
+    
+    // レコメンド曲のデータを処理する関数
+    processRecommendationData(data: any) {
+        const trackManager = new TrackManager();
+        trackManager.logResponseData(data);
+        const playlistIdManager = PlaylistIdManager.getInstance();
+        if (data.tracks) {
+            const filteredTracks = data.tracks.filter((track: any) => !playlistIdManager.playlistTrackIds.includes(track.id));
+            trackManager.logRecommendedTracks(filteredTracks);
+            this.uiManager.displayRecommendedTracks(filteredTracks);
+        } else {
+            console.log("No tracks found in the response.");
+        }
     }
 }

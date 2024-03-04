@@ -1,12 +1,17 @@
-import {PlaylistManager} from './playlistManager'
 import {PlaylistIdManager} from './playlistIdManager'
 import {Track} from './track'
 import {TrackManager} from './trackManager'
-import {TrackTable} from './trackTable'
-import {TableManager} from './TableManager'
+import {TableManager} from './tableManager'
 
 export class UIManager {
     private tableManager = new TableManager();
+    private uiManager: UIManager;
+    private playlistIdManager: PlaylistIdManager;
+    
+    constructor() {
+        this.uiManager = this;
+        this.playlistIdManager = PlaylistIdManager.getInstance();
+    }
     
     // 参照履歴テーブルを作成するメソッド
     createUITable(visitedPlaylistsDiv: HTMLElement, data: any) {
@@ -93,20 +98,6 @@ export class UIManager {
             }
         });
     }
-    
-    // レコメンド曲のデータを処理する関数
-    processRecommendationData(data: any) {
-        const trackManager = new TrackManager();
-        trackManager.logResponseData(data);
-        const playlistIdManager = PlaylistIdManager.getInstance();
-        if (data.tracks) {
-            const filteredTracks = data.tracks.filter((track: any) => !playlistIdManager.playlistTrackIds.includes(track.id));
-            trackManager.logRecommendedTracks(filteredTracks);
-            this.displayRecommendedTracks(filteredTracks);
-        } else {
-            console.log("No tracks found in the response.");
-        }
-    }
 
 // 推奨曲を表示する関数
     displayRecommendedTracks(tracks: any[]) {
@@ -125,14 +116,6 @@ export class UIManager {
         });
         
         trackManager.appendTableToDOM(table);
-    }
-    
-    private uiManager: UIManager;
-    private playlistIdManager: PlaylistIdManager;
-    
-    constructor() {
-        this.uiManager = this;
-        this.playlistIdManager = PlaylistIdManager.getInstance();
     }
     
     // IDに基づいてHTML要素を取得する
@@ -183,57 +166,6 @@ export class UIManager {
         }
     }
     
-    // すべてのテーブルをクリアする
-    clearAllTables(): void {
-        this.playlistTracksDiv.innerHTML = '';
-        this.searchResultsDiv.innerHTML = '';
-    }
-    
-    // テーブルを作成する
-    createDomTable(tracks: Track[]): void {
-        this.clearAllTables();
-        const trackTable = new TrackTable(tracks);
-        this.playlistTracksDiv.appendChild(trackTable.createTable());
-    }
-    
-    createSearchResultsTable(results: Record<string, any>): void {
-        this.clearAllTables();
-        if (!Array.isArray(results)) {
-            console.error('Expected results to be an array but received', results);
-            return;
-        }
-        const table = this.createTableFromResults(results);
-        this.searchResultsDiv.appendChild(table);
-    }
-    
-    createTableFromResults(results: Record<string, any>[]): HTMLTableElement {
-        const table = document.createElement('table');
-        table.classList.add('min-w-full', 'divide-y', 'divide-gray-200', 'shadow-md', 'rounded-lg', 'overflow-hidden');
-        results.forEach((result: any) => {
-            const row = this.createDomTableRow(result);
-            table.appendChild(row);
-        });
-        return table;
-    }
-    
-    // 検索結果の各行を作成する
-    createDomTableRow(result: PlaylistSimplified): HTMLTableRowElement {
-        const row = document.createElement('tr');
-        row.classList.add('odd:bg-white', 'even:bg-gray-100', 'hover:bg-gray-200', 'transition-colors', 'duration-300', 'ease-in-out');
-        const td = this.createTableCell(result.name);
-        const playlistManager = new PlaylistManager();
-        this.addClickListener(td, () => playlistManager.fetchAndDisplayPlaylistDetailsUI(result));
-        row.appendChild(td);
-        return row;
-    }
-    
-    createTableCell(text: string): HTMLTableCellElement {
-        const td = document.createElement('td');
-        td.textContent = text;
-        td.classList.add('px-6', 'py-4', 'whitespace-nowrap', 'text-sm', 'font-medium', 'text-gray-900');
-        return td;
-    }
-    
     addClickListener(element: HTMLElement, listener: () => void): void {
         element.addEventListener('click', listener);
     }
@@ -253,7 +185,7 @@ export class UIManager {
         
         if (data && Array.isArray(data.tracks)) {
             const tracks = data.tracks.map((item: any) => new Track(item.playlistTrack.track, item.audioFeatures));
-            this.createDomTable(tracks);
+            this.tableManager.createDomTable(tracks);
             trackManager.calculateTrackAverageAndMode(tracks);
         } else {
             console.error('Expected data.tracks to be an array but received', data);
@@ -264,7 +196,7 @@ export class UIManager {
     displayPlaylists(data: any) {
         this.playlistTracksDiv.innerHTML = '';
         if (data && Array.isArray(data)) {
-            this.createSearchResultsTable(data);
+            this.tableManager.createSearchResultsTable(data);
         } else {
             console.error(`Expected data to be an array but received data of type ${typeof data}`, data);
         }

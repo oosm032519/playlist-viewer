@@ -4,8 +4,10 @@ import {TrackTable} from './trackTable'
 import {TrackManager} from './trackManager'
 import {MessageManager} from './MessageManager'
 import {LoadingAnimationManager} from './loadingAnimationManager'
+import {TableManager} from './tableManager'
 
 export class PlaylistManager {
+    private tableManager = new TableManager();
     private uiManager = new UIManager();
     private playlistIdManager = PlaylistIdManager.getInstance();
     private trackManager = new TrackManager();
@@ -113,7 +115,7 @@ export class PlaylistManager {
 
     // データ取得のためのUIを準備する
     prepareUIForDataFetching(): void {
-        this.uiManager.clearAllTables();
+        this.tableManager.clearAllTables();
         this.loadingAnimationManager.showLoadingAnimation();
     }
     
@@ -188,16 +190,16 @@ export class PlaylistManager {
     
     // プレイリストデータの処理
     handlePlaylistData(data: any): void {
-        this.uiManager.clearAllTables();
+        this.tableManager.clearAllTables();
         this.processPlaylistData(data);
         this.loadingAnimationManager.hideLoadingAnimation();
     }
 
 // 検索データの処理
     handleSearchData(data: any): void {
-        this.uiManager.clearAllTables();
+        this.tableManager.clearAllTables();
         if (data && Array.isArray(data)) {  // データが配列であることを確認
-            this.uiManager.createSearchResultsTable(data);
+            this.tableManager.createSearchResultsTable(data);
         } else {
             console.error('Expected data to be an array but received', data);
             this.messageManager.showMessage('検索結果が見つかりませんでした');
@@ -209,7 +211,7 @@ export class PlaylistManager {
     processPlaylistData(data: any): void {
         if (this.uiManager.isValidData(data)) {
             const tracks = this.trackManager.createTracks(data);
-            this.uiManager.createDomTable(tracks);
+            this.tableManager.createDomTable(tracks);
             this.trackManager.calculateAverageAndMode(tracks);
             this.uiManager.displayPlaylistName(data.name);
         } else {
