@@ -3,12 +3,14 @@ import {PlaylistIdManager} from './playlistIdManager'
 import {TrackTable} from './trackTable'
 import {TrackManager} from './trackManager'
 import {MessageManager} from './MessageManager'
+import {LoadingAnimationManager} from './loadingAnimationManager'
 
 export class PlaylistManager {
     private uiManager = new UIManager();
     private playlistIdManager = PlaylistIdManager.getInstance();
     private trackManager = new TrackManager();
     private messageManager = new MessageManager();
+    private loadingAnimationManager = new LoadingAnimationManager();
     
     constructor() {
         this.uiManager = new UIManager();
@@ -17,13 +19,13 @@ export class PlaylistManager {
     // データ取得とUI更新の共通処理
     async fetchDataAndUpdateUI(fetchData: () => Promise<any>, updateUI: (data: any) => void) {
         try {
-            this.uiManager.showLoadingAnimation();
+            this.loadingAnimationManager.showLoadingAnimation();
             const data = await fetchData();
             updateUI(data);
         } catch (error) {
             this.messageManager.showMessage(error.message);
         } finally {
-            this.uiManager.hideLoadingAnimation();
+            this.loadingAnimationManager.hideLoadingAnimation();
         }
     }
 
@@ -100,7 +102,7 @@ export class PlaylistManager {
             .then(handler.bind(this))
             .catch(TrackTable.handleError)
             .finally(() => {
-                this.uiManager.hideLoadingAnimation();
+                this.loadingAnimationManager.hideLoadingAnimation();
             });
     }
 
@@ -112,7 +114,7 @@ export class PlaylistManager {
     // データ取得のためのUIを準備する
     prepareUIForDataFetching(): void {
         this.uiManager.clearAllTables();
-        this.uiManager.showLoadingAnimation();
+        this.loadingAnimationManager.showLoadingAnimation();
     }
     
     // プレイリストデータを取得する
@@ -147,7 +149,7 @@ export class PlaylistManager {
     }
     
     async fetchAndDisplayPlaylistDetailsUI(result: PlaylistSimplified): Promise<void> {
-        this.uiManager.toggleLoadingAnimation();
+        this.loadingAnimationManager.toggleLoadingAnimation();
         this.playlistIdManager.playlistId = result.id;
         try {
             await this.handlePlaylistDetails(result);
@@ -155,7 +157,7 @@ export class PlaylistManager {
             console.error(error.message);
             this.messageManager.showMessage(`Error: ${error.message}`);
         } finally {
-            this.uiManager.toggleLoadingAnimation();
+            this.loadingAnimationManager.toggleLoadingAnimation();
         }
     }
     
@@ -188,7 +190,7 @@ export class PlaylistManager {
     handlePlaylistData(data: any): void {
         this.uiManager.clearAllTables();
         this.processPlaylistData(data);
-        this.uiManager.hideLoadingAnimation();
+        this.loadingAnimationManager.hideLoadingAnimation();
     }
 
 // 検索データの処理
@@ -200,7 +202,7 @@ export class PlaylistManager {
             console.error('Expected data to be an array but received', data);
             this.messageManager.showMessage('検索結果が見つかりませんでした');
         }
-        this.uiManager.hideLoadingAnimation();
+        this.loadingAnimationManager.hideLoadingAnimation();
     }
     
     // プレイリストデータの処理

@@ -5,16 +5,6 @@ import {TrackManager} from './trackManager'
 import {TrackTable} from './trackTable'
 
 export class UIManager {
-    // ローディングアニメーションを表示するメソッド
-    showLoadingAnimation() {
-        document.getElementById('loading').classList.remove('hidden');
-    }
-
-    // ローディングアニメーションを非表示にするメソッド
-    hideLoadingAnimation() {
-        document.getElementById('loading').classList.add('hidden');
-    }
-    
     // 参照履歴テーブルを作成するメソッド
     createUITable(visitedPlaylistsDiv: HTMLElement, data: any) {
         // 既存のテーブルを取得または作成
@@ -338,11 +328,6 @@ export class UIManager {
         } else {
             console.error('Expected data.tracks to be an array but received', data);
         }
-    }
-    
-    toggleLoadingAnimation(): void {
-        const loadingElement = document.getElementById('loading');
-        loadingElement.classList.toggle('hidden');
     }
     
     // プレイリストを表示する
