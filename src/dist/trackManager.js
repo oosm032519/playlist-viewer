@@ -12,32 +12,13 @@ import { PlaylistIdManager } from './playlistIdManager';
 import { MessageManager } from './MessageManager';
 import { ElementManager } from './elementManager';
 import { TrackDisplayManager } from './trackDisplayManager';
+import { TrackFetcher } from './trackFetcher';
 export class TrackManager {
     constructor() {
         this.playlistIdManager = PlaylistIdManager.getInstance();
         this.messageManager = new MessageManager();
         this.elementManager = new ElementManager();
         this.trackDisplayManager = new TrackDisplayManager();
-    }
-    fetchRecommendedTracks(average, mode) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const artistNamesParam = mode.topFiveArtistNames.join(',');
-            const data = yield this.fetchRecommendationsFromAPI(average, mode, artistNamesParam);
-            this.processRecommendationData(data);
-        });
-    }
-    fetchRecommendationsFromAPI(average, mode, artistNamesParam) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const url = this.constructAPIUrl(average, mode, artistNamesParam);
-            const response = yield fetch(url);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch recommendations. Status: ${response.status} ${response.statusText}`);
-            }
-            return yield response.json();
-        });
-    }
-    constructAPIUrl(average, mode, artistNamesParam) {
-        return `/java/recommendations?tempo=${average.averageTempo}&key=${mode.modeKey}&danceability=${average.averageDanceability}&energy=${average.averageEnergy}&acousticness=${average.averageAcousticness}&liveness=${average.averageLiveness}&speechiness=${average.averageSpeechiness}&valence=${average.averageValence}&modeArtistNames=${artistNamesParam}`;
     }
     // レスポンスデータをログに出力する関数
     logResponseData(data) {
@@ -120,7 +101,8 @@ export class TrackManager {
             const endpoint = this.getEndpoint(isAddButton);
             const { successMessage, errorMessage } = this.getMessages(isAddButton);
             try {
-                yield this.fetchTrack(`/java/playlist/${endpoint}?trackId=${track.id}&playlistId=${playlistId}`);
+                const trackFetcher = new TrackFetcher();
+                yield trackFetcher.fetchTrack(`/java/playlist/${endpoint}?trackId=${track.id}&playlistId=${playlistId}`);
                 this.messageManager.showMessage(successMessage);
                 if (isAddButton) {
                     cell.classList.add('bg-green-100');
@@ -154,14 +136,6 @@ export class TrackManager {
             });
         }));
         return button;
-    }
-    fetchTrack(url) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield fetch(url);
-            if (!response.ok) {
-                throw new Error('There was a problem with the fetch operation');
-            }
-        });
     }
     // ヘッダー行を作成する関数
     createHeaderRow() {

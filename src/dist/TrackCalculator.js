@@ -1,13 +1,13 @@
-import { TrackManager } from './trackManager';
+import { TrackFetcher } from './trackFetcher';
 export class TrackCalculator {
     constructor() {
-        this.trackManager = new TrackManager();
+        this.trackFetcher = new TrackFetcher();
     }
     calculateAverageAndMode(tracks) {
         const sum = this.calculateSum(tracks);
         const average = this.calculateAverage(sum, tracks.length);
         const mode = this.calculateMode(sum);
-        this.trackManager.fetchRecommendedTracks(average, mode);
+        this.trackFetcher.fetchRecommendedTracks(average, mode);
     }
     // トラックの合計値を計算する関数
     calculateSum(tracks) {

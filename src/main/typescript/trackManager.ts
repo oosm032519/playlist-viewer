@@ -3,6 +3,7 @@ import {PlaylistIdManager} from './playlistIdManager'
 import {MessageManager} from './MessageManager'
 import {ElementManager} from './elementManager'
 import {TrackDisplayManager} from './trackDisplayManager'
+import {TrackFetcher} from './trackFetcher'
 
 
 export class TrackManager {
@@ -10,27 +11,6 @@ export class TrackManager {
     private messageManager = new MessageManager();
     private elementManager = new ElementManager();
     private trackDisplayManager = new TrackDisplayManager();
-    
-
-    
-    async fetchRecommendedTracks(average: any, mode: any) {
-        const artistNamesParam = mode.topFiveArtistNames.join(',');
-        const data = await this.fetchRecommendationsFromAPI(average, mode, artistNamesParam);
-        this.processRecommendationData(data);
-    }
-    
-    async fetchRecommendationsFromAPI(average: any, mode: any, artistNamesParam: string) {
-        const url = this.constructAPIUrl(average, mode, artistNamesParam);
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch recommendations. Status: ${response.status} ${response.statusText}`);
-        }
-        return await response.json();
-    }
-    
-    constructAPIUrl(average: any, mode: any, artistNamesParam: string) {
-        return `/java/recommendations?tempo=${average.averageTempo}&key=${mode.modeKey}&danceability=${average.averageDanceability}&energy=${average.averageEnergy}&acousticness=${average.averageAcousticness}&liveness=${average.averageLiveness}&speechiness=${average.averageSpeechiness}&valence=${average.averageValence}&modeArtistNames=${artistNamesParam}`;
-    }
     
     // レスポンスデータをログに出力する関数
     logResponseData(data: any) {
@@ -130,7 +110,8 @@ export class TrackManager {
         const {successMessage, errorMessage} = this.getMessages(isAddButton);
         
         try {
-            await this.fetchTrack(`/java/playlist/${endpoint}?trackId=${track.id}&playlistId=${playlistId}`);
+            const trackFetcher = new TrackFetcher();
+            await trackFetcher.fetchTrack(`/java/playlist/${endpoint}?trackId=${track.id}&playlistId=${playlistId}`);
             this.messageManager.showMessage(successMessage);
             if (isAddButton) {
                 cell.classList.add('bg-green-100');
@@ -162,13 +143,6 @@ export class TrackManager {
             isAddButton: isAddButton
         }));
         return button;
-    }
-    
-    async fetchTrack(url: string) {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error('There was a problem with the fetch operation');
-        }
     }
 
 // ヘッダー行を作成する関数
