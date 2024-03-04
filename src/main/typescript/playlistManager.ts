@@ -33,7 +33,10 @@ export class PlaylistManager {
 
     // プレイリストの詳細を取得し表示する
     fetchAndDisplayPlaylistDetails = (playlist: any) => this.fetchDataAndUpdateUI(
-        () => this.fetchPlaylistDuplicate(playlist.id),
+        () => {
+            this.playlistIdManager.playlistId = playlist.id;
+            return this.fetchPlaylistDuplicate(playlist.id)
+        },
         (data) => this.uiManager.displayPlaylistDetails(playlist, data)
     );
     
@@ -49,6 +52,7 @@ export class PlaylistManager {
     
     // プレイリストの詳細を取得する
     async fetchPlaylistDuplicate(playlistId: string) {
+        this.playlistIdManager.playlistId = playlistId;
         const response = await fetch(`/java/playlist/${playlistId}`);
         if (!response.ok) {
             throw new Error('There was a problem with the fetch operation');
@@ -111,17 +115,22 @@ export class PlaylistManager {
     
     // プレイリストデータを取得する
     fetchPlaylistData(playlistId: string): void {
+        this.playlistIdManager.playlistId = playlistId;
         this.fetchDataFromAPI(`/java/playlist/${playlistId}`, this.handlePlaylistData);
     }
     
     // 検索データを取得する
     fetchSearchData(searchQuery: string): void {
-        this.fetchDataFromAPI(`/java/search/${searchQuery}`, this.handleSearchData);
+        this.fetchDataFromAPI(`/java/search/${searchQuery}`, (data) => {
+            console.log("Search results:", data);  // 検索結果をコンソールに表示
+            this.handleSearchData(data);
+        });
     }
     
     // プレイリストの詳細を取得・表示する
     async fetchPlaylistDetails(result: PlaylistSimplified): Promise<any> {
         const url = `/java/playlist/${result.id}`;
+        this.playlistIdManager.playlistId = result.id;
         const data = await this.fetchData(url);
         this.uiManager.validateData(data);
         return data;
@@ -153,18 +162,17 @@ export class PlaylistManager {
         this.uiManager.displayPlaylistDetails(result, data);
     }
 
-    // 共通の処理を行うメソッド
-    handleFormSubmit(event: Event, inputId: string, fetchData: (id: string) => void): void {
-        event.preventDefault();
-        const inputElement = this.uiManager.getElementById(inputId) as HTMLInputElement;
-        const inputValue = inputElement.value;
-        fetchData(inputValue);
-    }
-
-    // フォーム送信イベントハンドラを作成するメソッド
+// フォーム送信イベントハンドラを作成するメソッド
     createFormSubmitHandler(inputId: string, fetchData: (id: string) => void): (event: Event) => void {
         return (event: Event) => {
-            this.handleFormSubmit(event, inputId, fetchData);
+            event.preventDefault();
+            const inputElement = this.uiManager.getElementById(inputId) as HTMLInputElement;
+            const inputValue = inputElement.value.trim();  // 空白を削除
+            if (inputValue) {  // 入力が空でないことを確認
+                fetchData(inputValue);
+            } else {
+                this.uiManager.showMessage('検索クエリを入力してください');
+            }
         };
     }
 
@@ -180,11 +188,16 @@ export class PlaylistManager {
         this.processPlaylistData(data);
         this.uiManager.hideLoadingAnimation();
     }
-    
-    // 検索データの処理
+
+// 検索データの処理
     handleSearchData(data: any): void {
         this.uiManager.clearAllTables();
-        this.uiManager.createSearchResultsTable(data);
+        if (data && Array.isArray(data)) {  // データが配列であることを確認
+            this.uiManager.createSearchResultsTable(data);
+        } else {
+            console.error('Expected data to be an array but received', data);
+            this.uiManager.showMessage('検索結果が見つかりませんでした');
+        }
         this.uiManager.hideLoadingAnimation();
     }
     

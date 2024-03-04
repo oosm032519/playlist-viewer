@@ -7,7 +7,6 @@ export class UIManager {
     // メッセージを表示するメソッド
     showMessage(message) {
         const messageDiv = this.createMessageElement(message);
-        this.applyStylesToElement(messageDiv, this.getMessageStyles());
         this.addMessageToDOM(messageDiv);
         this.removeElementAfterDelay(messageDiv, 3000);
     }
@@ -15,23 +14,18 @@ export class UIManager {
     createMessageElement(message) {
         const messageDiv = document.createElement('div');
         messageDiv.textContent = message;
+        messageDiv.className = 'fixed bottom-5 right-5 p-2.5 bg-green-500 text-white rounded-full';
         return messageDiv;
-    }
-    // メッセージのスタイルを取得するメソッド
-    getMessageStyles() {
-        return {
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            padding: '10px',
-            backgroundColor: '#2EBD59',
-            color: 'white',
-            borderRadius: '5px'
-        };
     }
     // メッセージをDOMに追加するメソッド
     addMessageToDOM(messageDiv) {
         document.body.appendChild(messageDiv);
+    }
+    // 一定時間後に要素を削除するメソッド
+    removeElementAfterDelay(element, delay) {
+        setTimeout(() => {
+            document.body.removeChild(element);
+        }, delay);
     }
     // ローディングアニメーションを表示するメソッド
     showLoadingAnimation() {
@@ -41,7 +35,7 @@ export class UIManager {
     hideLoadingAnimation() {
         document.getElementById('loading').classList.add('hidden');
     }
-    // テーブルを作成するメソッド
+    // 参照履歴テーブルを作成するメソッド
     createUITable(visitedPlaylistsDiv, data) {
         // 既存のテーブルを取得または作成
         let table = this.getTable(visitedPlaylistsDiv);
@@ -51,29 +45,27 @@ export class UIManager {
         }
         // 新しいテーブルを作成
         table = document.createElement('table');
+        table.classList.add('divide-y', 'divide-gray-200', 'w-full', 'mx-auto', 'mt-6', 'text-center', 'shadow-md', 'rounded-lg', 'overflow-hidden');
         visitedPlaylistsDiv.appendChild(table);
         // テーブルヘッダーを作成して追加
-        table.appendChild(this.createTableHeader());
+        const thead = this.createTableHeader();
+        thead.classList.add('bg-green-500', 'text-white', 'hover:bg-green-600', 'transition-colors', 'duration-300', 'ease-in-out');
+        table.appendChild(thead);
         // テーブルボディを作成して追加
-        table.appendChild(this.createTableBody(table, data));
+        const tbody = this.createTableBody(table, data);
+        tbody.classList.add('divide-y', 'divide-gray-200');
+        table.appendChild(tbody);
         // visitedPlaylistsDivを非表示に設定
         visitedPlaylistsDiv.classList.add('hidden');
     }
-    // ダークモードとライトモードを切り替えるメソッド
-    toggleDarkLightMode() {
-        // アイコンを取得
-        const sunIcon = document.getElementById('sun-icon');
-        // アニメーションを設定
-        sunIcon.style.transition = 'transform 0.5s';
-        // クリックイベントを追加
-        sunIcon.addEventListener('click', () => {
-            // ダークモードとライトモードを切り替え
-            document.body.classList.toggle('dark-mode');
-            document.body.classList.toggle('light-mode');
-            // アイコンの回転を設定
-            const rotationDegree = document.body.classList.contains('dark-mode') ? 180 : 0;
-            sunIcon.style.transform = `rotate(${rotationDegree}deg)`;
-        });
+    // visitedPlaylistsDivからテーブルを取得する関数
+    getTable(visitedPlaylistsDiv) {
+        let table = visitedPlaylistsDiv.querySelector('table');
+        if (!table) {
+            table = document.createElement('table');
+            visitedPlaylistsDiv.appendChild(table);
+        }
+        return table;
     }
     // フォームの表示を切り替えるメソッド
     toggleFormVisibility(showForm, hideForm) {
@@ -98,7 +90,26 @@ export class UIManager {
         const option = document.getElementById(optionId);
         const showForm = document.getElementById(showFormId);
         const hideForm = document.getElementById(hideFormId);
+        const labelForOption = document.querySelector(`label[for="${optionId}"]`);
         this.addChangeEventToOption(option, showForm, hideForm);
+        // すべてのラジオボタンを取得
+        const allOptions = document.querySelectorAll(`input[name="${option.name}"]`);
+        allOptions.forEach((otherOption) => {
+            otherOption.addEventListener('change', () => {
+                if (otherOption !== option) {
+                    // 他のラジオボタンが選択されたとき、このラジオボタンのスタイルをデフォルトに戻す
+                    labelForOption.classList.remove('bg-green-500', 'text-white');
+                    labelForOption.classList.add('bg-white', 'text-green-500');
+                }
+            });
+        });
+        option.addEventListener('change', () => {
+            if (option.checked) {
+                // ラジオボタンが選択されたとき、スタイルを変更
+                labelForOption.classList.remove('bg-white', 'text-green-500');
+                labelForOption.classList.add('bg-green-500', 'text-white');
+            }
+        });
     }
     // サイドメニューを切り替えるメソッド
     toggleSideMenu() {
@@ -112,8 +123,8 @@ export class UIManager {
     }
     // サイドメニューのクラスを切り替えるメソッド
     toggleMenuClass() {
-        const sideMenu = document.querySelector('.side-menu');
-        sideMenu.classList.toggle('open');
+        const sideMenu = document.getElementById('side-menu');
+        sideMenu.classList.toggle('translate-x-full');
     }
     // ログイン結果メッセージを表示するメソッド
     displayLoginResultMessage() {
@@ -131,16 +142,6 @@ export class UIManager {
     getLoginMessage(loginResult) {
         return this.loginMessages[loginResult];
     }
-    // 要素にスタイルを適用するメソッド
-    applyStylesToElement(element, styles) {
-        Object.assign(element.style, styles);
-    }
-    // 一定時間後に要素を削除するメソッド
-    removeElementAfterDelay(element, delay) {
-        setTimeout(() => {
-            document.body.removeChild(element);
-        }, delay);
-    }
     // テーブルの幅をチェックする関数
     checkTableWidth() {
         // 全てのテーブルを取得
@@ -156,15 +157,6 @@ export class UIManager {
                 table.style.overflowX = 'auto';
             }
         });
-    }
-    // visitedPlaylistsDivからテーブルを取得する関数
-    getTable(visitedPlaylistsDiv) {
-        let table = visitedPlaylistsDiv.querySelector('table');
-        if (!table) {
-            table = document.createElement('table');
-            visitedPlaylistsDiv.appendChild(table);
-        }
-        return table;
     }
     // テーブルヘッダーを作成する関数
     createTableHeader() {
@@ -185,6 +177,7 @@ export class UIManager {
         }
         data.forEach((playlist) => {
             const row = this.createTableRow(playlist);
+            row.classList.add('border', 'border-gray-300', 'odd:bg-white', 'even:bg-gray-100', 'hover:bg-gray-200', 'transition-colors', 'duration-300', 'ease-in-out');
             tableBody.appendChild(row);
         });
         return tableBody;
@@ -216,13 +209,17 @@ export class UIManager {
     // 推奨曲を表示する関数
     displayRecommendedTracks(tracks) {
         const table = document.createElement('table');
-        table.classList.add('recommendations-table');
+        // Tailwind CSS classes for styling the table
+        table.classList.add('recommendations-table', 'divide-x', 'divide-y', 'divide-gray-200', 'w-full', 'mx-auto', 'mt-6', 'text-center', 'shadow-md', 'rounded-lg', 'overflow-hidden');
         const trackManager = new TrackManager();
         table.appendChild(trackManager.createHeaderRow());
         const playlistIdManager = PlaylistIdManager.getInstance();
         const trackPairs = trackManager.createTrackPairs(tracks);
         const rows = trackManager.createRowsForTrackPairs(trackPairs, playlistIdManager.playlistId);
-        rows.forEach((row) => table.appendChild(row));
+        rows.forEach((row) => {
+            row.classList.add('hover:bg-gray-200', 'h-20', 'border', 'border-gray-300', 'odd:bg-white', 'even:bg-gray-100', 'transition-colors', 'duration-300', 'ease-in-out');
+            table.appendChild(row);
+        });
         trackManager.appendTableToDOM(table);
     }
     constructor() {
@@ -242,10 +239,6 @@ export class UIManager {
     get playlistForm() {
         return this.getElementById('playlistForm');
     }
-    // プレイリストID入力を取得する
-    get playlistIdInput() {
-        return this.getElementById('playlistId');
-    }
     // プレイリストトラックDivを取得する
     get playlistTracksDiv() {
         return this.getElementById('playlistTracks');
@@ -253,10 +246,6 @@ export class UIManager {
     // 検索フォームを取得する
     get searchForm() {
         return this.getElementById('searchForm');
-    }
-    // 検索クエリ入力を取得する
-    get searchQueryInput() {
-        return this.getElementById('searchQuery');
     }
     // 検索結果Divを取得する
     get searchResultsDiv() {
@@ -277,6 +266,7 @@ export class UIManager {
             console.log(`Playlist name: ${name}`);
             const playlistNameElement = document.createElement('h2');
             playlistNameElement.textContent = `${name}`;
+            playlistNameElement.classList.add('text-4xl', 'font-bold', 'text-green-500', 'mt-4', 'font-sans', 'font-semibold', 'w-full', 'text-center', 'border-b-2', 'border-green-500');
             this.playlistTracksDiv.insertBefore(playlistNameElement, this.playlistTracksDiv.firstChild);
         }
     }
@@ -302,6 +292,7 @@ export class UIManager {
     }
     createTableFromResults(results) {
         const table = document.createElement('table');
+        table.classList.add('min-w-full', 'divide-y', 'divide-gray-200', 'shadow-md', 'rounded-lg', 'overflow-hidden');
         results.forEach((result) => {
             const row = this.createDomTableRow(result);
             table.appendChild(row);
@@ -311,6 +302,7 @@ export class UIManager {
     // 検索結果の各行を作成する
     createDomTableRow(result) {
         const row = document.createElement('tr');
+        row.classList.add('odd:bg-white', 'even:bg-gray-100', 'hover:bg-gray-200', 'transition-colors', 'duration-300', 'ease-in-out');
         const td = this.createTableCell(result.name);
         const playlistManager = new PlaylistManager();
         this.addClickListener(td, () => playlistManager.fetchAndDisplayPlaylistDetailsUI(result));
@@ -320,6 +312,7 @@ export class UIManager {
     createTableCell(text) {
         const td = document.createElement('td');
         td.textContent = text;
+        td.classList.add('px-6', 'py-4', 'whitespace-nowrap', 'text-sm', 'font-medium', 'text-gray-900');
         return td;
     }
     addClickListener(element, listener) {

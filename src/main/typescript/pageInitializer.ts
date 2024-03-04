@@ -15,7 +15,6 @@ export class PageInitializer {
     }
     
     private setupUIManager() {
-        this.uiManager.toggleDarkLightMode();
         this.uiManager.togglePlaylistSearchOption();
         this.uiManager.toggleSideMenu();
         this.uiManager.displayLoginResultMessage();

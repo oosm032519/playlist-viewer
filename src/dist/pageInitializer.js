@@ -11,7 +11,6 @@ export class PageInitializer {
         this.fetchVisitedPlaylists();
     }
     setupUIManager() {
-        this.uiManager.toggleDarkLightMode();
         this.uiManager.togglePlaylistSearchOption();
         this.uiManager.toggleSideMenu();
         this.uiManager.displayLoginResultMessage();

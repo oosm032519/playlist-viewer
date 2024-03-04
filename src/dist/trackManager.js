@@ -33,7 +33,7 @@ export class TrackManager {
             const url = this.constructAPIUrl(average, mode, artistNamesParam);
             const response = yield fetch(url);
             if (!response.ok) {
-                throw new Error('Failed to fetch recommendations');
+                throw new Error(`Failed to fetch recommendations. Status: ${response.status} ${response.statusText}`);
             }
             return yield response.json();
         });
@@ -99,7 +99,7 @@ export class TrackManager {
     createButton(isAddButton) {
         const button = document.createElement('button');
         button.textContent = isAddButton ? '+' : '-';
-        button.className = 'track-button';
+        button.className = 'track-button bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded text-center text-lg w-10 h-10 flex items-center justify-center';
         return button;
     }
     // メッセージを生成するメソッド
@@ -124,7 +124,17 @@ export class TrackManager {
             try {
                 yield this.fetchTrack(`/java/playlist/${endpoint}?trackId=${track.id}&playlistId=${playlistId}`);
                 this.uiManager.showMessage(successMessage);
-                cell.style.backgroundColor = isAddButton ? 'lightgreen' : (row.sectionRowIndex % 2 === 0 ? '#FFF' : '#F2F2F2');
+                if (isAddButton) {
+                    cell.classList.add('bg-green-100');
+                }
+                else {
+                    if (row.sectionRowIndex % 2 === 0) {
+                        cell.classList.add('bg-white');
+                    }
+                    else {
+                        cell.classList.add('bg-gray-100');
+                    }
+                }
             }
             catch (error) {
                 console.error('There was a problem with the fetch operation: ', error);
@@ -135,6 +145,7 @@ export class TrackManager {
     // トラックボタンを作成する関数
     createTrackButton(track, playlistId, cell, row, isAddButton) {
         const button = this.createButton(isAddButton);
+        button.classList.add('bg-green-500', 'text-white', 'w-12', 'h-12', 'm-2', 'rounded', 'px-5', 'py-2.5', 'cursor-pointer', 'transition-colors', 'duration-300', 'ease-in-out');
         button.addEventListener('click', () => __awaiter(this, void 0, void 0, function* () {
             return this.handleButtonClick({
                 track: track,
@@ -159,6 +170,7 @@ export class TrackManager {
         const headerRow = document.createElement('tr');
         const headerCell = document.createElement('th');
         headerCell.textContent = "Recommended Tracks";
+        headerCell.classList.add('text-white', 'bg-green-500', 'text-center', 'py-2', 'hover:bg-green-600', 'transition-colors', 'duration-300', 'ease-in-out');
         headerRow.appendChild(headerCell);
         return headerRow;
     }

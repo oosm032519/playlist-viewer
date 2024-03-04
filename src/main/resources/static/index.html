@@ -11,49 +11,69 @@
 
 <div class="radio-group flex justify-center my-5">
     <div class="mx-2">
-        <input type="radio" id="playlistIdOption" name="option" checked>
-        <label for="playlistIdOption" class="text-green-500">プレイリストIDを入力</label>
+        <input type="radio" id="playlistIdOption" name="option" checked class="hidden">
+        <label for="playlistIdOption"
+               class="inline-block p-2 px-5 m-2 border-2 border-green-500 rounded-md bg-green-500 text-white transition-all duration-300 ease-in-out cursor-pointer w-11/10 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent hover:ring-4 hover:ring-green-300">
+            プレイリストIDを入力
+        </label>
     </div>
     <div class="mx-2">
-        <input type="radio" id="searchQueryOption" name="option">
-        <label for="searchQueryOption" class="text-green-500">プレイリスト名で検索</label>
+        <input type="radio" id="searchQueryOption" name="option" class="hidden">
+        <label for="searchQueryOption"
+               class="inline-block p-2 px-5 m-2 border-2 border-green-500 rounded-md bg-white text-green-500 transition-all duration-300 ease-in-out cursor-pointer w-11/10 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent hover:ring-4 hover:ring-green-300">
+            プレイリスト名で検索
+        </label>
     </div>
 </div>
 
-<form id="playlistForm" class="m-5 form-container">
+<form id="playlistForm" class="m-5 form-container flex items-center">
     <label for="playlistId"></label><input type="text" id="playlistId" placeholder="プレイリストIDを入力してください"
-                                           class="border-2 border-gray-300 rounded-lg h-10 w-3/4 p-3 mb-2">
-    <button type="submit" class="bg-green-500 text-white rounded-lg h-10 p-3">送信</button>
+                                           class="border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 w-11/12 p-3 mr-2">
+    <button type="submit"
+            class="bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent hover:ring-4 hover:ring-green-300">
+        送信
+    </button>
 </form>
-<form id="searchForm" class="m-5 form-container hidden">
+<form id="searchForm" class="m-5 form-container hidden flex items-center">
     <label for="searchQuery"></label><input type="text" id="searchQuery" placeholder="プレイリスト名を入力してください"
-                                            class="border-2 border-gray-300 rounded-lg h-10 w-3/4 p-3 mb-2">
-    <button type="submit" class="bg-green-500 text-white rounded-lg h-10 p-3">検索</button>
+                                            class="border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 w-11/12 p-3 mr-2">
+    <button type="submit"
+            class="bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent hover:ring-4 hover:ring-green-300">
+        検索
+    </button>
 </form>
 
 <div id="playlistTracks" class="m-5"></div>
 
 <div id="searchResults" class="m-5"></div>
 
-<div id="loading" class="loader hidden"></div>
+<div id="loading" class="loader hidden animate-spin h-12 w-12 border-t-4 border-green-500 rounded-full absolute top-0 bottom-0 left-0 right-0 m-auto"></div>
 
 <div id="visitedPlaylists" class="m-5"></div>
 
-<button id="open" class="bg-green-500 text-white rounded-lg h-10 p-3 absolute top-0 right-0">
+<button id="open"
+        class="bg-green-500 text-white rounded-lg h-10 p-3 absolute top-5 right-5 flex items-center justify-center transition-transform duration-500 ease-in-out hover:bg-green-600 hover:text-gray-900">
     メニューを開く
 </button>
 
-<div class="side-menu">
-    <button id="close" class="bg-green-500 text-white rounded-lg h-10 p-3">メニューを閉じる</button>
-    <button id="spotify-login" class="bg-green-500 text-white rounded-lg h-10 p-3">Spotifyアカウントでログイン</button>
-    <button id="show-playlists" class="bg-green-500 text-white rounded-lg h-10 p-3">フォロー中のプレイリスト
+<div id="side-menu"
+     class="fixed right-0 top-0 w-64 h-screen bg-gray-800 text-white p-5 shadow-md transform translate-x-full transition-transform duration-300 ease-in-out rounded-l-lg border-l-4 border-green-500">
+    <button id="close"
+            class="w-full bg-green-500 hover:bg-green-600 text-white hover:text-gray-900 rounded-lg h-10 p-3 flex items-center justify-center transition-colors duration-300">
+        メニューを閉じる
     </button>
-    <button id="visited-playlists" class="bg-green-500 text-white rounded-lg h-10 p-3">参照履歴を表示</button>
-    <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-         class="h-12 w-12 absolute top-2 right-2 transition-transform duration-500">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-    </svg>
+    <button id="spotify-login"
+            class="w-full bg-green-500 hover:bg-green-600 text-white hover:text-gray-900 rounded-lg h-10 p-3 mt-4 flex items-center justify-center transition-colors duration-300">
+        Spotifyにログイン
+    </button>
+    <button id="show-playlists"
+            class="w-full bg-green-500 hover:bg-green-600 text-white hover:text-gray-900 rounded-lg h-10 p-3 mt-4 flex items-center justify-center transition-colors duration-300">
+        フォロー中のプレイリスト
+    </button>
+    <button id="visited-playlists"
+            class="w-full bg-green-500 hover:bg-green-600 text-white hover:text-gray-900 rounded-lg h-10 p-3 mt-4 flex items-center justify-center transition-colors duration-300">
+        参照履歴を表示
+    </button>
 </div>
 
 <script src="bundle.js"></script>

@@ -14,9 +14,11 @@ export class TrackTable {
     }
     createTableHeader() {
         const thead = document.createElement('thead');
+        thead.classList.add('bg-green-500', 'text-white', 'hover:bg-green-600', 'transition-colors', 'duration-300', 'ease-in-out');
         const headerRow = document.createElement('tr');
         ['Track Name', 'Artist Name', 'BPM', 'Key', 'Mode', 'Acousticness', 'Danceability', 'Energy', /* 'Instrumentalness', */ 'Liveness', 'Speechiness', 'Valence'].forEach((text, index) => {
             const th = this.createHeaderCell(text, index);
+            th.classList.add('px-4', 'py-2');
             headerRow.appendChild(th);
         });
         thead.appendChild(headerRow);
@@ -77,9 +79,11 @@ export class TrackTable {
     }
     createRow(track) {
         const row = document.createElement('tr');
+        row.classList.add('hover:bg-gray-300', 'h-20', 'odd:bg-white', 'even:bg-gray-100', 'transition-colors', 'duration-300', 'ease-in-out');
         [track.name, track.artists[0].name, track.audioFeatures.tempo, this.keyToNote(track.audioFeatures.key), track.audioFeatures.mode, track.audioFeatures.acousticness, track.audioFeatures.danceability, track.audioFeatures.energy, /* track.audioFeatures.instrumentalness, */ track.audioFeatures.liveness, track.audioFeatures.speechiness, track.audioFeatures.valence].forEach(text => {
             const td = document.createElement('td');
             td.textContent = text.toString();
+            td.classList.add('border', 'border-gray-200', 'px-4', 'py-2'); // Tailwind CSS classes to add border and padding
             row.appendChild(td);
         });
         return row;
@@ -102,7 +106,7 @@ export class TrackTable {
     }
     createTable() {
         const table = document.createElement('table');
-        table.classList.add('playlist-table');
+        table.classList.add('playlist-table', 'divide-y', 'divide-gray-200', 'divide-x', 'w-full', 'mx-auto', 'mt-6', 'text-center', 'shadow-md', 'rounded-lg', 'overflow-hidden');
         table.appendChild(this.createTableHeader());
         table.appendChild(this.createTableBody());
         return table;
