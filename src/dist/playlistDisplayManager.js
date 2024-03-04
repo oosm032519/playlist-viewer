@@ -1,11 +1,12 @@
-import { TrackManager } from './trackManager';
 import { TableManager } from './tableManager';
 import { Track } from './track';
 import { ElementManager } from './elementManager';
+import { TrackCalculator } from './TrackCalculator';
 export class PlaylistDisplayManager {
     constructor() {
         this.tableManager = new TableManager();
         this.elementManager = new ElementManager();
+        this.trackCalculator = new TrackCalculator();
     }
     displayPlaylistName(name) {
         if (name) {
@@ -18,14 +19,13 @@ export class PlaylistDisplayManager {
     }
     displayPlaylistDetails(playlist, data) {
         this.elementManager.playlistTracksDiv.innerHTML = '';
-        const trackManager = new TrackManager();
         const playlistNameElement = document.createElement('h2');
         playlistNameElement.textContent = `${playlist.name}`;
         this.elementManager.playlistTracksDiv.appendChild(playlistNameElement);
         if (data && Array.isArray(data.tracks)) {
             const tracks = data.tracks.map((item) => new Track(item.playlistTrack.track, item.audioFeatures));
             this.tableManager.createDomTable(tracks);
-            trackManager.calculateTrackAverageAndMode(tracks);
+            this.trackCalculator.calculateTrackAverageAndMode(tracks);
         }
         else {
             console.error('Expected data.tracks to be an array but received', data);

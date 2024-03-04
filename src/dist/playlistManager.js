@@ -16,6 +16,7 @@ import { TableManager } from './tableManager';
 import { PlaylistDisplayManager } from './playlistDisplayManager';
 import { ValidationManager } from './validationManager';
 import { ElementManager } from './elementManager';
+import { TrackCalculator } from './TrackCalculator';
 export class PlaylistManager {
     constructor() {
         this.tableManager = new TableManager();
@@ -26,6 +27,7 @@ export class PlaylistManager {
         this.playlistDisplayManager = new PlaylistDisplayManager();
         this.validationManager = new ValidationManager();
         this.elementManager = new ElementManager();
+        this.trackCalculator = new TrackCalculator();
         // ユーザーのプレイリストを取得する
         this.fetchUserPlaylists = () => this.fetchDataAndUpdateUI(() => this.fetchPlaylistsFromAPI(), (data) => this.playlistDisplayManager.displayPlaylists(data));
         // プレイリストの詳細を取得し表示する
@@ -216,7 +218,7 @@ export class PlaylistManager {
         if (this.validationManager.isValidData(data)) {
             const tracks = this.trackManager.createTracks(data);
             this.tableManager.createDomTable(tracks);
-            this.trackManager.calculateAverageAndMode(tracks);
+            this.trackCalculator.calculateAverageAndMode(tracks);
             this.playlistDisplayManager.displayPlaylistName(data.name);
         }
         else {

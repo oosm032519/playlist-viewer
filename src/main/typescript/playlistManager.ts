@@ -8,6 +8,7 @@ import {TableManager} from './tableManager'
 import {PlaylistDisplayManager} from './playlistDisplayManager'
 import {ValidationManager} from './validationManager'
 import {ElementManager} from './elementManager'
+import {TrackCalculator} from './TrackCalculator'
 
 export class PlaylistManager {
     private tableManager = new TableManager();
@@ -18,6 +19,7 @@ export class PlaylistManager {
     private playlistDisplayManager = new PlaylistDisplayManager()
     private validationManager = new ValidationManager();
     private elementManager = new ElementManager();
+    private trackCalculator = new TrackCalculator();
 
     // データ取得とUI更新の共通処理
     async fetchDataAndUpdateUI(fetchData: () => Promise<any>, updateUI: (data: any) => void) {
@@ -213,7 +215,7 @@ export class PlaylistManager {
         if (this.validationManager.isValidData(data)) {
             const tracks = this.trackManager.createTracks(data);
             this.tableManager.createDomTable(tracks);
-            this.trackManager.calculateAverageAndMode(tracks);
+            this.trackCalculator.calculateAverageAndMode(tracks);
             this.playlistDisplayManager.displayPlaylistName(data.name);
         } else {
             console.error('Expected data.tracks to be an array but received', data);
