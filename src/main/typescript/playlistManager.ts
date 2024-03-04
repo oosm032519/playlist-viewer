@@ -2,11 +2,13 @@ import {PlaylistSimplified, UIManager} from './uiManager'
 import {PlaylistIdManager} from './playlistIdManager'
 import {TrackTable} from './trackTable'
 import {TrackManager} from './trackManager'
+import {MessageManager} from './MessageManager'
 
 export class PlaylistManager {
     private uiManager = new UIManager();
     private playlistIdManager = PlaylistIdManager.getInstance();
     private trackManager = new TrackManager();
+    private messageManager = new MessageManager();
     
     constructor() {
         this.uiManager = new UIManager();
@@ -19,7 +21,7 @@ export class PlaylistManager {
             const data = await fetchData();
             updateUI(data);
         } catch (error) {
-            this.uiManager.showMessage(error.message);
+            this.messageManager.showMessage(error.message);
         } finally {
             this.uiManager.hideLoadingAnimation();
         }
@@ -151,7 +153,7 @@ export class PlaylistManager {
             await this.handlePlaylistDetails(result);
         } catch (error) {
             console.error(error.message);
-            this.uiManager.showMessage(`Error: ${error.message}`);
+            this.messageManager.showMessage(`Error: ${error.message}`);
         } finally {
             this.uiManager.toggleLoadingAnimation();
         }
@@ -171,7 +173,7 @@ export class PlaylistManager {
             if (inputValue) {  // 入力が空でないことを確認
                 fetchData(inputValue);
             } else {
-                this.uiManager.showMessage('検索クエリを入力してください');
+                this.messageManager.showMessage('検索クエリを入力してください');
             }
         };
     }
@@ -196,7 +198,7 @@ export class PlaylistManager {
             this.uiManager.createSearchResultsTable(data);
         } else {
             console.error('Expected data to be an array but received', data);
-            this.uiManager.showMessage('検索結果が見つかりませんでした');
+            this.messageManager.showMessage('検索結果が見つかりませんでした');
         }
         this.uiManager.hideLoadingAnimation();
     }

@@ -10,10 +10,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { Track } from './track';
 import { UIManager } from './uiManager';
 import { PlaylistIdManager } from './playlistIdManager';
+import { MessageManager } from './MessageManager';
 export class TrackManager {
     constructor() {
         this.uiManager = new UIManager();
         this.playlistIdManager = PlaylistIdManager.getInstance();
+        this.messageManager = new MessageManager();
     }
     calculateAverageAndMode(tracks) {
         const sum = this.calculateSum(tracks);
@@ -123,7 +125,7 @@ export class TrackManager {
             const { successMessage, errorMessage } = this.getMessages(isAddButton);
             try {
                 yield this.fetchTrack(`/java/playlist/${endpoint}?trackId=${track.id}&playlistId=${playlistId}`);
-                this.uiManager.showMessage(successMessage);
+                this.messageManager.showMessage(successMessage);
                 if (isAddButton) {
                     cell.classList.add('bg-green-100');
                 }
@@ -138,7 +140,7 @@ export class TrackManager {
             }
             catch (error) {
                 console.error('There was a problem with the fetch operation: ', error);
-                this.uiManager.showMessage(errorMessage);
+                this.messageManager.showMessage(errorMessage);
             }
         });
     }

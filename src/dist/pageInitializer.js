@@ -1,9 +1,11 @@
 import { UIManager } from './uiManager';
 import { PlaylistManager } from './playlistManager';
+import { MessageManager } from './MessageManager';
 export class PageInitializer {
     constructor() {
         this.uiManager = new UIManager();
         this.playlistManager = new PlaylistManager();
+        this.messageManager = new MessageManager();
         this.initializePage();
     }
     initializePage() {
@@ -13,7 +15,7 @@ export class PageInitializer {
     setupUIManager() {
         this.uiManager.togglePlaylistSearchOption();
         this.uiManager.toggleSideMenu();
-        this.uiManager.displayLoginResultMessage();
+        this.messageManager.displayLoginResultMessage();
         this.uiManager.addSubmitEventToForm('playlistForm', this.playlistManager.handlePlaylistFormSubmit.bind(this.playlistManager));
         this.uiManager.addSubmitEventToForm('searchForm', this.playlistManager.handleSearchFormSubmit.bind(this.playlistManager));
     }

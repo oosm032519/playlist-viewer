@@ -11,11 +11,13 @@ import { UIManager } from './uiManager';
 import { PlaylistIdManager } from './playlistIdManager';
 import { TrackTable } from './trackTable';
 import { TrackManager } from './trackManager';
+import { MessageManager } from './MessageManager';
 export class PlaylistManager {
     constructor() {
         this.uiManager = new UIManager();
         this.playlistIdManager = PlaylistIdManager.getInstance();
         this.trackManager = new TrackManager();
+        this.messageManager = new MessageManager();
         // ユーザーのプレイリストを取得する
         this.fetchUserPlaylists = () => this.fetchDataAndUpdateUI(() => this.fetchPlaylistsFromAPI(), (data) => this.uiManager.displayPlaylists(data));
         // プレイリストの詳細を取得し表示する
@@ -38,7 +40,7 @@ export class PlaylistManager {
                 updateUI(data);
             }
             catch (error) {
-                this.uiManager.showMessage(error.message);
+                this.messageManager.showMessage(error.message);
             }
             finally {
                 this.uiManager.hideLoadingAnimation();
@@ -157,7 +159,7 @@ export class PlaylistManager {
             }
             catch (error) {
                 console.error(error.message);
-                this.uiManager.showMessage(`Error: ${error.message}`);
+                this.messageManager.showMessage(`Error: ${error.message}`);
             }
             finally {
                 this.uiManager.toggleLoadingAnimation();
@@ -180,7 +182,7 @@ export class PlaylistManager {
                 fetchData(inputValue);
             }
             else {
-                this.uiManager.showMessage('検索クエリを入力してください');
+                this.messageManager.showMessage('検索クエリを入力してください');
             }
         };
     }
@@ -198,7 +200,7 @@ export class PlaylistManager {
         }
         else {
             console.error('Expected data to be an array but received', data);
-            this.uiManager.showMessage('検索結果が見つかりませんでした');
+            this.messageManager.showMessage('検索結果が見つかりませんでした');
         }
         this.uiManager.hideLoadingAnimation();
     }
