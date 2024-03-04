@@ -16,7 +16,7 @@ import { TableManager } from './tableManager';
 import { PlaylistDisplayManager } from './playlistDisplayManager';
 import { ValidationManager } from './validationManager';
 import { ElementManager } from './elementManager';
-import { TrackCalculator } from './TrackCalculator';
+import { TrackCalculator } from './trackCalculator';
 export class PlaylistManager {
     constructor() {
         this.tableManager = new TableManager();

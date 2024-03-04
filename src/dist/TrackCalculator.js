@@ -114,4 +114,4 @@ export class TrackCalculator {
         this.calculateAverageAndMode(tracks);
     }
 }
-//# sourceMappingURL=TrackCalculator.js.map
+//# sourceMappingURL=trackCalculator.js.map

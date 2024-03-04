@@ -1,7 +1,7 @@
 import {TableManager} from './tableManager'
 import {Track} from './track'
 import {ElementManager} from './elementManager'
-import {TrackCalculator} from './TrackCalculator'
+import {TrackCalculator} from './trackCalculator'
 
 export class PlaylistDisplayManager {
     private tableManager = new TableManager();
