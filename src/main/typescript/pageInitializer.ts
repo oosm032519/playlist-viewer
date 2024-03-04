@@ -1,13 +1,15 @@
-import {UIManager} from './uiManager'
 import {PlaylistManager} from './playlistManager'
 import {MessageManager} from './MessageManager'
 import {SideMenuManager} from './sideMenuManager'
+import {FormManager} from './formManager'
+import {OptionManager} from './optionManager'
 
 export class PageInitializer {
-    private uiManager = new UIManager();
     private playlistManager = new PlaylistManager();
     private messageManager = new MessageManager();
     private sideMenuManager = new SideMenuManager();
+    private formManager = new FormManager();
+    private optionManager = new OptionManager();
 
     constructor() {
         this.initializePage();
@@ -19,11 +21,11 @@ export class PageInitializer {
     }
     
     private setupUIManager() {
-        this.uiManager.togglePlaylistSearchOption();
+        this.optionManager.togglePlaylistSearchOption();
         this.sideMenuManager.toggleSideMenu();
         this.messageManager.displayLoginResultMessage();
-        this.uiManager.addSubmitEventToForm('playlistForm', this.playlistManager.handlePlaylistFormSubmit.bind(this.playlistManager));
-        this.uiManager.addSubmitEventToForm('searchForm', this.playlistManager.handleSearchFormSubmit.bind(this.playlistManager));
+        this.formManager.addSubmitEventToForm('playlistForm', this.playlistManager.handlePlaylistFormSubmit.bind(this.playlistManager));
+        this.formManager.addSubmitEventToForm('searchForm', this.playlistManager.handleSearchFormSubmit.bind(this.playlistManager));
     }
     
     private fetchVisitedPlaylists() {

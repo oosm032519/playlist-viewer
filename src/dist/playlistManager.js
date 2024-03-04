@@ -94,7 +94,7 @@ export class PlaylistManager {
     }
     createAndDisplayTable(data) {
         const visitedPlaylistsDiv = document.getElementById('visitedPlaylists');
-        this.uiManager.createUITable(visitedPlaylistsDiv, data);
+        this.tableManager.createUITable(visitedPlaylistsDiv, data);
     }
     // レスポンスのステータスをチェックする関数
     checkResponseStatus(response) {

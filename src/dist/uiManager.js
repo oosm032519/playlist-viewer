@@ -5,84 +5,6 @@ import { TableManager } from './tableManager';
 export class UIManager {
     constructor() {
         this.tableManager = new TableManager();
-        this.uiManager = this;
-        this.playlistIdManager = PlaylistIdManager.getInstance();
-    }
-    // 参照履歴テーブルを作成するメソッド
-    createUITable(visitedPlaylistsDiv, data) {
-        // 既存のテーブルを取得または作成
-        let table = this.getTable(visitedPlaylistsDiv);
-        // 既存のテーブルがある場合は削除
-        if (table) {
-            visitedPlaylistsDiv.removeChild(table);
-        }
-        // 新しいテーブルを作成
-        table = document.createElement('table');
-        table.classList.add('divide-y', 'divide-gray-200', 'w-full', 'mx-auto', 'mt-6', 'text-center', 'shadow-md', 'rounded-lg', 'overflow-hidden');
-        visitedPlaylistsDiv.appendChild(table);
-        // テーブルヘッダーを作成して追加
-        const thead = this.tableManager.createTableHeader();
-        thead.classList.add('bg-green-500', 'text-white', 'hover:bg-green-600', 'transition-colors', 'duration-300', 'ease-in-out');
-        table.appendChild(thead);
-        // テーブルボディを作成して追加
-        const tbody = this.tableManager.createTableBody(table, data);
-        tbody.classList.add('divide-y', 'divide-gray-200');
-        table.appendChild(tbody);
-        // visitedPlaylistsDivを非表示に設定
-        visitedPlaylistsDiv.classList.add('hidden');
-    }
-    // visitedPlaylistsDivからテーブルを取得する関数
-    getTable(visitedPlaylistsDiv) {
-        let table = visitedPlaylistsDiv.querySelector('table');
-        if (!table) {
-            table = document.createElement('table');
-            visitedPlaylistsDiv.appendChild(table);
-        }
-        return table;
-    }
-    // フォームの表示を切り替えるメソッド
-    toggleFormVisibility(showForm, hideForm) {
-        showForm.classList.remove('hidden');
-        hideForm.classList.add('hidden');
-    }
-    // オプションの変更イベントを監視するメソッド
-    addChangeEventToOption(option, showForm, hideForm) {
-        option.addEventListener('change', () => {
-            if (option.checked) {
-                this.toggleFormVisibility(showForm, hideForm);
-            }
-        });
-    }
-    // プレイリスト検索オプションを切り替えるメソッド
-    togglePlaylistSearchOption() {
-        this.toggleOption('playlistIdOption', 'playlistForm', 'searchForm');
-        this.toggleOption('searchQueryOption', 'searchForm', 'playlistForm');
-    }
-    // オプションの切り替えを行うメソッド
-    toggleOption(optionId, showFormId, hideFormId) {
-        const option = document.getElementById(optionId);
-        const showForm = document.getElementById(showFormId);
-        const hideForm = document.getElementById(hideFormId);
-        const labelForOption = document.querySelector(`label[for="${optionId}"]`);
-        this.addChangeEventToOption(option, showForm, hideForm);
-        // すべてのラジオボタンを取得
-        const allOptions = document.querySelectorAll(`input[name="${option.name}"]`);
-        allOptions.forEach((otherOption) => {
-            otherOption.addEventListener('change', () => {
-                if (otherOption !== option) {
-                    // 他のラジオボタンが選択されたとき、このラジオボタンのスタイルをデフォルトに戻す
-                    labelForOption.classList.remove('bg-green-500', 'text-white');
-                    labelForOption.classList.add('bg-white', 'text-green-500');
-                }
-            });
-        });
-        option.addEventListener('change', () => {
-            if (option.checked) {
-                // ラジオボタンが選択されたとき、スタイルを変更
-                labelForOption.classList.remove('bg-white', 'text-green-500');
-                labelForOption.classList.add('bg-green-500', 'text-white');
-            }
-        });
     }
     // 推奨曲を表示する関数
     displayRecommendedTracks(tracks) {
@@ -119,11 +41,6 @@ export class UIManager {
     // 検索結果Divを取得する
     get searchResultsDiv() {
         return this.getElementById('searchResults');
-    }
-    // フォームに送信イベントを追加する
-    addSubmitEventToForm(formId, handler) {
-        const form = this.getElementById(formId);
-        form.addEventListener('submit', handler.bind(this));
     }
     // データが有効かどうかを確認する
     isValidData(data) {

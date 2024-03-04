@@ -115,4 +115,39 @@ export class TableManager {
         td.classList.add('px-6', 'py-4', 'whitespace-nowrap', 'text-sm', 'font-medium', 'text-gray-900');
         return td;
     }
+    
+    
+    // 参照履歴テーブルを作成するメソッド
+    createUITable(visitedPlaylistsDiv: HTMLElement, data: any) {
+        // 既存のテーブルを取得または作成
+        let table = this.getTable(visitedPlaylistsDiv);
+        // 既存のテーブルがある場合は削除
+        if (table) {
+            visitedPlaylistsDiv.removeChild(table);
+        }
+        // 新しいテーブルを作成
+        table = document.createElement('table');
+        table.classList.add('divide-y', 'divide-gray-200', 'w-full', 'mx-auto', 'mt-6', 'text-center', 'shadow-md', 'rounded-lg', 'overflow-hidden');
+        visitedPlaylistsDiv.appendChild(table);
+        // テーブルヘッダーを作成して追加
+        const thead = this.createTableHeader();
+        thead.classList.add('bg-green-500', 'text-white', 'hover:bg-green-600', 'transition-colors', 'duration-300', 'ease-in-out');
+        table.appendChild(thead);
+        // テーブルボディを作成して追加
+        const tbody = this.createTableBody(table, data);
+        tbody.classList.add('divide-y', 'divide-gray-200');
+        table.appendChild(tbody);
+        // visitedPlaylistsDivを非表示に設定
+        visitedPlaylistsDiv.classList.add('hidden');
+    }
+    
+    // visitedPlaylistsDivからテーブルを取得する関数
+    getTable(visitedPlaylistsDiv: HTMLElement): HTMLTableElement {
+        let table = visitedPlaylistsDiv.querySelector('table');
+        if (!table) {
+            table = document.createElement('table');
+            visitedPlaylistsDiv.appendChild(table);
+        }
+        return table;
+    }
 }
