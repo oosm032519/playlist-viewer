@@ -12,7 +12,7 @@
       "esnext"
     ],
     "esModuleInterop": true,
-    "jsx": "react"
+    "jsx": "react",
   },
   "include": [
     "./**/*.ts",

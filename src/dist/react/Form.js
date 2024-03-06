@@ -13,8 +13,10 @@ import PlaylistTable from './PlaylistTable';
 const FormComponent = () => {
     const { selectedOption } = useContext(SelectedOptionContext);
     const [playlist, setPlaylist] = useState(null);
+    const [isLoading, setIsLoading] = useState(false); // New state for loading status
     const handleSubmit = (event) => __awaiter(void 0, void 0, void 0, function* () {
         event.preventDefault();
+        setIsLoading(true); // Set loading status to true when button is clicked
         let response;
         if (selectedOption === 'playlistIdOption') {
             const playlistId = event.target.elements.playlistId.value;
@@ -27,6 +29,7 @@ const FormComponent = () => {
         const playlist = yield response.json();
         console.log(playlist);
         setPlaylist(playlist);
+        setIsLoading(false); // Set loading status to false after data is fetched
     });
     return (React.createElement("div", null,
         selectedOption === 'playlistIdOption' ? (React.createElement("form", { id: "playlistForm", className: "m-5 form-container flex items-center", onSubmit: handleSubmit },
@@ -34,7 +37,7 @@ const FormComponent = () => {
             React.createElement("button", { type: "submit", className: "bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent hover:ring-4 hover:ring-green-300" }, "\u9001\u4FE1"))) : (React.createElement("form", { id: "searchForm", className: "m-5 form-container flex items-center", onSubmit: handleSubmit },
             React.createElement("input", { type: "text", id: "searchQuery", placeholder: "\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8\u540D\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044", className: "border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 w-11/12 p-3 mr-2" }),
             React.createElement("button", { type: "submit", className: "bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent hover:ring-4 hover:ring-green-300" }, "\u691C\u7D22"))),
-        playlist && React.createElement(PlaylistTable, { playlist: playlist })));
+        isLoading ? (React.createElement("div", { className: "loader animate-spin h-12 w-12 border-t-4 border-green-500 rounded-full absolute top-0 bottom-0 left-0 right-0 m-auto" })) : (playlist && React.createElement(PlaylistTable, { playlist: playlist }))));
 };
 export default FormComponent;
 //# sourceMappingURL=Form.js.map
