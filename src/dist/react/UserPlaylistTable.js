@@ -6,8 +6,18 @@ const UserPlaylistTable = () => {
     const data = React.useMemo(() => playlists, [playlists]);
     const columns = React.useMemo(() => [
         {
+            Header: 'Preview',
+            accessor: 'images[0].url',
+            Cell: ({ value, row }) => (React.createElement("a", { href: `https://open.spotify.com/playlist/${row.original.id}`, target: "_blank", rel: "noopener noreferrer" },
+                React.createElement("img", { src: value, alt: "Playlist", style: { width: '50px', height: '50px' } })))
+        },
+        {
             Header: 'Playlist Name',
             accessor: 'name',
+        },
+        {
+            Header: 'Tracks',
+            accessor: 'tracks.total',
         },
         {
             Header: 'Owner',

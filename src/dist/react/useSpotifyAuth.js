@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { useCallback } from 'react';
 export function useSpotifyAuth() {
-    const authorize = useCallback(() => __awaiter(this, void 0, void 0, function* () {
+    return useCallback(() => __awaiter(this, void 0, void 0, function* () {
         try {
             const response = yield fetch('/java/authorize');
             const uri = yield response.text();
@@ -21,6 +21,5 @@ export function useSpotifyAuth() {
             console.error('There was a problem with the fetch operation: ', error);
         }
     }), []);
-    return authorize;
 }
 //# sourceMappingURL=useSpotifyAuth.js.map

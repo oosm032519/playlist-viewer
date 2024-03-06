@@ -1,6 +1,7 @@
 import React, {useState, useContext} from 'react';
 import {SelectedOptionContext} from './SelectedOptionContext';
 import PlaylistTable from './PlaylistTable';
+import PlaylistContext from './PlaylistContext';
 
 type FormComponentProps = {
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -10,28 +11,35 @@ type FormComponentProps = {
 const FormComponent: React.FC<FormComponentProps> = ({setIsLoading, isLoading}) => {
     const {selectedOption} = useContext(SelectedOptionContext);
     const [playlist, setPlaylist] = useState(null);
+    const {setPlaylists, setTableVisible} = useContext(PlaylistContext);
     
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handlePlaylistIdSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setIsLoading(true);
-        let response;
-        if (selectedOption === 'playlistIdOption') {
-            const playlistId = (event.target as any).elements.playlistId.value;
-            response = await fetch(`/java/playlist/${playlistId}`);
-        } else {
-            const searchQuery = (event.target as any).elements.searchQuery.value;
-            response = await fetch(`/java/search/${searchQuery}`);
-        }
+        const playlistId = (event.target as any).elements.playlistId.value;
+        const response = await fetch(`/java/playlist/${playlistId}`);
         const playlist = await response.json();
         console.log(playlist);
         setPlaylist(playlist);
         setIsLoading(false);
     };
     
+    const handleSearchSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        setIsLoading(true);
+        const searchQuery = (event.target as any).elements.searchQuery.value;
+        const response = await fetch(`/java/search/${searchQuery}`);
+        const playlists = await response.json();
+        console.log(playlists);
+        setPlaylists(playlists);
+        setTableVisible(true);
+        setIsLoading(false);
+    };
+    
     return (
         <div>
             {selectedOption === 'playlistIdOption' ? (
-                <form id="playlistForm" className="m-5 form-container flex items-center" onSubmit={handleSubmit}>
+                <form id="playlistForm" className="m-5 form-container flex items-center" onSubmit={handlePlaylistIdSubmit}>
                     <input type="text" id="playlistId" placeholder="プレイリストIDを入力してください"
                            className="border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 w-11/12 p-3 mr-2"/>
                     <button type="submit"
@@ -40,7 +48,7 @@ const FormComponent: React.FC<FormComponentProps> = ({setIsLoading, isLoading}) 
                     </button>
                 </form>
             ) : (
-                <form id="searchForm" className="m-5 form-container flex items-center" onSubmit={handleSubmit}>
+                <form id="searchForm" className="m-5 form-container flex items-center" onSubmit={handleSearchSubmit}>
                     <input type="text" id="searchQuery" placeholder="プレイリスト名を入力してください"
                            className="border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 w-11/12 p-3 mr-2"/>
                     <button type="submit"

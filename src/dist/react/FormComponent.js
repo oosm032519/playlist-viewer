@@ -45,4 +45,4 @@ const FormComponent = ({ setIsLoading, isLoading }) => {
         !isLoading && playlist && React.createElement(PlaylistTable, { playlist: playlist })));
 };
 export default FormComponent;
-//# sourceMappingURL=Form.js.map
+//# sourceMappingURL=FormComponent.js.map

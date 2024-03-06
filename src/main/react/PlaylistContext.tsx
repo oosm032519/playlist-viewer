@@ -5,6 +5,8 @@ type PlaylistContextType = {
     setPlaylists: (playlists: any[]) => void;
     isTableVisible: boolean;
     setTableVisible: (visible: boolean) => void;
+    isLoading: boolean;
+    setIsLoading: (loading: boolean) => void;
 };
 
 const PlaylistContext = React.createContext<PlaylistContextType>({
@@ -13,6 +15,9 @@ const PlaylistContext = React.createContext<PlaylistContextType>({
     },
     isTableVisible: false,
     setTableVisible: () => {
+    },
+    isLoading: false,
+    setIsLoading: () => {
     },
 });
 

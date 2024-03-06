@@ -2,8 +2,9 @@ import React, {useContext, useCallback} from 'react';
 import PlaylistContext from './PlaylistContext';
 
 const FetchUserPlaylistsButton = () => {
-    const {setPlaylists, setTableVisible} = useContext(PlaylistContext);
+    const {setPlaylists, setTableVisible, setIsLoading} = useContext(PlaylistContext);
     const fetchUserPlaylists = useCallback(async () => {
+        setIsLoading(true);
         try {
             const response = await fetch('/java/spotify/user/playlists');
             if (!response.ok) {
@@ -15,8 +16,10 @@ const FetchUserPlaylistsButton = () => {
             setTableVisible(true);
         } catch (error) {
             console.error('There was a problem with the fetch operation: ', error);
+        } finally {
+            setIsLoading(false);
         }
-    }, [setPlaylists, setTableVisible]);
+    }, [setPlaylists, setTableVisible, setIsLoading]);
     
     return (
         <button onClick={fetchUserPlaylists}

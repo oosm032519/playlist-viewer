@@ -6,6 +6,9 @@ const PlaylistContext = React.createContext({
     isTableVisible: false,
     setTableVisible: () => {
     },
+    isLoading: false,
+    setIsLoading: () => {
+    },
 });
 export default PlaylistContext;
 //# sourceMappingURL=PlaylistContext.js.map

@@ -1,7 +1,7 @@
 import {useCallback} from 'react';
 
 export function useSpotifyAuth() {
-    const authorize = useCallback(async () => {
+    return useCallback(async () => {
         try {
             const response = await fetch('/java/authorize');
             const uri = await response.text();
@@ -12,6 +12,4 @@ export function useSpotifyAuth() {
             console.error('There was a problem with the fetch operation: ', error);
         }
     }, []);
-    
-    return authorize;
 }
