@@ -24,5 +24,13 @@ export function useApi() {
         return playlists;
     };
     
-    return {fetchPlaylistById, fetchPlaylistsByName};
+    const fetchVisitedPlaylists = async () => {
+        const response = await fetch('/java/user/visited-playlists');
+        const playlists = await response.json();
+        console.log(playlists);
+        setPlaylists(playlists);
+        return playlists;
+    };
+    
+    return {fetchPlaylistById, fetchPlaylistsByName, fetchVisitedPlaylists};
 }

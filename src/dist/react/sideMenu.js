@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSpotifyAuth } from './useSpotifyAuth';
 import FetchUserPlaylistsButton from './FetchUserPlaylistsButton';
+import FetchVisitedPlaylistsButton from './FetchVisitedPlaylistsButton';
 const SideMenu = () => {
     const [isOpen, setIsOpen] = useState(false);
     const authorize = useSpotifyAuth();
@@ -14,7 +15,7 @@ const SideMenu = () => {
             React.createElement("button", { onClick: toggleMenu, className: "w-full bg-green-500 hover:bg-green-600 text-white hover:text-gray-900 rounded-lg h-10 p-3 flex items-center justify-center transition-colors duration-300" }, "\u30E1\u30CB\u30E5\u30FC\u3092\u9589\u3058\u308B"),
             React.createElement("button", { id: "spotify-login", onClick: authorize, className: "w-full bg-green-500 hover:bg-green-600 text-white hover:text-gray-900 rounded-lg h-10 p-3 mt-4 flex items-center justify-center transition-colors duration-300" }, "Spotify\u306B\u30ED\u30B0\u30A4\u30F3"),
             React.createElement(FetchUserPlaylistsButton, null),
-            React.createElement("button", { id: "visited-playlists", className: "w-full bg-green-500 hover:bg-green-600 text-white hover:text-gray-900 rounded-lg h-10 p-3 mt-4 flex items-center justify-center transition-colors duration-300" }, "\u53C2\u7167\u5C65\u6B74\u3092\u8868\u793A"))));
+            React.createElement(FetchVisitedPlaylistsButton, null))));
 };
 export default SideMenu;
 //# sourceMappingURL=SideMenu.js.map

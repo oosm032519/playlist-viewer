@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {useSpotifyAuth} from './useSpotifyAuth';
 import FetchUserPlaylistsButton from './FetchUserPlaylistsButton';
+import FetchVisitedPlaylistsButton from './FetchVisitedPlaylistsButton'
 
 const SideMenu = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -31,10 +32,7 @@ const SideMenu = () => {
                     Spotifyにログイン
                 </button>
                 <FetchUserPlaylistsButton/>
-                <button id="visited-playlists"
-                        className="w-full bg-green-500 hover:bg-green-600 text-white hover:text-gray-900 rounded-lg h-10 p-3 mt-4 flex items-center justify-center transition-colors duration-300">
-                    参照履歴を表示
-                </button>
+                <FetchVisitedPlaylistsButton/>
             </div>
         </div>
     );

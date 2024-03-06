@@ -26,6 +26,13 @@ export function useApi() {
         setPlaylists(playlists);
         return playlists;
     });
-    return { fetchPlaylistById, fetchPlaylistsByName };
+    const fetchVisitedPlaylists = () => __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch('/java/user/visited-playlists');
+        const playlists = yield response.json();
+        console.log(playlists);
+        setPlaylists(playlists);
+        return playlists;
+    });
+    return { fetchPlaylistById, fetchPlaylistsByName, fetchVisitedPlaylists };
 }
 //# sourceMappingURL=useApi.js.map
