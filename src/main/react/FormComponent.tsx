@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import CombinedContext, { Option } from './CombinedContext';
+import CombinedContext, {Option} from './CombinedContext';
 import {useApi} from './useApi'
 
 type FormComponentProps = {
@@ -8,9 +8,9 @@ type FormComponentProps = {
 };
 
 const FormComponent: React.FC<FormComponentProps> = ({setIsLoading}) => {
-    const {selectedOption, setShowPlaylists, setShowTracks} = useContext(CombinedContext);
+    const {selectedOption, setShowPlaylists, setShowTracks, setPlaylists} = useContext(CombinedContext);
     const {fetchPlaylistById, fetchPlaylistsByName} = useApi();
-
+    
     const handlePlaylistIdSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         console.log('handlePlaylistIdSubmitが呼び出されました');
         event.preventDefault();
@@ -21,16 +21,24 @@ const FormComponent: React.FC<FormComponentProps> = ({setIsLoading}) => {
         setShowPlaylists(false);
         setIsLoading(false);
     };
-
+    
     const handleSearchSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         console.log('handleSearchSubmitが呼び出されました');
         event.preventDefault();
         setIsLoading(true);
         const searchQuery = (event.target as any).elements.searchQuery.value;
-        await fetchPlaylistsByName(searchQuery);
-        setShowPlaylists(true);
-        setShowTracks(false);
-        setIsLoading(false);
+        try {
+            const playlists = await fetchPlaylistsByName(searchQuery);
+            if (JSON.stringify(playlists) !== JSON.stringify(playlists)) {
+                setPlaylists(playlists);
+            }
+            setShowPlaylists(true);
+            setShowTracks(false);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (

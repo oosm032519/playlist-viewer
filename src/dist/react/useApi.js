@@ -22,6 +22,7 @@ export function useApi() {
         const playlists = yield response.json();
         console.log(playlists);
         setPlaylists(playlists);
+        return playlists;
     });
     return { fetchPlaylistById, fetchPlaylistsByName };
 }

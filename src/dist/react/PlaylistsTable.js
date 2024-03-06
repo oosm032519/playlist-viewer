@@ -14,6 +14,7 @@ const PlaylistsTable = () => {
         {
             Header: 'Playlist Name',
             accessor: 'name',
+            Cell: ({ row }) => (React.createElement("div", { onClick: () => console.log(row.original.id) }, row.values.name)),
         },
         {
             Header: 'Tracks',
