@@ -1,8 +1,32 @@
-import React, { useContext } from 'react';
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+import React, { useContext, useEffect, useState } from 'react';
 import CombinedContext from './CombinedContext';
 import { useTable } from 'react-table';
+import { useApi } from './useApi';
 const PlaylistsTable = () => {
-    const { playlists } = useContext(CombinedContext);
+    const { playlists, setShowTracks, setShowPlaylists, setIsLoading } = useContext(CombinedContext);
+    const { fetchPlaylistById } = useApi();
+    const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
+    useEffect(() => {
+        const fetchAndSetPlaylist = () => __awaiter(void 0, void 0, void 0, function* () {
+            if (selectedPlaylistId) {
+                setIsLoading(true);
+                yield fetchPlaylistById(selectedPlaylistId);
+                setIsLoading(false);
+                setShowTracks(true);
+                setShowPlaylists(false);
+            }
+        });
+        fetchAndSetPlaylist();
+    }, [selectedPlaylistId, fetchPlaylistById, setShowTracks, setShowPlaylists]);
     const data = React.useMemo(() => playlists, [playlists]);
     const columns = React.useMemo(() => [
         {
@@ -14,7 +38,7 @@ const PlaylistsTable = () => {
         {
             Header: 'Playlist Name',
             accessor: 'name',
-            Cell: ({ row }) => (React.createElement("div", { onClick: () => console.log(row.original.id) }, row.values.name)),
+            Cell: ({ row }) => (React.createElement("div", { onClick: () => setSelectedPlaylistId(row.original.id) }, row.values.name)),
         },
         {
             Header: 'Tracks',
@@ -24,7 +48,7 @@ const PlaylistsTable = () => {
             Header: 'Owner',
             accessor: 'owner.displayName',
         },
-    ], []);
+    ], [setSelectedPlaylistId]);
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, } = useTable({ columns, data });
     return (React.createElement("table", Object.assign({}, getTableProps(), { className: "w-full table-auto" }),
         React.createElement("thead", null, headerGroups.map((headerGroup) => (React.createElement("tr", Object.assign({}, headerGroup.getHeaderGroupProps()), headerGroup.headers.map(column => (React.createElement("th", Object.assign({}, column.getHeaderProps(), { className: "px-4 py-2" }), column.render('Header')))))))),

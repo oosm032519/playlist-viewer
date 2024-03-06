@@ -12,12 +12,14 @@ import CombinedContext from './CombinedContext';
 export function useApi() {
     const { setPlaylists, setSelectedPlaylist, } = useContext(CombinedContext);
     const fetchPlaylistById = (playlistId) => __awaiter(this, void 0, void 0, function* () {
+        console.log('fetchPlaylistByIdが呼び出されました');
         const response = yield fetch(`/java/playlist/${playlistId}`);
         const playlist = yield response.json();
         console.log(playlist);
         setSelectedPlaylist(playlist);
     });
     const fetchPlaylistsByName = (searchQuery) => __awaiter(this, void 0, void 0, function* () {
+        console.log('fetchPlaylistsByNameが呼び出されました');
         const response = yield fetch(`/java/search/${searchQuery}`);
         const playlists = yield response.json();
         console.log(playlists);

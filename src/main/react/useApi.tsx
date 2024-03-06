@@ -8,6 +8,7 @@ export function useApi() {
     } = useContext(CombinedContext);
     
     const fetchPlaylistById = async (playlistId: string) => {
+        console.log('fetchPlaylistByIdが呼び出されました');
         const response = await fetch(`/java/playlist/${playlistId}`);
         const playlist = await response.json();
         console.log(playlist);
@@ -15,6 +16,7 @@ export function useApi() {
     };
     
     const fetchPlaylistsByName = async (searchQuery: string) => {
+        console.log('fetchPlaylistsByNameが呼び出されました');
         const response = await fetch(`/java/search/${searchQuery}`);
         const playlists = await response.json();
         console.log(playlists);

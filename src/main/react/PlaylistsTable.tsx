@@ -1,9 +1,26 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import CombinedContext from './CombinedContext';
 import {useTable} from 'react-table';
+import {useApi} from './useApi';
 
 const PlaylistsTable = () => {
-    const {playlists} = useContext(CombinedContext);
+    const {playlists, setShowTracks, setShowPlaylists, setIsLoading} = useContext(CombinedContext);
+    const {fetchPlaylistById} = useApi();
+    const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
+    
+    useEffect(() => {
+        const fetchAndSetPlaylist = async () => {
+            if (selectedPlaylistId) {
+                setIsLoading(true);
+                await fetchPlaylistById(selectedPlaylistId);
+                setIsLoading(false);
+                setShowTracks(true);
+                setShowPlaylists(false);
+            }
+        };
+        fetchAndSetPlaylist();
+    }, [selectedPlaylistId, fetchPlaylistById, setShowTracks, setShowPlaylists]);
+    
     const data = React.useMemo(() => playlists, [playlists]);
     const columns = React.useMemo(() => [
         {
@@ -20,7 +37,7 @@ const PlaylistsTable = () => {
             Header: 'Playlist Name',
             accessor: 'name',
             Cell: ({row}: { row: any }) => (
-                <div onClick={() => console.log(row.original.id)}>
+                <div onClick={() => setSelectedPlaylistId(row.original.id)}>
                     {row.values.name}
                 </div>
             ),
@@ -33,38 +50,44 @@ const PlaylistsTable = () => {
             Header: 'Owner',
             accessor: 'owner.displayName',
         },
-    ], []);
-
+    ], [setSelectedPlaylistId]);
+    
     const {
         getTableProps,
         getTableBodyProps,
         headerGroups,
         rows,
         prepareRow,
-    } = useTable({ columns, data });
-
+    } = useTable({columns, data});
+    
     return (
         <table {...getTableProps()} className="w-full table-auto">
             <thead>
-                {headerGroups.map((headerGroup: { getHeaderGroupProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>; headers: any[]; }) => (
-                    <tr {...headerGroup.getHeaderGroupProps()}>
-                        {headerGroup.headers.map(column => (
-                            <th {...column.getHeaderProps()} className="px-4 py-2">{column.render('Header')}</th>
-                        ))}
-                    </tr>
-                ))}
+            {headerGroups.map((headerGroup: {
+                getHeaderGroupProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>;
+                headers: any[];
+            }) => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                    {headerGroup.headers.map(column => (
+                        <th {...column.getHeaderProps()} className="px-4 py-2">{column.render('Header')}</th>
+                    ))}
+                </tr>
+            ))}
             </thead>
             <tbody {...getTableBodyProps()}>
-                {rows.map((row: { getRowProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>; cells: any[]; }) => {
-                    prepareRow(row);
-                    return (
-                        <tr {...row.getRowProps()}>
-                            {row.cells.map(cell => (
-                                <td {...cell.getCellProps()} className="border px-4 py-2">{cell.render('Cell')}</td>
-                            ))}
-                        </tr>
-                    );
-                })}
+            {rows.map((row: {
+                getRowProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>;
+                cells: any[];
+            }) => {
+                prepareRow(row);
+                return (
+                    <tr {...row.getRowProps()}>
+                        {row.cells.map(cell => (
+                            <td {...cell.getCellProps()} className="border px-4 py-2">{cell.render('Cell')}</td>
+                        ))}
+                    </tr>
+                );
+            })}
             </tbody>
         </table>
     );
