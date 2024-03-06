@@ -2,14 +2,18 @@ import React, {useState, useContext} from 'react';
 import {SelectedOptionContext} from './SelectedOptionContext';
 import PlaylistTable from './PlaylistTable';
 
-const FormComponent = () => {
+type FormComponentProps = {
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    isLoading: boolean;
+};
+
+const FormComponent: React.FC<FormComponentProps> = ({setIsLoading, isLoading}) => {
     const {selectedOption} = useContext(SelectedOptionContext);
     const [playlist, setPlaylist] = useState(null);
-    const [isLoading, setIsLoading] = useState(false); // New state for loading status
     
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        setIsLoading(true); // Set loading status to true when button is clicked
+        setIsLoading(true);
         let response;
         if (selectedOption === 'playlistIdOption') {
             const playlistId = (event.target as any).elements.playlistId.value;
@@ -21,7 +25,7 @@ const FormComponent = () => {
         const playlist = await response.json();
         console.log(playlist);
         setPlaylist(playlist);
-        setIsLoading(false); // Set loading status to false after data is fetched
+        setIsLoading(false);
     };
     
     return (
@@ -45,12 +49,7 @@ const FormComponent = () => {
                     </button>
                 </form>
             )}
-            {isLoading ? (
-                <div
-                    className="loader animate-spin h-12 w-12 border-t-4 border-green-500 rounded-full absolute top-0 bottom-0 left-0 right-0 m-auto"></div>
-            ) : (
-                playlist && <PlaylistTable playlist={playlist}/>
-            )}
+            {!isLoading && playlist && <PlaylistTable playlist={playlist}/>}
         </div>
     );
 };
