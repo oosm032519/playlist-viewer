@@ -2,7 +2,8 @@ const path = require('path');
 
 module.exports = {
     mode: 'development',
-    entry: './src/main/typescript/main.ts',
+    // entry: './src/main/typescript/main.ts',
+    entry: './src/main/react/index.tsx',
     module: {
         rules: [
             {

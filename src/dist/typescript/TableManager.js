@@ -1,7 +1,10 @@
 import { PlaylistManager } from './playlistManager';
 import { TrackTable } from './trackTable';
-import { UIManager } from './uiManager';
+import { ElementManager } from './elementManager';
 export class TableManager {
+    constructor() {
+        this.elementManager = new ElementManager();
+    }
     // テーブルの幅をチェックする関数
     checkTableWidth() {
         // 全てのテーブルを取得
@@ -54,26 +57,24 @@ export class TableManager {
     }
     // すべてのテーブルをクリアする
     clearAllTables() {
-        const uiManager = new UIManager();
-        uiManager.playlistTracksDiv.innerHTML = '';
-        uiManager.searchResultsDiv.innerHTML = '';
+        const elementManager = new ElementManager();
+        elementManager.playlistTracksDiv.innerHTML = '';
+        elementManager.searchResultsDiv.innerHTML = '';
     }
     // テーブルを作成する
     createDomTable(tracks) {
-        const uiManager = new UIManager();
         this.clearAllTables();
         const trackTable = new TrackTable(tracks);
-        uiManager.playlistTracksDiv.appendChild(trackTable.createTable());
+        this.elementManager.playlistTracksDiv.appendChild(trackTable.createTable());
     }
     createSearchResultsTable(results) {
-        const uiManager = new UIManager();
         this.clearAllTables();
         if (!Array.isArray(results)) {
             console.error('Expected results to be an array but received', results);
             return;
         }
         const table = this.createTableFromResults(results);
-        uiManager.searchResultsDiv.appendChild(table);
+        this.elementManager.searchResultsDiv.appendChild(table);
     }
     createTableFromResults(results) {
         const table = document.createElement('table');
@@ -86,12 +87,11 @@ export class TableManager {
     }
     // 検索結果の各行を作成する
     createDomTableRow(result) {
-        const uiManager = new UIManager();
         const row = document.createElement('tr');
         row.classList.add('odd:bg-white', 'even:bg-gray-100', 'hover:bg-gray-200', 'transition-colors', 'duration-300', 'ease-in-out');
         const td = this.createTableCell(result.name);
         const playlistManager = new PlaylistManager();
-        uiManager.addClickListener(td, () => playlistManager.fetchAndDisplayPlaylistDetailsUI(result));
+        this.elementManager.addClickListener(td, () => playlistManager.fetchAndDisplayPlaylistDetailsUI(result));
         row.appendChild(td);
         return row;
     }
@@ -100,6 +100,38 @@ export class TableManager {
         td.textContent = text;
         td.classList.add('px-6', 'py-4', 'whitespace-nowrap', 'text-sm', 'font-medium', 'text-gray-900');
         return td;
+    }
+    // 参照履歴テーブルを作成するメソッド
+    createUITable(visitedPlaylistsDiv, data) {
+        // 既存のテーブルを取得または作成
+        let table = this.getTable(visitedPlaylistsDiv);
+        // 既存のテーブルがある場合は削除
+        if (table) {
+            visitedPlaylistsDiv.removeChild(table);
+        }
+        // 新しいテーブルを作成
+        table = document.createElement('table');
+        table.classList.add('divide-y', 'divide-gray-200', 'w-full', 'mx-auto', 'mt-6', 'text-center', 'shadow-md', 'rounded-lg', 'overflow-hidden');
+        visitedPlaylistsDiv.appendChild(table);
+        // テーブルヘッダーを作成して追加
+        const thead = this.createTableHeader();
+        thead.classList.add('bg-green-500', 'text-white', 'hover:bg-green-600', 'transition-colors', 'duration-300', 'ease-in-out');
+        table.appendChild(thead);
+        // テーブルボディを作成して追加
+        const tbody = this.createTableBody(table, data);
+        tbody.classList.add('divide-y', 'divide-gray-200');
+        table.appendChild(tbody);
+        // visitedPlaylistsDivを非表示に設定
+        visitedPlaylistsDiv.classList.add('hidden');
+    }
+    // visitedPlaylistsDivからテーブルを取得する関数
+    getTable(visitedPlaylistsDiv) {
+        let table = visitedPlaylistsDiv.querySelector('table');
+        if (!table) {
+            table = document.createElement('table');
+            visitedPlaylistsDiv.appendChild(table);
+        }
+        return table;
     }
 }
 //# sourceMappingURL=tableManager.js.map
