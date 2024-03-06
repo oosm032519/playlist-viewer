@@ -3,8 +3,10 @@ import React from 'react';
 type PlaylistContextType = {
     playlists: any[];
     setPlaylists: (playlists: any[]) => void;
-    isTableVisible: boolean;
-    setTableVisible: (visible: boolean) => void;
+    isUserPlaylistTableVisible: boolean;
+    setUserPlaylistTableVisible: (visible: boolean) => void;
+    isPlaylistTableVisible: boolean;
+    setPlaylistTableVisible: (visible: boolean) => void;
     isLoading: boolean;
     setIsLoading: (loading: boolean) => void;
 };
@@ -13,8 +15,11 @@ const PlaylistContext = React.createContext<PlaylistContextType>({
     playlists: [],
     setPlaylists: () => {
     },
-    isTableVisible: false,
-    setTableVisible: () => {
+    isUserPlaylistTableVisible: false,
+    setUserPlaylistTableVisible: () => {
+    },
+    isPlaylistTableVisible: false,
+    setPlaylistTableVisible: () => {
     },
     isLoading: false,
     setIsLoading: () => {

@@ -3,8 +3,11 @@ const PlaylistContext = React.createContext({
     playlists: [],
     setPlaylists: () => {
     },
-    isTableVisible: false,
-    setTableVisible: () => {
+    isUserPlaylistTableVisible: false,
+    setUserPlaylistTableVisible: () => {
+    },
+    isPlaylistTableVisible: false,
+    setPlaylistTableVisible: () => {
     },
     isLoading: false,
     setIsLoading: () => {

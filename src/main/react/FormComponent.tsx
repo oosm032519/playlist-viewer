@@ -1,6 +1,5 @@
-import React, {useState, useContext} from 'react';
+import React, {useContext} from 'react';
 import {SelectedOptionContext} from './SelectedOptionContext';
-import PlaylistTable from './PlaylistTable';
 import PlaylistContext from './PlaylistContext';
 
 type FormComponentProps = {
@@ -10,8 +9,7 @@ type FormComponentProps = {
 
 const FormComponent: React.FC<FormComponentProps> = ({setIsLoading, isLoading}) => {
     const {selectedOption} = useContext(SelectedOptionContext);
-    const [playlist, setPlaylist] = useState(null);
-    const {setPlaylists, setTableVisible} = useContext(PlaylistContext);
+    const {setPlaylists, setPlaylistTableVisible, setUserPlaylistTableVisible} = useContext(PlaylistContext);
     
     const handlePlaylistIdSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -20,7 +18,8 @@ const FormComponent: React.FC<FormComponentProps> = ({setIsLoading, isLoading}) 
         const response = await fetch(`/java/playlist/${playlistId}`);
         const playlist = await response.json();
         console.log(playlist);
-        setPlaylist(playlist);
+        setPlaylists([playlist]);
+        setPlaylistTableVisible(true);
         setIsLoading(false);
     };
     
@@ -32,7 +31,7 @@ const FormComponent: React.FC<FormComponentProps> = ({setIsLoading, isLoading}) 
         const playlists = await response.json();
         console.log(playlists);
         setPlaylists(playlists);
-        setTableVisible(true);
+        setUserPlaylistTableVisible(true);
         setIsLoading(false);
     };
     
@@ -57,7 +56,6 @@ const FormComponent: React.FC<FormComponentProps> = ({setIsLoading, isLoading}) 
                     </button>
                 </form>
             )}
-            {!isLoading && playlist && <PlaylistTable playlist={playlist}/>}
         </div>
     );
 };
