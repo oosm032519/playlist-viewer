@@ -1,8 +1,8 @@
 import React, {useContext, useCallback} from 'react';
-import PlaylistContext from './PlaylistContext';
+import CombinedContext from './CombinedContext';
 
 const FetchUserPlaylistsButton = () => {
-    const {setPlaylists, setUserPlaylistTableVisible, setIsLoading} = useContext(PlaylistContext);
+    const {setPlaylists, setIsLoading, setShowPlaylists} = useContext(CombinedContext);
     const fetchUserPlaylists = useCallback(async () => {
         setIsLoading(true);
         try {
@@ -13,13 +13,13 @@ const FetchUserPlaylistsButton = () => {
             }
             const data = await response.json();
             setPlaylists(data);
-            setUserPlaylistTableVisible(true);
+            setShowPlaylists(true);
         } catch (error) {
             console.error('There was a problem with the fetch operation: ', error);
         } finally {
             setIsLoading(false);
         }
-    }, [setPlaylists, setUserPlaylistTableVisible, setIsLoading]);
+    }, [setPlaylists, setShowPlaylists, setIsLoading]);
     
     return (
         <button onClick={fetchUserPlaylists}

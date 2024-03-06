@@ -1,43 +1,41 @@
 import React, {useContext} from 'react';
-import {SelectedOptionContext} from './SelectedOptionContext';
-import PlaylistContext from './PlaylistContext';
+import CombinedContext, { Option } from './CombinedContext';
+import {useApi} from './useApi'
 
 type FormComponentProps = {
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
     isLoading: boolean;
 };
 
-const FormComponent: React.FC<FormComponentProps> = ({setIsLoading, isLoading}) => {
-    const {selectedOption} = useContext(SelectedOptionContext);
-    const {setPlaylists, setPlaylistTableVisible, setUserPlaylistTableVisible} = useContext(PlaylistContext);
-    
+const FormComponent: React.FC<FormComponentProps> = ({setIsLoading}) => {
+    const {selectedOption, setShowPlaylists, setShowTracks} = useContext(CombinedContext);
+    const {fetchPlaylistById, fetchPlaylistsByName} = useApi();
+
     const handlePlaylistIdSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        console.log('handlePlaylistIdSubmitが呼び出されました');
         event.preventDefault();
         setIsLoading(true);
         const playlistId = (event.target as any).elements.playlistId.value;
-        const response = await fetch(`/java/playlist/${playlistId}`);
-        const playlist = await response.json();
-        console.log(playlist);
-        setPlaylists([playlist]);
-        setPlaylistTableVisible(true);
+        await fetchPlaylistById(playlistId);
+        setShowTracks(true);
+        setShowPlaylists(false);
         setIsLoading(false);
     };
-    
+
     const handleSearchSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        console.log('handleSearchSubmitが呼び出されました');
         event.preventDefault();
         setIsLoading(true);
         const searchQuery = (event.target as any).elements.searchQuery.value;
-        const response = await fetch(`/java/search/${searchQuery}`);
-        const playlists = await response.json();
-        console.log(playlists);
-        setPlaylists(playlists);
-        setUserPlaylistTableVisible(true);
+        await fetchPlaylistsByName(searchQuery);
+        setShowPlaylists(true);
+        setShowTracks(false);
         setIsLoading(false);
     };
-    
+
     return (
         <div>
-            {selectedOption === 'playlistIdOption' ? (
+            {selectedOption === Option.PlaylistIdOption ? (
                 <form id="playlistForm" className="m-5 form-container flex items-center" onSubmit={handlePlaylistIdSubmit}>
                     <input type="text" id="playlistId" placeholder="プレイリストIDを入力してください"
                            className="border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 w-11/12 p-3 mr-2"/>

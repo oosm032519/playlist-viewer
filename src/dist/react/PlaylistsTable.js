@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import CombinedContext from './CombinedContext';
 import { useTable } from 'react-table';
-const UserPlaylistTable = () => {
+const PlaylistsTable = () => {
     const { playlists } = useContext(CombinedContext);
     const data = React.useMemo(() => playlists, [playlists]);
     const columns = React.useMemo(() => [
@@ -32,5 +32,5 @@ const UserPlaylistTable = () => {
             return (React.createElement("tr", Object.assign({}, row.getRowProps()), row.cells.map(cell => (React.createElement("td", Object.assign({}, cell.getCellProps(), { className: "border px-4 py-2" }), cell.render('Cell'))))));
         }))));
 };
-export default UserPlaylistTable;
-//# sourceMappingURL=UserPlaylistTable.js.map
+export default PlaylistsTable;
+//# sourceMappingURL=PlaylistsTable.js.map

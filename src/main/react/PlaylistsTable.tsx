@@ -1,9 +1,9 @@
 import React, {useContext} from 'react';
-import PlaylistContext from './PlaylistContext';
+import CombinedContext from './CombinedContext';
 import {useTable} from 'react-table';
 
-const UserPlaylistTable = () => {
-    const {playlists} = useContext(PlaylistContext);
+const PlaylistsTable = () => {
+    const {playlists} = useContext(CombinedContext);
     const data = React.useMemo(() => playlists, [playlists]);
     const columns = React.useMemo(() => [
         {
@@ -65,4 +65,4 @@ const UserPlaylistTable = () => {
     );
 };
 
-export default UserPlaylistTable;
+export default PlaylistsTable;

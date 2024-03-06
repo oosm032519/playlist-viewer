@@ -1,8 +1,8 @@
 import React from 'react';
 import {useTable, useSortBy} from 'react-table';
 
-const PlaylistTable = ({playlist}: { playlist: { name: string, tracks: any[] } }) => {
-    const data = React.useMemo(() => playlist.tracks, [playlist.tracks]);
+const TracksTable = ({playlist}: { playlist: { name: string, tracks: any[] }}) => {
+    const data = React.useMemo(() => playlist.tracks, [playlist]);
     
     const columns = React.useMemo(() => [
         { Header: 'Track Name', accessor: 'playlistTrack.track.name' },
@@ -70,4 +70,4 @@ const PlaylistTable = ({playlist}: { playlist: { name: string, tracks: any[] } }
     );
 };
 
-export default PlaylistTable;
+export default TracksTable;
