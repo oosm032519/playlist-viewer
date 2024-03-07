@@ -1,30 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import { useTable } from 'react-table';
-import {calculateAverageValues, calculateMode, calculateModeArtistNames} from './RecommendationCalculator'
-import {Track} from '../typescript/track'
+import {useApi} from './useApi'
 
-const RecommendationsTable = ({ playlist }: { playlist: { name: string, tracks: any[] }}) => {
+const RecommendationsTable = ({playlist}: { playlist: { name: string, tracks: any[] } }) => {
     const [recommendations, setRecommendations] = useState([]);
+    const {fetchRecommendations} = useApi();
     
-    useEffect(() => {
-        const modeArtistNames = calculateModeArtistNames(playlist.tracks);
-        const averageValues = calculateAverageValues(playlist.tracks);
-        const mode = calculateMode(playlist.tracks);
-        
-        const endpoint = `/java/recommendations?tempo=${averageValues.averageTempo}&key=${averageValues.modeKey}&danceability=${averageValues.averageDanceability}&energy=${averageValues.averageEnergy}&acousticness=${averageValues.averageAcousticness}&liveness=${averageValues.averageLiveness}&speechiness=${averageValues.averageSpeechiness}&valence=${averageValues.averageValence}&timeSignature=${averageValues.timeSignature}&durationMs=${averageValues.durationMs}&mode=${mode}&instrumentalness=${averageValues.instrumentalness}&loudness=${averageValues.loudness}&modeArtistNames=${modeArtistNames}`;
-        fetch(endpoint)
-            .then(response => response.json())
+    const fetchAndSetRecommendations = useCallback(() => {
+        fetchRecommendations(playlist.tracks)
             .then(data => {
-                console.log("Response:", Response);
-                console.log("data:", data);
-                // Get the ids of the tracks in the playlist
-                const trackIds = playlist.tracks.map(track => track.audioFeatures.id);
-                // Filter out the recommendations that are already in the playlist
-                const uniqueRecommendations = data.tracks.filter((track: Track) => !trackIds.includes(track.id));
-                setRecommendations(uniqueRecommendations);
+                setRecommendations(data);
             })
             .catch(error => console.error(error));
-    }, [playlist]);
+    }, [fetchRecommendations, playlist]);
+    
+    useEffect(() => {
+        fetchAndSetRecommendations();
+    }, [fetchAndSetRecommendations]);
     
     const data = React.useMemo(() => recommendations, [recommendations]);
 

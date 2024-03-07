@@ -7,8 +7,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { useContext } from 'react';
+import { useCallback, useContext } from 'react';
 import CombinedContext from './CombinedContext';
+import { calculateAverageValues, calculateMode, calculateModeArtistNames } from './RecommendationCalculator';
 export function useApi() {
     const { setPlaylists, setSelectedPlaylist } = useContext(CombinedContext);
     const fetchPlaylistById = (playlistId) => __awaiter(this, void 0, void 0, function* () {
@@ -33,6 +34,19 @@ export function useApi() {
         console.log(visitedPlaylists);
         return visitedPlaylists;
     });
-    return { fetchPlaylistById, fetchPlaylistsByName, fetchVisitedPlaylists };
+    const fetchRecommendations = useCallback((tracks) => __awaiter(this, void 0, void 0, function* () {
+        console.log('fetchRecommendationsが呼び出されました');
+        const modeArtistNames = calculateModeArtistNames(tracks);
+        const averageValues = calculateAverageValues(tracks);
+        const mode = calculateMode(tracks);
+        const endpoint = `/java/recommendations?tempo=${averageValues.averageTempo}&key=${averageValues.modeKey}&danceability=${averageValues.averageDanceability}&energy=${averageValues.averageEnergy}&acousticness=${averageValues.averageAcousticness}&liveness=${averageValues.averageLiveness}&speechiness=${averageValues.averageSpeechiness}&valence=${averageValues.averageValence}&timeSignature=${averageValues.timeSignature}&durationMs=${averageValues.durationMs}&mode=${mode}&instrumentalness=${averageValues.instrumentalness}&loudness=${averageValues.loudness}&modeArtistNames=${modeArtistNames}`;
+        const response = yield fetch(endpoint);
+        const data = yield response.json();
+        const trackIds = tracks.map(track => track.audioFeatures.id);
+        const uniqueRecommendations = data.tracks.filter((track) => !trackIds.includes(track.id));
+        console.log(uniqueRecommendations);
+        return uniqueRecommendations;
+    }), []);
+    return { fetchPlaylistById, fetchPlaylistsByName, fetchVisitedPlaylists, fetchRecommendations };
 }
 //# sourceMappingURL=useApi.js.map
