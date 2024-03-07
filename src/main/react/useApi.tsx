@@ -15,6 +15,7 @@ export function useApi() {
         const playlist = await response.json();
         console.log(playlist);
         setSelectedPlaylist(playlist);
+        return playlist;
     };
     
     const fetchPlaylistsByName = async (searchQuery: string) => {

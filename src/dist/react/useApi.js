@@ -18,6 +18,7 @@ export function useApi() {
         const playlist = yield response.json();
         console.log(playlist);
         setSelectedPlaylist(playlist);
+        return playlist;
     });
     const fetchPlaylistsByName = (searchQuery) => __awaiter(this, void 0, void 0, function* () {
         console.log('fetchPlaylistsByNameが呼び出されました');

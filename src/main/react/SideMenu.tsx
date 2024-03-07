@@ -21,8 +21,7 @@ const SideMenu = () => {
             </button>
             
             <div id="side-menu"
-                 className={`fixed right-0 top-0 w-64 h-screen bg-gray-800 text-white p-5 shadow-md transform ${menuClass} transition-transform duration-300 ease-in-out rounded-l-lg border-l-4 border-green-500`}>
-                <button onClick={toggleMenu}
+                 className={`fixed right-0 top-0 w-64 h-screen bg-gray-800 text-white p-5 shadow-md transform ${menuClass} transition-transform duration-300 ease-in-out rounded-l-lg border-l-4 border-green-500 z-50`}>            <button onClick={toggleMenu}
                         className="w-full bg-green-500 hover:bg-green-600 text-white hover:text-gray-900 rounded-lg h-10 p-3 flex items-center justify-center transition-colors duration-300">
                     メニューを閉じる
                 </button>

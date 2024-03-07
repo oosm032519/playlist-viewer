@@ -48,7 +48,7 @@ const FormComponent: React.FC<FormComponentProps> = ({setIsLoading}) => {
                     <input type="text" id="playlistId" placeholder="プレイリストIDを入力してください"
                            className="border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 w-11/12 p-3 mr-2"/>
                     <button type="submit"
-                            className="bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent hover:ring-4 hover:ring-green-300">
+                            className="bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent hover:ring-4 hover:ring-green-300 z-10">
                         送信
                     </button>
                 </form>
@@ -57,7 +57,7 @@ const FormComponent: React.FC<FormComponentProps> = ({setIsLoading}) => {
                     <input type="text" id="searchQuery" placeholder="プレイリスト名を入力してください"
                            className="border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 w-11/12 p-3 mr-2"/>
                     <button type="submit"
-                            className="bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent hover:ring-4 hover:ring-green-300">
+                            className="bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent hover:ring-4 hover:ring-green-300 z-10">
                         検索
                     </button>
                 </form>
