@@ -30,7 +30,6 @@ const App = () => {
     const [showVisitedPlaylists, setShowVisitedPlaylists] = useState(false);
     const [showRecommendations, setShowRecommendations] = useState(false);
     const { fetchVisitedPlaylists } = useApi();
-    const [selectedPlaylistId] = useState(null);
     useEffect(() => {
         const fetchPlaylists = () => __awaiter(void 0, void 0, void 0, function* () {
             setIsLoading(true);
@@ -69,7 +68,6 @@ const App = () => {
             setShowVisitedPlaylists,
             showRecommendations,
             setShowRecommendations,
-            selectedPlaylistId
         } },
         React.createElement("div", { className: "App" },
             React.createElement("h1", { className: "text-3xl font-light ml-5 text-center py-5" }, "Playlist Viewer"),

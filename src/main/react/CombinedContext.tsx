@@ -23,7 +23,6 @@ type CombinedContextType = {
     showVisitedPlaylists: boolean;
     setShowVisitedPlaylists: (show: boolean) => void;
     showRecommendations: boolean;
-    selectedPlaylistId: string | null;
     setShowRecommendations: (show: boolean) => void;
 };
 
@@ -55,7 +54,6 @@ const CombinedContext = React.createContext<CombinedContextType>({
     showRecommendations: false,
     setShowRecommendations: () => {
     },
-    selectedPlaylistId: null,
 });
 
 export default CombinedContext;

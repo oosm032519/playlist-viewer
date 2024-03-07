@@ -1,13 +1,13 @@
 import React, {useContext, useEffect, useMemo} from 'react';
 import {useTable} from 'react-table';
 import CombinedContext from './CombinedContext';
-import {useApi} from './useApi';
+import {useApi} from './useApi'
 
 const VisitedPlaylistsTable: React.FC = () => {
     const {
-        visitedPlaylists,
-        setShowPlaylists,
-        setShowTracks
+        setIsLoading,
+        setShowTracks,
+        visitedPlaylists
     } = useContext(CombinedContext);
     const {fetchPlaylistById} = useApi();
     
@@ -22,19 +22,17 @@ const VisitedPlaylistsTable: React.FC = () => {
             accessor: 'name',
             Cell: ({row}: { row: any }) => (
                 <div onClick={async () => {
+                    console.log(row.original.id)
+                    setIsLoading(true);
                     await fetchPlaylistById(row.original.id);
-                    setShowPlaylists(true);
-                    setShowTracks(false);
+                    setIsLoading(false);
+                    setShowTracks(true);
                 }}>
                     {row.values.name}
                 </div>
             ),
         },
-        {
-            Header: 'ID',
-            accessor: 'id',
-        },
-    ], [fetchPlaylistById, setShowPlaylists, setShowTracks]);
+    ], []);
 
     const {
         getTableProps,

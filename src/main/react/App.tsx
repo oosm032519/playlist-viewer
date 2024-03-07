@@ -22,7 +22,6 @@ const App: React.FC = () => {
     const [showVisitedPlaylists, setShowVisitedPlaylists] = useState(false);
     const [showRecommendations, setShowRecommendations] = useState(false);
     const {fetchVisitedPlaylists} = useApi();
-    const [selectedPlaylistId] = useState(null);
     
     useEffect(() => {
         const fetchPlaylists = async () => {
@@ -65,7 +64,6 @@ const App: React.FC = () => {
                 setShowVisitedPlaylists,
                 showRecommendations,
                 setShowRecommendations,
-                selectedPlaylistId
             }}>
             <div className="App">
                 <h1 className="text-3xl font-light ml-5 text-center py-5">Playlist Viewer</h1>

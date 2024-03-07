@@ -3,15 +3,11 @@ import CombinedContext from './CombinedContext';
 
 const FetchVisitedPlaylistsButton: React.FC = () => {
     const {
-        setShowPlaylists,
-        setShowTracks,
         setShowVisitedPlaylists,
         showVisitedPlaylists
     } = useContext(CombinedContext);
     
     const handleClick = () => {
-        setShowPlaylists(false);
-        setShowTracks(false);
         setShowVisitedPlaylists(!showVisitedPlaylists);
     };
     
