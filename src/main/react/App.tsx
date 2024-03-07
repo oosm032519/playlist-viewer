@@ -9,6 +9,7 @@ import TracksTable from './TracksTable';
 import {Option} from './CombinedContext';
 import VisitedPlaylistsTable from './VisitedPlaylistsTable';
 import {useApi} from './useApi'
+import RecommendationsTable from './RecommendationTable'
 
 const App: React.FC = () => {
     const [selectedOption, setSelectedOption] = useState(Option.PlaylistIdOption);
@@ -18,8 +19,10 @@ const App: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [showPlaylists, setShowPlaylists] = useState(false);
     const [showTracks, setShowTracks] = useState(false);
-    const [showVisitedPlaylists, setShowVisitedPlaylists] = useState(true);
+    const [showVisitedPlaylists, setShowVisitedPlaylists] = useState(false);
+    const [showRecommendations, setShowRecommendations] = useState(false);
     const {fetchVisitedPlaylists} = useApi();
+    const [selectedPlaylistId] = useState(null);
     
     useEffect(() => {
         const fetchPlaylists = async () => {
@@ -36,6 +39,10 @@ const App: React.FC = () => {
         
         fetchPlaylists();
     }, []);
+    
+    useEffect(() => {
+        setShowRecommendations(showTracks);
+    }, [showTracks]);
     
     return (
         <CombinedContext.Provider
@@ -55,16 +62,28 @@ const App: React.FC = () => {
                 showTracks,
                 setShowTracks,
                 showVisitedPlaylists,
-                setShowVisitedPlaylists
+                setShowVisitedPlaylists,
+                showRecommendations,
+                setShowRecommendations,
+                selectedPlaylistId
             }}>
             <div className="App">
                 <h1 className="text-3xl font-light ml-5 text-center py-5">Playlist Viewer</h1>
                 <SideMenu/>
                 <RadioButton/>
                 <Form setIsLoading={setIsLoading} isLoading={isLoading}/>
-                {showPlaylists && <PlaylistsTable/>}
-                {showTracks && <TracksTable playlist={selectedPlaylist}/>}
-                {!isLoading && showVisitedPlaylists && <VisitedPlaylistsTable/>}
+                <div className="my-4">
+                    {showPlaylists && <PlaylistsTable/>}
+                </div>
+                <div className="my-4">
+                    {showTracks && <TracksTable playlist={selectedPlaylist}/>}
+                </div>
+                <div className="my-4">
+                    {showRecommendations && <RecommendationsTable playlist={selectedPlaylist}/>}
+                </div>
+                <div className="my-4">
+                    {!isLoading && showVisitedPlaylists && <VisitedPlaylistsTable/>}
+                </div>
                 <LoadingAnimation isLoading={isLoading}/>
             </div>
         </CombinedContext.Provider>

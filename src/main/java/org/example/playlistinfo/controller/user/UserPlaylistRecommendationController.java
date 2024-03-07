@@ -53,10 +53,24 @@ public class UserPlaylistRecommendationController {
 
     // レコメンド楽曲を取得
     @GetMapping("/java/recommendations")
-    public ResponseEntity<Recommendations> getRecommendations(@RequestParam float tempo, @RequestParam int key, @RequestParam float danceability, @RequestParam float energy, @RequestParam float acousticness, @RequestParam float liveness, @RequestParam float speechiness, @RequestParam float valence, @RequestParam List<String> modeArtistNames) {
+    public ResponseEntity<Recommendations> getRecommendations(
+            @RequestParam float tempo,
+            @RequestParam int key,
+            @RequestParam float danceability,
+            @RequestParam float energy,
+            @RequestParam float acousticness,
+            @RequestParam float liveness,
+            @RequestParam float speechiness,
+            @RequestParam float valence,
+            @RequestParam int timeSignature,
+            @RequestParam int durationMs,
+            @RequestParam int mode,
+            @RequestParam float instrumentalness,
+            @RequestParam float loudness,
+            @RequestParam List<String> modeArtistNames) {
         try {
             logger.info("modeArtistNames: " + modeArtistNames);
-            Recommendations recommendations = GetRecommendations.getRecommendationsBasedOnTrackFeatures(tempo, key, danceability, energy, acousticness, liveness, speechiness, valence, modeArtistNames);
+            Recommendations recommendations = GetRecommendations.getRecommendationsBasedOnTrackFeatures(tempo, key, danceability, energy, acousticness, liveness, speechiness, valence, timeSignature, durationMs, mode, instrumentalness, loudness, modeArtistNames);
             return ResponseEntity.ok(recommendations);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

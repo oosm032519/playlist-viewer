@@ -25,6 +25,7 @@ export function useApi() {
     };
     
     const fetchVisitedPlaylists = async () => {
+        console.log('fetchVisitedPlaylistsが呼び出されました');
         const response = await fetch('/java/user/visited-playlists');
         const visitedPlaylists = await response.json();
         console.log(visitedPlaylists);

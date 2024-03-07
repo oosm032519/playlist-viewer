@@ -47,7 +47,7 @@ public class GetRecommendations {
     }
 
     // トラックの特徴に基づいておすすめを取得
-    public static Recommendations getRecommendationsBasedOnTrackFeatures(float tempo, int key, float danceability, float energy, float acousticness, float liveness, float speechiness, float valence, List<String> modeArtistNames) throws IOException, SpotifyWebApiException, ParseException {
+    public static Recommendations getRecommendationsBasedOnTrackFeatures(float tempo, int key, float danceability, float energy, float acousticness, float liveness, float speechiness, float valence, int timeSignature, int durationMs, int mode, float instrumentalness, float loudness, List<String> modeArtistNames) throws IOException, SpotifyWebApiException, ParseException {
         SpotifyApi spotifyApi = spotifyApiService.getSpotifyApi();
         List<String> modeArtistIds = getTopFiveArtistIdsFromNames(modeArtistNames);
         String seedArtists = String.join(",", modeArtistIds);
@@ -55,14 +55,19 @@ public class GetRecommendations {
         return spotifyApi.getRecommendations()
                 .limit(10)
                 .seed_artists(seedArtists)
-                .target_tempo(tempo)
-                .target_key(key)
-                .target_danceability(danceability)
-                .target_valence(valence)
-                .target_energy(energy)
                 .target_acousticness(acousticness)
-                .target_speechiness(speechiness)
+                .target_danceability(danceability)
+                .target_duration_ms(durationMs)
+                .target_energy(energy)
+                .target_instrumentalness(instrumentalness)
+                .target_key(key)
                 .target_liveness(liveness)
+                .target_loudness(loudness)
+                .target_mode(mode)
+                .target_speechiness(speechiness)
+                .target_tempo(tempo)
+                .target_time_signature(timeSignature)
+                .target_valence(valence)
                 .build()
                 .execute();
     }

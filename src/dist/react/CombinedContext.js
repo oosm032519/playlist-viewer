@@ -29,6 +29,10 @@ const CombinedContext = React.createContext({
     showVisitedPlaylists: false,
     setShowVisitedPlaylists: () => {
     },
+    showRecommendations: false,
+    setShowRecommendations: () => {
+    },
+    selectedPlaylistId: null,
 });
 export default CombinedContext;
 //# sourceMappingURL=CombinedContext.js.map

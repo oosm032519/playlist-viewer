@@ -635,6 +635,11 @@ video {
   margin-right: 12px;
 }
 
+.my-4 {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
 .my-5 {
   margin-top: 32px;
   margin-bottom: 32px;
@@ -738,6 +743,10 @@ video {
 
 .flex-auto {
   flex: 1 1 auto;
+}
+
+.table-auto {
+  table-layout: auto;
 }
 
 .translate-x-full {
