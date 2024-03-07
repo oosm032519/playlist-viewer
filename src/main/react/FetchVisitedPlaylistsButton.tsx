@@ -1,22 +1,18 @@
 import React, {useContext} from 'react';
 import CombinedContext from './CombinedContext';
-import {useApi} from './useApi';
 
 const FetchVisitedPlaylistsButton: React.FC = () => {
-    const {setIsLoading, setShowPlaylists, setShowTracks} = useContext(CombinedContext);
-    const {fetchVisitedPlaylists} = useApi();
+    const {
+        setShowPlaylists,
+        setShowTracks,
+        setShowVisitedPlaylists,
+        showVisitedPlaylists
+    } = useContext(CombinedContext);
     
-    const handleClick = async () => {
-        setIsLoading(true);
-        try {
-            await fetchVisitedPlaylists();
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setShowPlaylists(true);
-            setShowTracks(false);
-            setIsLoading(false);
-        }
+    const handleClick = () => {
+        setShowPlaylists(false);
+        setShowTracks(false);
+        setShowVisitedPlaylists(!showVisitedPlaylists);
     };
     
     return (

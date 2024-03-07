@@ -12,12 +12,16 @@ type CombinedContextType = {
     setPlaylists: (playlists: any[]) => void;
     selectedPlaylist: any;
     setSelectedPlaylist: (playlist: any) => void;
+    visitedPlaylists: any[];
+    setVisitedPlaylists: (playlists: any[]) => void;
     isLoading: boolean;
     setIsLoading: (loading: boolean) => void;
     showPlaylists: boolean;
     setShowPlaylists: (show: boolean) => void;
     showTracks: boolean;
     setShowTracks: (show: boolean) => void;
+    showVisitedPlaylists: boolean;
+    setShowVisitedPlaylists: (show: boolean) => void;
 };
 
 const CombinedContext = React.createContext<CombinedContextType>({
@@ -30,6 +34,9 @@ const CombinedContext = React.createContext<CombinedContextType>({
     selectedPlaylist: null,
     setSelectedPlaylist: () => {
     },
+    visitedPlaylists: [],
+    setVisitedPlaylists: () => {
+    },
     isLoading: false,
     setIsLoading: () => {
     },
@@ -38,6 +45,9 @@ const CombinedContext = React.createContext<CombinedContextType>({
     },
     showTracks: false,
     setShowTracks: () => {
+    },
+    showVisitedPlaylists: false,
+    setShowVisitedPlaylists: () => {
     },
 });
 

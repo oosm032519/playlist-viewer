@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { useContext } from 'react';
 import CombinedContext from './CombinedContext';
 export function useApi() {
-    const { setPlaylists, setSelectedPlaylist, } = useContext(CombinedContext);
+    const { setPlaylists, setSelectedPlaylist } = useContext(CombinedContext);
     const fetchPlaylistById = (playlistId) => __awaiter(this, void 0, void 0, function* () {
         console.log('fetchPlaylistByIdが呼び出されました');
         const response = yield fetch(`/java/playlist/${playlistId}`);
@@ -28,10 +28,9 @@ export function useApi() {
     });
     const fetchVisitedPlaylists = () => __awaiter(this, void 0, void 0, function* () {
         const response = yield fetch('/java/user/visited-playlists');
-        const playlists = yield response.json();
-        console.log(playlists);
-        setPlaylists(playlists);
-        return playlists;
+        const visitedPlaylists = yield response.json();
+        console.log(visitedPlaylists);
+        return visitedPlaylists;
     });
     return { fetchPlaylistById, fetchPlaylistsByName, fetchVisitedPlaylists };
 }

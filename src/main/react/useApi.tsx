@@ -4,7 +4,7 @@ import CombinedContext from './CombinedContext';
 export function useApi() {
     const {
         setPlaylists,
-        setSelectedPlaylist,
+        setSelectedPlaylist
     } = useContext(CombinedContext);
     
     const fetchPlaylistById = async (playlistId: string) => {
@@ -26,10 +26,9 @@ export function useApi() {
     
     const fetchVisitedPlaylists = async () => {
         const response = await fetch('/java/user/visited-playlists');
-        const playlists = await response.json();
-        console.log(playlists);
-        setPlaylists(playlists);
-        return playlists;
+        const visitedPlaylists = await response.json();
+        console.log(visitedPlaylists);
+        return visitedPlaylists;
     };
     
     return {fetchPlaylistById, fetchPlaylistsByName, fetchVisitedPlaylists};

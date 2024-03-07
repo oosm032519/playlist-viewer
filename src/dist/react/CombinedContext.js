@@ -14,6 +14,9 @@ const CombinedContext = React.createContext({
     selectedPlaylist: null,
     setSelectedPlaylist: () => {
     },
+    visitedPlaylists: [],
+    setVisitedPlaylists: () => {
+    },
     isLoading: false,
     setIsLoading: () => {
     },
@@ -22,6 +25,9 @@ const CombinedContext = React.createContext({
     },
     showTracks: false,
     setShowTracks: () => {
+    },
+    showVisitedPlaylists: false,
+    setShowVisitedPlaylists: () => {
     },
 });
 export default CombinedContext;
