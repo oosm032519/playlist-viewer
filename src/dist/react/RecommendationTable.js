@@ -18,6 +18,13 @@ const RecommendationsTable = ({ playlist }) => {
     const columns = React.useMemo(() => [
         { Header: 'Track Name', accessor: 'name' },
         { Header: 'Artist', accessor: 'artists[0].name' },
+        {
+            Header: 'Actions',
+            accessor: 'id',
+            Cell: ({ row }) => (React.createElement("div", null,
+                React.createElement("button", { onClick: () => console.log('Plus button clicked for', row.values.name) }, "+"),
+                React.createElement("button", { onClick: () => console.log('Minus button clicked for', row.values.name) }, "-"))),
+        },
     ], []);
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, } = useTable({ columns, data });
     return (React.createElement("table", Object.assign({}, getTableProps(), { className: "min-w-full divide-y divide-gray-200" }),

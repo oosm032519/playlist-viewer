@@ -5,7 +5,7 @@ import {useApi} from './useApi'
 const RecommendationsTable = ({playlist}: { playlist: { name: string, tracks: any[] } }) => {
     const [recommendations, setRecommendations] = useState([]);
     const {fetchRecommendations} = useApi();
-    
+
     const fetchAndSetRecommendations = useCallback(() => {
         fetchRecommendations(playlist.tracks)
             .then(data => {
@@ -13,16 +13,26 @@ const RecommendationsTable = ({playlist}: { playlist: { name: string, tracks: an
             })
             .catch(error => console.error(error));
     }, [fetchRecommendations, playlist]);
-    
+
     useEffect(() => {
         fetchAndSetRecommendations();
     }, [fetchAndSetRecommendations]);
-    
+
     const data = React.useMemo(() => recommendations, [recommendations]);
 
     const columns = React.useMemo(() => [
         { Header: 'Track Name', accessor: 'name' },
         { Header: 'Artist', accessor: 'artists[0].name' },
+        {
+            Header: 'Actions',
+            accessor: 'id',
+            Cell: ({row}: { row: any }) => (
+                <div>
+                    <button onClick={() => console.log('Plus button clicked for', row.values.name)}>+</button>
+                    <button onClick={() => console.log('Minus button clicked for', row.values.name)}>-</button>
+                </div>
+            ),
+        },
     ], []);
 
     const {
