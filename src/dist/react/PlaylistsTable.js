@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useMemo } from 'react';
 import CombinedContext from './CombinedContext';
 import { useTable } from 'react-table';
 import { useApi } from './useApi';
@@ -15,20 +15,20 @@ const PlaylistsTable = () => {
     const { playlists, setShowTracks, setShowPlaylists, setIsLoading } = useContext(CombinedContext);
     const { fetchPlaylistById } = useApi();
     const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
+    const fetchAndSetPlaylist = (id) => __awaiter(void 0, void 0, void 0, function* () {
+        if (id) {
+            setIsLoading(true);
+            yield fetchPlaylistById(id);
+            setIsLoading(false);
+            setShowTracks(true);
+            setShowPlaylists(false);
+        }
+    });
     useEffect(() => {
-        const fetchAndSetPlaylist = () => __awaiter(void 0, void 0, void 0, function* () {
-            if (selectedPlaylistId) {
-                setIsLoading(true);
-                yield fetchPlaylistById(selectedPlaylistId);
-                setIsLoading(false);
-                setShowTracks(true);
-                setShowPlaylists(false);
-            }
-        });
-        fetchAndSetPlaylist();
+        fetchAndSetPlaylist(selectedPlaylistId);
     }, [selectedPlaylistId, fetchPlaylistById, setShowTracks, setShowPlaylists]);
-    const data = React.useMemo(() => playlists, [playlists]);
-    const columns = React.useMemo(() => [
+    const data = useMemo(() => playlists, [playlists]);
+    const columns = useMemo(() => [
         {
             Header: 'Preview',
             accessor: 'images[0].url',

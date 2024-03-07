@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState, useMemo} from 'react';
 import CombinedContext from './CombinedContext';
 import {useTable} from 'react-table';
 import {useApi} from './useApi';
@@ -7,22 +7,23 @@ const PlaylistsTable = () => {
     const {playlists, setShowTracks, setShowPlaylists, setIsLoading} = useContext(CombinedContext);
     const {fetchPlaylistById} = useApi();
     const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
-    
+
+    const fetchAndSetPlaylist = async (id: string) => {
+        if (id) {
+            setIsLoading(true);
+            await fetchPlaylistById(id);
+            setIsLoading(false);
+            setShowTracks(true);
+            setShowPlaylists(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchAndSetPlaylist = async () => {
-            if (selectedPlaylistId) {
-                setIsLoading(true);
-                await fetchPlaylistById(selectedPlaylistId);
-                setIsLoading(false);
-                setShowTracks(true);
-                setShowPlaylists(false);
-            }
-        };
-        fetchAndSetPlaylist();
+        fetchAndSetPlaylist(selectedPlaylistId);
     }, [selectedPlaylistId, fetchPlaylistById, setShowTracks, setShowPlaylists]);
-    
-    const data = React.useMemo(() => playlists, [playlists]);
-    const columns = React.useMemo(() => [
+
+    const data = useMemo(() => playlists, [playlists]);
+    const columns = useMemo(() => [
         {
             Header: 'Preview',
             accessor: 'images[0].url',
@@ -51,7 +52,7 @@ const PlaylistsTable = () => {
             accessor: 'owner.displayName',
         },
     ], [setSelectedPlaylistId]);
-    
+
     const {
         getTableProps,
         getTableBodyProps,
@@ -59,14 +60,11 @@ const PlaylistsTable = () => {
         rows,
         prepareRow,
     } = useTable({columns, data});
-    
+
     return (
         <table {...getTableProps()} className="w-full table-auto">
             <thead>
-            {headerGroups.map((headerGroup: {
-                getHeaderGroupProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>;
-                headers: any[];
-            }) => (
+            {headerGroups.map((headerGroup: { getHeaderGroupProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>; headers: any[]; }) => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
                     {headerGroup.headers.map(column => (
                         <th {...column.getHeaderProps()} className="px-4 py-2">{column.render('Header')}</th>
@@ -75,10 +73,7 @@ const PlaylistsTable = () => {
             ))}
             </thead>
             <tbody {...getTableBodyProps()}>
-            {rows.map((row: {
-                getRowProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>;
-                cells: any[];
-            }) => {
+            {rows.map((row: { getRowProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>; cells: any[]; }) => {
                 prepareRow(row);
                 return (
                     <tr {...row.getRowProps()}>

@@ -13,28 +13,25 @@ import { useApi } from './useApi';
 const FormComponent = ({ setIsLoading }) => {
     const { selectedOption, setShowPlaylists, setShowTracks, setPlaylists } = useContext(CombinedContext);
     const { fetchPlaylistById, fetchPlaylistsByName } = useApi();
-    const handlePlaylistIdSubmit = (event) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log('handlePlaylistIdSubmitが呼び出されました');
+    const handleSubmit = (event) => __awaiter(void 0, void 0, void 0, function* () {
         event.preventDefault();
         setIsLoading(true);
-        const playlistId = event.target.elements.playlistId.value;
-        yield fetchPlaylistById(playlistId);
-        setShowTracks(true);
-        setShowPlaylists(false);
-        setIsLoading(false);
-    });
-    const handleSearchSubmit = (event) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log('handleSearchSubmitが呼び出されました');
-        event.preventDefault();
-        setIsLoading(true);
-        const searchQuery = event.target.elements.searchQuery.value;
+        const inputElement = event.currentTarget.elements.namedItem('inputField');
+        const inputValue = inputElement.value;
         try {
-            const playlists = yield fetchPlaylistsByName(searchQuery);
-            if (JSON.stringify(playlists) !== JSON.stringify(playlists)) {
-                setPlaylists(playlists);
+            if (selectedOption === Option.PlaylistIdOption) {
+                yield fetchPlaylistById(inputValue);
+                setShowTracks(true);
+                setShowPlaylists(false);
             }
-            setShowPlaylists(true);
-            setShowTracks(false);
+            else {
+                const playlists = yield fetchPlaylistsByName(inputValue);
+                if (JSON.stringify(playlists) !== JSON.stringify(playlists)) {
+                    setPlaylists(playlists);
+                }
+                setShowPlaylists(true);
+                setShowTracks(false);
+            }
         }
         catch (error) {
             console.error(error);
@@ -43,11 +40,10 @@ const FormComponent = ({ setIsLoading }) => {
             setIsLoading(false);
         }
     });
-    return (React.createElement("div", null, selectedOption === Option.PlaylistIdOption ? (React.createElement("form", { id: "playlistForm", className: "m-5 form-container flex items-center", onSubmit: handlePlaylistIdSubmit },
-        React.createElement("input", { type: "text", id: "playlistId", placeholder: "\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8ID\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044", className: "border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 w-11/12 p-3 mr-2" }),
-        React.createElement("button", { type: "submit", className: "bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent hover:ring-4 hover:ring-green-300 z-10" }, "\u9001\u4FE1"))) : (React.createElement("form", { id: "searchForm", className: "m-5 form-container flex items-center", onSubmit: handleSearchSubmit },
-        React.createElement("input", { type: "text", id: "searchQuery", placeholder: "\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8\u540D\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044", className: "border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 w-11/12 p-3 mr-2" }),
-        React.createElement("button", { type: "submit", className: "bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent hover:ring-4 hover:ring-green-300 z-10" }, "\u691C\u7D22")))));
+    return (React.createElement("div", null,
+        React.createElement("form", { className: "m-5 form-container flex items-center", onSubmit: handleSubmit },
+            React.createElement("input", { type: "text", name: "inputField", placeholder: selectedOption === Option.PlaylistIdOption ? "プレイリストIDを入力してください" : "プレイリスト名を入力してください", className: "border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 w-11/12 p-3 mr-2" }),
+            React.createElement("button", { type: "submit", className: "bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent hover:ring-4 hover:ring-green-300 z-10" }, selectedOption === Option.PlaylistIdOption ? "送信" : "検索"))));
 };
 export default FormComponent;
 //# sourceMappingURL=FormComponent.js.map
