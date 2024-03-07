@@ -1,8 +1,11 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import { useTable } from 'react-table';
 import {useApi} from './useApi'
+import PlaylistIdContext from './PlaylistIdContext';
+
 
 const RecommendationsTable = ({playlist}: { playlist: { name: string, tracks: any[] } }) => {
+    const playlistId = useContext(PlaylistIdContext);
     const [recommendations, setRecommendations] = useState([]);
     const {fetchRecommendations} = useApi();
 
@@ -28,12 +31,20 @@ const RecommendationsTable = ({playlist}: { playlist: { name: string, tracks: an
             accessor: 'id',
             Cell: ({row}: { row: any }) => (
                 <div>
-                    <button onClick={() => console.log('Plus button clicked for', row.values.name)}>+</button>
-                    <button onClick={() => console.log('Minus button clicked for', row.values.name)}>-</button>
+                    <button onClick={() => {
+                        console.log('Plus button clicked for', row.values.name);
+                        console.log('Playlist ID:', playlistId);
+                    }}>+
+                    </button>
+                    <button onClick={() => {
+                        console.log('Minus button clicked for', row.values.name);
+                        console.log('Playlist ID:', playlistId);
+                    }}>-
+                    </button>
                 </div>
             ),
         },
-    ], []);
+    ], [playlistId]);
 
     const {
         getTableProps,

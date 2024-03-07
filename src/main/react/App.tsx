@@ -10,6 +10,8 @@ import {Option} from './CombinedContext';
 import VisitedPlaylistsTable from './VisitedPlaylistsTable';
 import {useApi} from './useApi'
 import RecommendationsTable from './RecommendationTable'
+import PlaylistIdContext from './PlaylistIdContext';
+
 
 const App: React.FC = () => {
     const [selectedOption, setSelectedOption] = useState(Option.PlaylistIdOption);
@@ -22,6 +24,8 @@ const App: React.FC = () => {
     const [showVisitedPlaylists, setShowVisitedPlaylists] = useState(false);
     const [showRecommendations, setShowRecommendations] = useState(false);
     const {fetchVisitedPlaylists} = useApi();
+    const [playlistId, setPlaylistId] = useState<string | null>(null);
+    
     
     useEffect(() => {
         const fetchPlaylists = async () => {
@@ -40,7 +44,9 @@ const App: React.FC = () => {
     }, []);
     
     useEffect(() => {
-        setShowRecommendations(showTracks);
+        if (showTracks) {
+            setShowRecommendations(showTracks);
+        }
     }, [showTracks]);
     
     return (
@@ -65,6 +71,7 @@ const App: React.FC = () => {
                 showRecommendations,
                 setShowRecommendations,
             }}>
+            <PlaylistIdContext.Provider value={{playlistId, setPlaylistId}}>
             <div className="App">
                 <h1 className="text-3xl font-light ml-5 text-center py-5">Playlist Viewer</h1>
                 <SideMenu/>
@@ -77,13 +84,14 @@ const App: React.FC = () => {
                     {showTracks && <TracksTable playlist={selectedPlaylist}/>}
                 </div>
                 <div className="my-4">
-                    {showRecommendations && <RecommendationsTable playlist={selectedPlaylist}/>}
+                        {showRecommendations && <RecommendationsTable playlist={selectedPlaylist}/>}
                 </div>
                 <div className="my-4">
                     {!isLoading && showVisitedPlaylists && <VisitedPlaylistsTable/>}
                 </div>
                 <LoadingAnimation isLoading={isLoading}/>
             </div>
+            </PlaylistIdContext.Provider>
         </CombinedContext.Provider>
     );
 };
