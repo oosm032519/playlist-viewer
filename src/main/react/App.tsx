@@ -12,6 +12,7 @@ import {useApi} from './useApi'
 import RecommendationsTable from './RecommendationTable'
 import PlaylistIdContext from './PlaylistIdContext';
 import MessageDisplay from './MessageDisplay';
+import {useSpotifyAuth} from './useSpotifyAuth';
 
 
 const App: React.FC = () => {
@@ -28,7 +29,7 @@ const App: React.FC = () => {
     const [playlistId, setPlaylistId] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
     const [messageType, setMessageType] = useState<'success' | 'error' | null>(null);
-    
+    const authorize = useSpotifyAuth(setMessage, setMessageType);
     
     useEffect(() => {
         const fetchPlaylists = async () => {
@@ -51,6 +52,15 @@ const App: React.FC = () => {
             setShowRecommendations(showTracks);
         }
     }, [showTracks]);
+    
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const loginResult = urlParams.get('loginResult');
+        if (loginResult === 'success') {
+            setMessage("Spotifyへのログインが完了しました");
+            setMessageType('success');
+        }
+    }, []);
     
     return (
         <CombinedContext.Provider
@@ -75,10 +85,10 @@ const App: React.FC = () => {
                 setShowRecommendations,
             }}>
             <PlaylistIdContext.Provider value={{playlistId, setPlaylistId}}>
-                <div className="App">
+            <div className="App">
                     <h1 className="text-3xl font-light ml-5 text-center py-5">Playlist Viewer</h1>
-                    <SideMenu/>
-                    <RadioButton/>
+                <SideMenu authorize={authorize}/>
+                <RadioButton/>
                     <Form setIsLoading={setIsLoading} isLoading={isLoading}/>
                     <div className="my-4">
                         {showPlaylists && <PlaylistsTable/>}

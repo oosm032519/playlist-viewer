@@ -21,6 +21,7 @@ import { useApi } from './useApi';
 import RecommendationsTable from './RecommendationTable';
 import PlaylistIdContext from './PlaylistIdContext';
 import MessageDisplay from './MessageDisplay';
+import { useSpotifyAuth } from './useSpotifyAuth';
 const App = () => {
     const [selectedOption, setSelectedOption] = useState(Option.PlaylistIdOption);
     const [playlists, setPlaylists] = useState([]);
@@ -35,6 +36,7 @@ const App = () => {
     const [playlistId, setPlaylistId] = useState(null);
     const [message, setMessage] = useState(null);
     const [messageType, setMessageType] = useState(null);
+    const authorize = useSpotifyAuth(setMessage, setMessageType);
     useEffect(() => {
         const fetchPlaylists = () => __awaiter(void 0, void 0, void 0, function* () {
             setIsLoading(true);
@@ -56,6 +58,14 @@ const App = () => {
             setShowRecommendations(showTracks);
         }
     }, [showTracks]);
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const loginResult = urlParams.get('loginResult');
+        if (loginResult === 'success') {
+            setMessage("Spotifyへのログインが完了しました");
+            setMessageType('success');
+        }
+    }, []);
     return (React.createElement(CombinedContext.Provider, { value: {
             selectedOption,
             setSelectedOption,
@@ -79,7 +89,7 @@ const App = () => {
         React.createElement(PlaylistIdContext.Provider, { value: { playlistId, setPlaylistId } },
             React.createElement("div", { className: "App" },
                 React.createElement("h1", { className: "text-3xl font-light ml-5 text-center py-5" }, "Playlist Viewer"),
-                React.createElement(SideMenu, null),
+                React.createElement(SideMenu, { authorize: authorize }),
                 React.createElement(RadioButton, null),
                 React.createElement(Form, { setIsLoading: setIsLoading, isLoading: isLoading }),
                 React.createElement("div", { className: "my-4" }, showPlaylists && React.createElement(PlaylistsTable, null)),

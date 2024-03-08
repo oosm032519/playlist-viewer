@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { useCallback } from 'react';
-export function useSpotifyAuth() {
+export function useSpotifyAuth(setMessage, setMessageType) {
     return useCallback(() => __awaiter(this, void 0, void 0, function* () {
         try {
             const response = yield fetch('/java/authorize');
@@ -16,9 +16,13 @@ export function useSpotifyAuth() {
             console.log("認証が完了しました");
             console.log(uri);
             window.location.href = uri;
+            setMessage("Spotifyへのログインが完了しました");
+            setMessageType('success');
         }
         catch (error) {
             console.error('There was a problem with the fetch operation: ', error);
+            setMessage("Spotifyへのログインに失敗しました");
+            setMessageType('error');
         }
     }), []);
 }
