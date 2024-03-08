@@ -15,16 +15,25 @@ const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
     const playlistId = useContext(PlaylistIdContext);
     const [recommendations, setRecommendations] = useState([]);
     const { fetchRecommendations } = useApi();
+    const [trackStatus, setTrackStatus] = useState({});
     const addTrackToPlaylist = (trackId, playlistId) => __awaiter(void 0, void 0, void 0, function* () {
         console.log('addTrackToPlaylistが呼び出されました');
         try {
             const response = yield fetch(`/java/playlist/addTrack?trackId=${trackId}&playlistId=${playlistId}`, {
                 method: 'GET',
             });
-            const data = yield response.text();
-            console.log('Track added successfully:', data);
-            setMessage('楽曲がプレイリストに追加されました');
-            setMessageType('success');
+            if (response.status === 200) {
+                const data = yield response.text();
+                console.log('Track added successfully:', data);
+                setMessage('楽曲がプレイリストに追加されました');
+                setMessageType('success');
+                setTrackStatus(prevStatus => (Object.assign(Object.assign({}, prevStatus), { [trackId]: true })));
+            }
+            else {
+                console.error('Error adding track:', response.status);
+                setMessage('楽曲の追加に失敗しました');
+                setMessageType('error');
+            }
         }
         catch (error) {
             console.error('Error adding track:', error);
@@ -38,10 +47,18 @@ const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
             const response = yield fetch(`/java/playlist/removeTrack?trackId=${trackId}&playlistId=${playlistId}`, {
                 method: 'GET',
             });
-            const data = yield response.text();
-            console.log('Track removed successfully:', data);
-            setMessage('楽曲がプレイリストから削除されました');
-            setMessageType('success');
+            if (response.status === 200) {
+                const data = yield response.text();
+                console.log('Track removed successfully:', data);
+                setMessage('楽曲がプレイリストから削除されました');
+                setMessageType('success');
+                setTrackStatus(prevStatus => (Object.assign(Object.assign({}, prevStatus), { [trackId]: false })));
+            }
+            else {
+                console.error('Error removing track:', response.status);
+                setMessage('楽曲の削除に失敗しました');
+                setMessageType('error');
+            }
         }
         catch (error) {
             console.error('Error removing track:', error);
@@ -84,7 +101,7 @@ const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
         React.createElement("thead", { className: "bg-gray-50" }, headerGroups.map((headerGroup) => (React.createElement("tr", Object.assign({}, headerGroup.getHeaderGroupProps()), headerGroup.headers.map(column => (React.createElement("th", Object.assign({}, column.getHeaderProps(), { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" }), column.render('Header')))))))),
         React.createElement("tbody", Object.assign({}, getTableBodyProps(), { className: "bg-white divide-y divide-gray-200" }), rows.map((row) => {
             prepareRow(row);
-            return (React.createElement("tr", Object.assign({}, row.getRowProps()), row.cells.map(cell => (React.createElement("td", Object.assign({}, cell.getCellProps(), { className: "px-6 py-4 whitespace-nowrap" }), cell.render('Cell'))))));
+            return (React.createElement("tr", Object.assign({}, row.getRowProps(), { style: { backgroundColor: trackStatus[row.original.id] ? 'lightgreen' : 'white' } }), row.cells.map(cell => (React.createElement("td", Object.assign({}, cell.getCellProps(), { className: "px-6 py-4 whitespace-nowrap" }), cell.render('Cell'))))));
         }))));
 };
 export default RecommendationsTable;

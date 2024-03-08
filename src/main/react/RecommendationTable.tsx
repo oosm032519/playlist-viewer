@@ -13,6 +13,7 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
     const playlistId = useContext(PlaylistIdContext);
     const [recommendations, setRecommendations] = useState([]);
     const {fetchRecommendations} = useApi();
+    const [trackStatus, setTrackStatus] = useState<{ [key: string]: boolean }>({});
     
     const addTrackToPlaylist = async (trackId: string, playlistId: string) => {
         console.log('addTrackToPlaylistが呼び出されました');
@@ -20,10 +21,17 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
             const response = await fetch(`/java/playlist/addTrack?trackId=${trackId}&playlistId=${playlistId}`, {
                 method: 'GET',
             });
-            const data = await response.text();
-            console.log('Track added successfully:', data);
-            setMessage('楽曲がプレイリストに追加されました');
-            setMessageType('success');
+            if (response.status === 200) {
+                const data = await response.text();
+                console.log('Track added successfully:', data);
+                setMessage('楽曲がプレイリストに追加されました');
+                setMessageType('success');
+                setTrackStatus(prevStatus => ({...prevStatus, [trackId]: true}));
+            } else {
+                console.error('Error adding track:', response.status);
+                setMessage('楽曲の追加に失敗しました');
+                setMessageType('error');
+            }
         } catch (error) {
             console.error('Error adding track:', error);
             setMessage('楽曲の追加に失敗しました');
@@ -37,10 +45,17 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
             const response = await fetch(`/java/playlist/removeTrack?trackId=${trackId}&playlistId=${playlistId}`, {
                 method: 'GET',
             });
-            const data = await response.text();
-            console.log('Track removed successfully:', data);
-            setMessage('楽曲がプレイリストから削除されました');
-            setMessageType('success');
+            if (response.status === 200) {
+                const data = await response.text();
+                console.log('Track removed successfully:', data);
+                setMessage('楽曲がプレイリストから削除されました');
+                setMessageType('success');
+                setTrackStatus(prevStatus => ({...prevStatus, [trackId]: false}));
+            } else {
+                console.error('Error removing track:', response.status);
+                setMessage('楽曲の削除に失敗しました');
+                setMessageType('error');
+            }
         } catch (error) {
             console.error('Error removing track:', error);
             setMessage('楽曲の削除に失敗しました');
@@ -109,10 +124,15 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
             ))}
             </thead>
             <tbody {...getTableBodyProps()} className="bg-white divide-y divide-gray-200">
-            {rows.map((row: { getRowProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>; cells: any[]; }) => {
+            {rows.map((row: {
+                getRowProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>;
+                cells: any[];
+                original: any;
+            }) => {
                 prepareRow(row);
                 return (
-                    <tr {...row.getRowProps()}>
+                    <tr {...row.getRowProps()}
+                        style={{backgroundColor: trackStatus[row.original.id] ? 'lightgreen' : 'white'}}>
                         {row.cells.map(cell => (
                             <td {...cell.getCellProps()} className="px-6 py-4 whitespace-nowrap">
                                 {cell.render('Cell')}
