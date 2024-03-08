@@ -1,5 +1,5 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
-import { useTable } from 'react-table';
+import {useTable} from 'react-table';
 import {useApi} from './useApi'
 import PlaylistIdContext from './PlaylistIdContext';
 
@@ -8,6 +8,36 @@ const RecommendationsTable = ({playlist}: { playlist: { name: string, tracks: an
     const playlistId = useContext(PlaylistIdContext);
     const [recommendations, setRecommendations] = useState([]);
     const {fetchRecommendations} = useApi();
+    
+    const addTrackToPlaylist = async (trackId: string, playlistId: string) => {
+        console.log('addTrackToPlaylistが呼び出されました');
+        await fetch(`/java/playlist/addTrack?trackId=${trackId}&playlistId=${playlistId}`, {
+            method: 'GET',
+        })
+            .then(async response => {
+                const data = await response.text();
+                console.log('Track added successfully:', data);
+                return data;
+            })
+            .catch(error => {
+                console.error('Error adding track:', error);
+            });
+    };
+    
+    const removeTrackFromPlaylist = async (trackId: string, playlistId: string) => {
+        console.log('removeTrackFromPlaylistが呼び出されました');
+        await fetch(`/java/playlist/removeTrack?trackId=${trackId}&playlistId=${playlistId}`, {
+            method: 'GET',
+        })
+            .then(async response => {
+                const data = await response.text();
+                console.log('Track removed successfully:', data);
+                return data;
+            })
+            .catch(error => {
+                console.error('Error removing track:', error);
+            });
+    };
 
     const fetchAndSetRecommendations = useCallback(() => {
         fetchRecommendations(playlist.tracks)
@@ -34,11 +64,13 @@ const RecommendationsTable = ({playlist}: { playlist: { name: string, tracks: an
                     <button onClick={() => {
                         console.log('Plus button clicked for', row.values.name);
                         console.log('Playlist ID:', playlistId);
+                        addTrackToPlaylist(row.values.id, playlistId.playlistId);
                     }}>+
                     </button>
                     <button onClick={() => {
                         console.log('Minus button clicked for', row.values.name);
                         console.log('Playlist ID:', playlistId);
+                        removeTrackFromPlaylist(row.values.id, playlistId.playlistId);
                     }}>-
                     </button>
                 </div>

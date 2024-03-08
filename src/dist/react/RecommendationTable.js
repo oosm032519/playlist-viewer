@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useTable } from 'react-table';
 import { useApi } from './useApi';
@@ -6,6 +15,34 @@ const RecommendationsTable = ({ playlist }) => {
     const playlistId = useContext(PlaylistIdContext);
     const [recommendations, setRecommendations] = useState([]);
     const { fetchRecommendations } = useApi();
+    const addTrackToPlaylist = (trackId, playlistId) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log('addTrackToPlaylistが呼び出されました');
+        yield fetch(`/java/playlist/addTrack?trackId=${trackId}&playlistId=${playlistId}`, {
+            method: 'GET',
+        })
+            .then((response) => __awaiter(void 0, void 0, void 0, function* () {
+            const data = yield response.text();
+            console.log('Track added successfully:', data);
+            return data;
+        }))
+            .catch(error => {
+            console.error('Error adding track:', error);
+        });
+    });
+    const removeTrackFromPlaylist = (trackId, playlistId) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log('removeTrackFromPlaylistが呼び出されました');
+        yield fetch(`/java/playlist/removeTrack?trackId=${trackId}&playlistId=${playlistId}`, {
+            method: 'GET',
+        })
+            .then((response) => __awaiter(void 0, void 0, void 0, function* () {
+            const data = yield response.text();
+            console.log('Track removed successfully:', data);
+            return data;
+        }))
+            .catch(error => {
+            console.error('Error removing track:', error);
+        });
+    });
     const fetchAndSetRecommendations = useCallback(() => {
         fetchRecommendations(playlist.tracks)
             .then(data => {
@@ -27,10 +64,12 @@ const RecommendationsTable = ({ playlist }) => {
                 React.createElement("button", { onClick: () => {
                         console.log('Plus button clicked for', row.values.name);
                         console.log('Playlist ID:', playlistId);
+                        addTrackToPlaylist(row.values.id, playlistId.playlistId);
                     } }, "+"),
                 React.createElement("button", { onClick: () => {
                         console.log('Minus button clicked for', row.values.name);
                         console.log('Playlist ID:', playlistId);
+                        removeTrackFromPlaylist(row.values.id, playlistId.playlistId);
                     } }, "-"))),
         },
     ], [playlistId]);
