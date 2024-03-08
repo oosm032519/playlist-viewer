@@ -1,42 +1,51 @@
-import React, {useCallback, useContext, useEffect, useState} from 'react';
+import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useState} from 'react';
 import {useTable} from 'react-table';
 import {useApi} from './useApi'
 import PlaylistIdContext from './PlaylistIdContext';
 
+type RecommendationsTableProps = {
+    playlist: { name: string, tracks: any[] },
+    setMessage: Dispatch<SetStateAction<string | null>>,
+    setMessageType: Dispatch<SetStateAction<'success' | 'error' | null>>
+};
 
-const RecommendationsTable = ({playlist}: { playlist: { name: string, tracks: any[] } }) => {
+const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, setMessage, setMessageType}) => {
     const playlistId = useContext(PlaylistIdContext);
     const [recommendations, setRecommendations] = useState([]);
     const {fetchRecommendations} = useApi();
     
     const addTrackToPlaylist = async (trackId: string, playlistId: string) => {
         console.log('addTrackToPlaylistが呼び出されました');
-        await fetch(`/java/playlist/addTrack?trackId=${trackId}&playlistId=${playlistId}`, {
-            method: 'GET',
-        })
-            .then(async response => {
-                const data = await response.text();
-                console.log('Track added successfully:', data);
-                return data;
-            })
-            .catch(error => {
-                console.error('Error adding track:', error);
+        try {
+            const response = await fetch(`/java/playlist/addTrack?trackId=${trackId}&playlistId=${playlistId}`, {
+                method: 'GET',
             });
+            const data = await response.text();
+            console.log('Track added successfully:', data);
+            setMessage('楽曲がプレイリストに追加されました');
+            setMessageType('success');
+        } catch (error) {
+            console.error('Error adding track:', error);
+            setMessage('楽曲の追加に失敗しました');
+            setMessageType('error');
+        }
     };
     
     const removeTrackFromPlaylist = async (trackId: string, playlistId: string) => {
         console.log('removeTrackFromPlaylistが呼び出されました');
-        await fetch(`/java/playlist/removeTrack?trackId=${trackId}&playlistId=${playlistId}`, {
-            method: 'GET',
-        })
-            .then(async response => {
-                const data = await response.text();
-                console.log('Track removed successfully:', data);
-                return data;
-            })
-            .catch(error => {
-                console.error('Error removing track:', error);
+        try {
+            const response = await fetch(`/java/playlist/removeTrack?trackId=${trackId}&playlistId=${playlistId}`, {
+                method: 'GET',
             });
+            const data = await response.text();
+            console.log('Track removed successfully:', data);
+            setMessage('楽曲がプレイリストから削除されました');
+            setMessageType('success');
+        } catch (error) {
+            console.error('Error removing track:', error);
+            setMessage('楽曲の削除に失敗しました');
+            setMessageType('error');
+        }
     };
 
     const fetchAndSetRecommendations = useCallback(() => {

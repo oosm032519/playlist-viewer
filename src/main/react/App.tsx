@@ -11,6 +11,7 @@ import VisitedPlaylistsTable from './VisitedPlaylistsTable';
 import {useApi} from './useApi'
 import RecommendationsTable from './RecommendationTable'
 import PlaylistIdContext from './PlaylistIdContext';
+import MessageDisplay from './MessageDisplay';
 
 
 const App: React.FC = () => {
@@ -25,6 +26,8 @@ const App: React.FC = () => {
     const [showRecommendations, setShowRecommendations] = useState(false);
     const {fetchVisitedPlaylists} = useApi();
     const [playlistId, setPlaylistId] = useState<string | null>(null);
+    const [message, setMessage] = useState<string | null>(null);
+    const [messageType, setMessageType] = useState<'success' | 'error' | null>(null);
     
     
     useEffect(() => {
@@ -72,25 +75,27 @@ const App: React.FC = () => {
                 setShowRecommendations,
             }}>
             <PlaylistIdContext.Provider value={{playlistId, setPlaylistId}}>
-            <div className="App">
-                <h1 className="text-3xl font-light ml-5 text-center py-5">Playlist Viewer</h1>
-                <SideMenu/>
-                <RadioButton/>
-                <Form setIsLoading={setIsLoading} isLoading={isLoading}/>
-                <div className="my-4">
-                    {showPlaylists && <PlaylistsTable/>}
-                </div>
-                <div className="my-4">
-                    {showTracks && <TracksTable playlist={selectedPlaylist}/>}
-                </div>
-                <div className="my-4">
-                        {showRecommendations && <RecommendationsTable playlist={selectedPlaylist}/>}
-                </div>
-                <div className="my-4">
-                    {!isLoading && showVisitedPlaylists && <VisitedPlaylistsTable/>}
-                </div>
-                <LoadingAnimation isLoading={isLoading}/>
-            </div>
+                <div className="App">
+                    <h1 className="text-3xl font-light ml-5 text-center py-5">Playlist Viewer</h1>
+                    <SideMenu/>
+                    <RadioButton/>
+                    <Form setIsLoading={setIsLoading} isLoading={isLoading}/>
+                    <div className="my-4">
+                        {showPlaylists && <PlaylistsTable/>}
+                    </div>
+                    <div className="my-4">
+                        {showTracks && <TracksTable playlist={selectedPlaylist}/>}
+                    </div>
+                    <div className="my-4">
+                        {showRecommendations &&
+                            <RecommendationsTable playlist={selectedPlaylist} setMessage={setMessage}
+                                                  setMessageType={setMessageType}/>}
+                    </div>
+                    <div className="my-4">
+                        {!isLoading && showVisitedPlaylists && <VisitedPlaylistsTable/>}
+                    </div>
+                    <LoadingAnimation isLoading={isLoading}/>
+                    {message && messageType && <MessageDisplay message={message} type={messageType}/>}                </div>
             </PlaylistIdContext.Provider>
         </CombinedContext.Provider>
     );

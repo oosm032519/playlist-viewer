@@ -11,37 +11,43 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useTable } from 'react-table';
 import { useApi } from './useApi';
 import PlaylistIdContext from './PlaylistIdContext';
-const RecommendationsTable = ({ playlist }) => {
+const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
     const playlistId = useContext(PlaylistIdContext);
     const [recommendations, setRecommendations] = useState([]);
     const { fetchRecommendations } = useApi();
     const addTrackToPlaylist = (trackId, playlistId) => __awaiter(void 0, void 0, void 0, function* () {
         console.log('addTrackToPlaylistが呼び出されました');
-        yield fetch(`/java/playlist/addTrack?trackId=${trackId}&playlistId=${playlistId}`, {
-            method: 'GET',
-        })
-            .then((response) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const response = yield fetch(`/java/playlist/addTrack?trackId=${trackId}&playlistId=${playlistId}`, {
+                method: 'GET',
+            });
             const data = yield response.text();
             console.log('Track added successfully:', data);
-            return data;
-        }))
-            .catch(error => {
+            setMessage('楽曲がプレイリストに追加されました');
+            setMessageType('success');
+        }
+        catch (error) {
             console.error('Error adding track:', error);
-        });
+            setMessage('楽曲の追加に失敗しました');
+            setMessageType('error');
+        }
     });
     const removeTrackFromPlaylist = (trackId, playlistId) => __awaiter(void 0, void 0, void 0, function* () {
         console.log('removeTrackFromPlaylistが呼び出されました');
-        yield fetch(`/java/playlist/removeTrack?trackId=${trackId}&playlistId=${playlistId}`, {
-            method: 'GET',
-        })
-            .then((response) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const response = yield fetch(`/java/playlist/removeTrack?trackId=${trackId}&playlistId=${playlistId}`, {
+                method: 'GET',
+            });
             const data = yield response.text();
             console.log('Track removed successfully:', data);
-            return data;
-        }))
-            .catch(error => {
+            setMessage('楽曲がプレイリストから削除されました');
+            setMessageType('success');
+        }
+        catch (error) {
             console.error('Error removing track:', error);
-        });
+            setMessage('楽曲の削除に失敗しました');
+            setMessageType('error');
+        }
     });
     const fetchAndSetRecommendations = useCallback(() => {
         fetchRecommendations(playlist.tracks)
