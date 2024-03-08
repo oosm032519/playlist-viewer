@@ -21,11 +21,9 @@ const SideMenu: React.FC<SideMenuProps> = ({authorize}) => {
     const handleAuthorize = async () => {
         try {
             await authorize();
-            setMessage("Spotifyへのログインが完了しました");
-            setMessageType('success');
+            console.log("認証が完了しました");
         } catch (error) {
-            setMessage("Spotifyへのログインに失敗しました");
-            setMessageType('error');
+            console.error('There was a problem with the fetch operation: ', error);
         }
     };
     

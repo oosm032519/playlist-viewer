@@ -22,12 +22,10 @@ const SideMenu = ({ authorize }) => {
     const handleAuthorize = () => __awaiter(void 0, void 0, void 0, function* () {
         try {
             yield authorize();
-            setMessage("Spotifyへのログインが完了しました");
-            setMessageType('success');
+            console.log("認証が完了しました");
         }
         catch (error) {
-            setMessage("Spotifyへのログインに失敗しました");
-            setMessageType('error');
+            console.error('There was a problem with the fetch operation: ', error);
         }
     });
     return (React.createElement("div", null,

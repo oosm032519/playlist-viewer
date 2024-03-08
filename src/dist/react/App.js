@@ -36,7 +36,7 @@ const App = () => {
     const [playlistId, setPlaylistId] = useState(null);
     const [message, setMessage] = useState(null);
     const [messageType, setMessageType] = useState(null);
-    const authorize = useSpotifyAuth(setMessage, setMessageType);
+    const authorize = useSpotifyAuth();
     useEffect(() => {
         const fetchPlaylists = () => __awaiter(void 0, void 0, void 0, function* () {
             setIsLoading(true);

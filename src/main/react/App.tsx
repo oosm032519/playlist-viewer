@@ -29,7 +29,7 @@ const App: React.FC = () => {
     const [playlistId, setPlaylistId] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
     const [messageType, setMessageType] = useState<'success' | 'error' | null>(null);
-    const authorize = useSpotifyAuth(setMessage, setMessageType);
+    const authorize = useSpotifyAuth();
     
     useEffect(() => {
         const fetchPlaylists = async () => {
