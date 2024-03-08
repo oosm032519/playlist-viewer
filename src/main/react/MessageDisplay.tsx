@@ -19,7 +19,7 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({message, type}) => {
     
     return (
         <div
-            className={`message-display ${messageClass} text-lg font-bold border-2 p-2 fixed bottom-0 right-0 m-6 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+            className={`message-display ${messageClass} text-lg font-bold border-2 p-2 fixed bottom-0 right-0 m-6 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'} shadow-lg rounded-lg flex items-center justify-center text-2xl`}>
             {message}
         </div>
     );

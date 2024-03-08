@@ -1,7 +1,6 @@
 import {useCallback, useContext} from 'react';
 import CombinedContext from './CombinedContext';
-import {calculateAverageValues, calculateMode, calculateModeArtistNames} from './RecommendationCalculator'
-import {Track} from '../typescript/track'
+import {RecommendationCalculator} from './RecommendationCalculator';
 import PlaylistIdContext from './PlaylistIdContext'
 
 export function useApi() {
@@ -41,16 +40,15 @@ export function useApi() {
     
     const fetchRecommendations = useCallback(async (tracks: any[]) => {
         console.log('fetchRecommendationsが呼び出されました');
-        const modeArtistNames = calculateModeArtistNames(tracks);
-        const averageValues = calculateAverageValues(tracks);
-        const mode = calculateMode(tracks);
+        const modeArtistNames = RecommendationCalculator.calculateModeArtistNames(tracks);
+        const averageValues = RecommendationCalculator.calculateAverageValues(tracks);        const mode = RecommendationCalculator.calculateMode(tracks);
         const endpoint = `/java/recommendations?tempo=${averageValues.averageTempo}&key=${averageValues.modeKey}&danceability=${averageValues.averageDanceability}&energy=${averageValues.averageEnergy}&acousticness=${averageValues.averageAcousticness}&liveness=${averageValues.averageLiveness}&speechiness=${averageValues.averageSpeechiness}&valence=${averageValues.averageValence}&timeSignature=${averageValues.timeSignature}&durationMs=${averageValues.durationMs}&mode=${mode}&instrumentalness=${averageValues.instrumentalness}&loudness=${averageValues.loudness}&modeArtistNames=${modeArtistNames}`;
         const response = await fetch(endpoint);
         const data = await response.json();
         console.log(data);
         if (data && data.tracks) {
             const trackIds = tracks.map(track => track.audioFeatures.id);
-            const uniqueRecommendations = data.tracks.filter((track: Track) => !trackIds.includes(track.id));
+            const uniqueRecommendations = data.tracks.filter((track: { id: any; }) => !trackIds.includes(track.id));
             console.log(uniqueRecommendations);
             return uniqueRecommendations;
         } else {

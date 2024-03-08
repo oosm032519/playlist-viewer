@@ -7,17 +7,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import CombinedContext, { Option } from './CombinedContext';
 import { useApi } from './useApi';
 const FormComponent = ({ setIsLoading }) => {
     const { selectedOption, setShowPlaylists, setShowTracks, setPlaylists } = useContext(CombinedContext);
     const { fetchPlaylistById, fetchPlaylistsByName } = useApi();
+    const inputRef = useRef(null);
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.value = '';
+        }
+    }, [selectedOption]);
     const handleSubmit = (event) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
         event.preventDefault();
         setIsLoading(true);
-        const inputElement = event.currentTarget.elements.namedItem('inputField');
-        const inputValue = inputElement.value;
+        const inputValue = (_a = inputRef.current) === null || _a === void 0 ? void 0 : _a.value;
         try {
             if (selectedOption === Option.PlaylistIdOption) {
                 yield fetchPlaylistById(inputValue);
@@ -42,7 +48,7 @@ const FormComponent = ({ setIsLoading }) => {
     });
     return (React.createElement("div", null,
         React.createElement("form", { className: "m-5 form-container flex items-center", onSubmit: handleSubmit },
-            React.createElement("input", { type: "text", name: "inputField", placeholder: selectedOption === Option.PlaylistIdOption ? "プレイリストIDを入力してください" : "プレイリスト名を入力してください", className: "border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 w-11/12 p-3 mr-2" }),
+            React.createElement("input", { ref: inputRef, type: "text", name: "inputField", placeholder: selectedOption === Option.PlaylistIdOption ? "プレイリストIDを入力してください" : "プレイリスト名を入力してください", className: "border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 w-11/12 p-3 mr-2" }),
             React.createElement("button", { type: "submit", className: "bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent hover:ring-4 hover:ring-green-300 z-10" }, selectedOption === Option.PlaylistIdOption ? "送信" : "検索"))));
 };
 export default FormComponent;

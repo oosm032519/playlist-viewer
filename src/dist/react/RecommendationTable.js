@@ -16,6 +16,7 @@ const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
     const [recommendations, setRecommendations] = useState([]);
     const { fetchRecommendations } = useApi();
     const [trackStatus, setTrackStatus] = useState({});
+    const [, setShowPlaylists] = useState(false);
     const addTrackToPlaylist = (trackId, playlistId) => __awaiter(void 0, void 0, void 0, function* () {
         console.log('addTrackToPlaylistが呼び出されました');
         try {
@@ -75,7 +76,8 @@ const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
     }, [fetchRecommendations, playlist]);
     useEffect(() => {
         fetchAndSetRecommendations();
-    }, [fetchAndSetRecommendations]);
+        setShowPlaylists(false);
+    }, [fetchAndSetRecommendations, setShowPlaylists]);
     const data = React.useMemo(() => recommendations, [recommendations]);
     const columns = React.useMemo(() => [
         { Header: 'Track Name', accessor: 'name' },

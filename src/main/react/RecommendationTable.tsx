@@ -14,6 +14,7 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
     const [recommendations, setRecommendations] = useState([]);
     const {fetchRecommendations} = useApi();
     const [trackStatus, setTrackStatus] = useState<{ [key: string]: boolean }>({});
+    const [, setShowPlaylists] = useState(false);
     
     const addTrackToPlaylist = async (trackId: string, playlistId: string) => {
         console.log('addTrackToPlaylistが呼び出されました');
@@ -73,7 +74,8 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
 
     useEffect(() => {
         fetchAndSetRecommendations();
-    }, [fetchAndSetRecommendations]);
+        setShowPlaylists(false);
+    }, [fetchAndSetRecommendations, setShowPlaylists]);
 
     const data = React.useMemo(() => recommendations, [recommendations]);
 

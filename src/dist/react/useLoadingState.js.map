@@ -1,0 +1,1 @@
+{"version":3,"file":"useLoadingState.js","sourceRoot":"","sources":["../../main/react/useLoadingState.tsx"],"names":[],"mappings":"AAAA,OAAO,EAAC,QAAQ,EAAC,MAAM,OAAO,CAAC;AAE/B,MAAM,CAAC,MAAM,eAAe,GAAG,GAAG,EAAE;IAChC,MAAM,CAAC,SAAS,EAAE,YAAY,CAAC,GAAG,QAAQ,CAAC,KAAK,CAAC,CAAC;IAElD,OAAO,EAAC,SAAS,EAAE,YAAY,EAAC,CAAC;AACrC,CAAC,CAAC"}
