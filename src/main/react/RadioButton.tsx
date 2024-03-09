@@ -1,8 +1,10 @@
 import React, {useContext} from 'react';
 import CombinedContext, {Option} from './CombinedContext';
+import { useWindowWidth } from './useWindowWidth';
 
 const RadioButton = () => {
-    const {selectedOption, setSelectedOption} = useContext(CombinedContext);
+    const {selectedOption, setSelectedOption, isOpen} = useContext(CombinedContext);
+    const windowWidth = useWindowWidth();
 
     const handleOptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSelectedOption(event.target.value as Option);
@@ -13,8 +15,12 @@ const RadioButton = () => {
         { id: 'searchQueryOption', value: Option.SearchOption, label: 'プレイリスト名で検索' },
     ];
 
+    // Calculate the position of the radio buttons based on the isOpen state
+    const positionStyle = isOpen ? {marginRight: (windowWidth / 4)} : {};
+    
     return (
-        <div className="radio-group flex justify-center my-5">
+        <div className={`radio-group flex justify-center my-5 transition-all duration-200 ease-in-out`}
+             style={positionStyle}>
             {options.map((option) => (
                 <div className="mx-2" key={option.id}>
                     <input type="radio" id={option.id} value={option.value} name="option" className="hidden"

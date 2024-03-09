@@ -6,16 +6,13 @@ import {Button} from './Button';
 
 type SideMenuProps = {
     authorize: () => Promise<void>;
+    isOpen: boolean;
+    toggleMenu: () => void;
 };
 
-const SideMenu: React.FC<SideMenuProps> = ({authorize}) => {
-    const [isOpen, setIsOpen] = useState(false);
+const SideMenu: React.FC<SideMenuProps> = ({authorize, isOpen, toggleMenu}) => {
     const [message] = useState("");
     const [messageType] = useState<'success' | 'error' | null>(null);
-    
-    const toggleMenu = () => {
-        setIsOpen(!isOpen);
-    };
     
     const menuClass = isOpen ? '' : 'translate-x-full';
     
@@ -30,13 +27,7 @@ const SideMenu: React.FC<SideMenuProps> = ({authorize}) => {
     
     return (
         <div>
-            <button onClick={toggleMenu}
-                    className="bg-green-500 text-white rounded-lg h-10 p-3 absolute top-5 right-5 flex items-center justify-center transition-transform duration-500 ease-in-out hover:bg-green-600 hover:text-gray-900">
-                メニューを開く
-            </button>
-            
-            <div id="side-menu"
-                 className={`fixed right-0 top-0 w-64 h-screen bg-gray-800 text-white p-5 shadow-md transform ${menuClass} transition-transform duration-300 ease-in-out rounded-l-lg border-l-4 border-green-500 z-50`}>
+            <div id="side-menu" className={`fixed top-16 right-0 w-1/4 h-screen bg-black text-white p-5 shadow-md transform ${menuClass} transition-transform duration-300 ease-in-out z-50`}>
                 <Button onClick={toggleMenu}>メニューを閉じる</Button>
                 <Button onClick={handleAuthorize}>Spotifyにログイン</Button>
                 <FetchUserPlaylistsButton/>

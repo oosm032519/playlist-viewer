@@ -42,6 +42,9 @@ const CombinedContext = react_1.default.createContext({
     },
     setMessageType: () => {
     },
+    isOpen: false,
+    setIsOpen: () => {
+    },
 });
 exports.default = CombinedContext;
 //# sourceMappingURL=CombinedContext.js.map

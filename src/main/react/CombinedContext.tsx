@@ -26,6 +26,8 @@ type CombinedContextType = {
     setShowRecommendations: (show: boolean) => void;
     setMessage: React.Dispatch<React.SetStateAction<string | null>>;
     setMessageType: React.Dispatch<React.SetStateAction<'success' | 'error' | null>>;
+    isOpen: boolean;
+    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const CombinedContext = React.createContext<CombinedContextType>({
@@ -59,6 +61,9 @@ const CombinedContext = React.createContext<CombinedContextType>({
     setMessage: () => {
     },
     setMessageType: () => {
+    },
+    isOpen: false,
+    setIsOpen: () => {
     },
 });
 

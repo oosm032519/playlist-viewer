@@ -12,6 +12,7 @@ import PlaylistIdContext from './PlaylistIdContext';
 import MessageDisplay from './MessageDisplay';
 import {useSpotifyAuth} from './useSpotifyAuth';
 import {useApp} from './useApp';
+import Header from './Header';
 
 const App: React.FC = () => {
     const {
@@ -42,6 +43,11 @@ const App: React.FC = () => {
     } = useApp();
     
     const authorize = useSpotifyAuth();
+    const [isOpen, setIsOpen] = React.useState(false);
+    
+    const toggleMenu = () => {
+        setIsOpen(!isOpen);
+    };
     
     return (
         <CombinedContext.Provider
@@ -66,11 +72,13 @@ const App: React.FC = () => {
                 setShowRecommendations,
                 setMessage,
                 setMessageType,
+                isOpen,
+                setIsOpen,
             }}>
             <PlaylistIdContext.Provider value={{playlistId, setPlaylistId}}>
-                <div className="App">
-                    <h1 className="text-3xl font-light ml-5 text-center py-5">Playlist Viewer</h1>
-                    <SideMenu authorize={authorize}/>
+                <div className="App pt-16">
+                    <Header/>
+                    <SideMenu authorize={authorize} isOpen={isOpen} toggleMenu={toggleMenu}/>
                     <RadioButton/>
                     <Form setIsLoading={setIsLoading} isLoading={isLoading}/>
                     <div className="my-4">
@@ -80,7 +88,9 @@ const App: React.FC = () => {
                         {showTracks && <TracksTable playlist={selectedPlaylist}/>}
                     </div>
                     <div className="my-4">
-                        {showRecommendations && <RecommendationsTable playlist={selectedPlaylist} setMessage={setMessage} setMessageType={setMessageType}/>}
+                        {showRecommendations &&
+                            <RecommendationsTable playlist={selectedPlaylist} setMessage={setMessage}
+                                                  setMessageType={setMessageType}/>}
                     </div>
                     <div className="my-4">
                         {showVisitedPlaylists && <VisitedPlaylistsTable/>}
@@ -91,6 +101,6 @@ const App: React.FC = () => {
             </PlaylistIdContext.Provider>
         </CombinedContext.Provider>
     );
-};
+}
 
 export default App;
