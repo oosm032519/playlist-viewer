@@ -35,7 +35,7 @@ const FetchUserPlaylistsButton = () => {
             setIsLoading(false);
         }
     });
-    return (react_1.default.createElement(Button_1.Button, { onClick: handleClick, className: "w-full bg-green-500 hover:bg-green-600 text-white hover:text-gray-900 rounded-lg h-10 p-3 mt-4 flex items-center justify-center transition-colors duration-300" }, "\u30D5\u30A9\u30ED\u30FC\u4E2D\u306E\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8"));
+    return (react_1.default.createElement(Button_1.Button, { onClick: handleClick }, "\u30D5\u30A9\u30ED\u30FC\u4E2D\u306E\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8"));
 };
 exports.default = FetchUserPlaylistsButton;
 //# sourceMappingURL=FetchUserPlaylistsButton.js.map

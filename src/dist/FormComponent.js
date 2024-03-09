@@ -39,6 +39,7 @@ const FormComponent = ({ setIsLoading }) => {
     const { selectedOption, setShowPlaylists, setShowTracks, setPlaylists } = (0, react_1.useContext)(CombinedContext_1.default);
     const { fetchPlaylistById, fetchPlaylistsByName } = (0, useApi_1.useApi)();
     const inputRef = (0, react_1.useRef)(null);
+    // Clear the input field when the selected option changes
     (0, react_1.useEffect)(() => {
         if (inputRef.current) {
             inputRef.current.value = '';
@@ -49,29 +50,20 @@ const FormComponent = ({ setIsLoading }) => {
         event.preventDefault();
         setIsLoading(true);
         const inputValue = (_a = inputRef.current) === null || _a === void 0 ? void 0 : _a.value;
-        try {
-            if (selectedOption === CombinedContext_1.Option.PlaylistIdOption) {
-                console.log('fetchPlaylistByIdを呼び出します');
-                yield fetchPlaylistById(inputValue);
-                setShowTracks(true);
-                setShowPlaylists(false);
-            }
-            else {
-                console.log('fetchPlaylistsByNameを呼び出します');
-                const playlists = yield fetchPlaylistsByName(inputValue);
-                if (JSON.stringify(playlists) !== JSON.stringify(playlists)) {
-                    setPlaylists(playlists);
-                }
-                setShowPlaylists(true);
-                setShowTracks(false);
-            }
+        if (selectedOption === CombinedContext_1.Option.PlaylistIdOption) {
+            console.log('fetchPlaylistByIdを呼び出します');
+            yield fetchPlaylistById(inputValue);
+            setShowTracks(true);
+            setShowPlaylists(false);
         }
-        catch (error) {
-            console.error(error);
+        else {
+            console.log('fetchPlaylistsByNameを呼び出します');
+            const playlists = yield fetchPlaylistsByName(inputValue);
+            setPlaylists(playlists);
+            setShowPlaylists(true);
+            setShowTracks(false);
         }
-        finally {
-            setIsLoading(false);
-        }
+        setIsLoading(false);
     });
     return (react_1.default.createElement("div", null,
         react_1.default.createElement("form", { className: "m-5 form-container flex items-center", onSubmit: handleSubmit },

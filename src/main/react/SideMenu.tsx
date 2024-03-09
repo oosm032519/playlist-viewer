@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import FetchUserPlaylistsButton from './FetchUserPlaylistsButton';
 import FetchVisitedPlaylistsButton from './FetchVisitedPlaylistsButton';
 import MessageDisplay from './MessageDisplay';
+import {Button} from './Button';
 
 type SideMenuProps = {
     authorize: () => Promise<void>;
@@ -9,8 +10,8 @@ type SideMenuProps = {
 
 const SideMenu: React.FC<SideMenuProps> = ({authorize}) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [message, setMessage] = useState("");
-    const [messageType, setMessageType] = useState<'success' | 'error' | null>(null);
+    const [message] = useState("");
+    const [messageType] = useState<'success' | 'error' | null>(null);
     
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -36,15 +37,8 @@ const SideMenu: React.FC<SideMenuProps> = ({authorize}) => {
             
             <div id="side-menu"
                  className={`fixed right-0 top-0 w-64 h-screen bg-gray-800 text-white p-5 shadow-md transform ${menuClass} transition-transform duration-300 ease-in-out rounded-l-lg border-l-4 border-green-500 z-50`}>
-                <button onClick={toggleMenu}
-                        className="w-full bg-green-500 hover:bg-green-600 text-white hover:text-gray-900 rounded-lg h-10 p-3 flex items-center justify-center transition-colors duration-300">
-                    メニューを閉じる
-                </button>
-                <button id="spotify-login"
-                        onClick={handleAuthorize}
-                        className="w-full bg-green-500 hover:bg-green-600 text-white hover:text-gray-900 rounded-lg h-10 p-3 mt-4 flex items-center justify-center transition-colors duration-300">
-                    Spotifyにログイン
-                </button>
+                <Button onClick={toggleMenu}>メニューを閉じる</Button>
+                <Button onClick={handleAuthorize}>Spotifyにログイン</Button>
                 <FetchUserPlaylistsButton/>
                 <FetchVisitedPlaylistsButton/>
             </div>

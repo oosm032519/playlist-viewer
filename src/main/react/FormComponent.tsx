@@ -12,6 +12,7 @@ const FormComponent: React.FC<FormComponentProps> = ({setIsLoading}) => {
     const {fetchPlaylistById, fetchPlaylistsByName} = useApi();
     const inputRef = useRef<HTMLInputElement>(null);
 
+    // Clear the input field when the selected option changes
     useEffect(() => {
         if (inputRef.current) {
             inputRef.current.value = '';
@@ -23,26 +24,20 @@ const FormComponent: React.FC<FormComponentProps> = ({setIsLoading}) => {
         setIsLoading(true);
         const inputValue = inputRef.current?.value;
 
-        try {
-            if (selectedOption === Option.PlaylistIdOption) {
-                console.log('fetchPlaylistByIdを呼び出します');
-                await fetchPlaylistById(inputValue);
-                setShowTracks(true);
-                setShowPlaylists(false);
-            } else {
-                console.log('fetchPlaylistsByNameを呼び出します');
-                const playlists = await fetchPlaylistsByName(inputValue);
-                if (JSON.stringify(playlists) !== JSON.stringify(playlists)) {
-                    setPlaylists(playlists);
-                }
-                setShowPlaylists(true);
-                setShowTracks(false);
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsLoading(false);
+        if (selectedOption === Option.PlaylistIdOption) {
+            console.log('fetchPlaylistByIdを呼び出します');
+            await fetchPlaylistById(inputValue);
+            setShowTracks(true);
+            setShowPlaylists(false);
+        } else {
+            console.log('fetchPlaylistsByNameを呼び出します');
+            const playlists = await fetchPlaylistsByName(inputValue);
+            setPlaylists(playlists);
+            setShowPlaylists(true);
+            setShowTracks(false);
         }
+
+        setIsLoading(false);
     };
 
     return (
