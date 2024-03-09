@@ -6,6 +6,7 @@ const FetchUserPlaylistsButton = () => {
     const fetchUserPlaylists = useCallback(async () => {
         setIsLoading(true);
         try {
+            console.log('fetchUserPlaylistsが呼び出されました');
             const response = await fetch('/java/spotify/user/playlists');
             if (!response.ok) {
                 const message = await response.text();
@@ -19,12 +20,11 @@ const FetchUserPlaylistsButton = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [setPlaylists, setShowPlaylists, setIsLoading]);
+    }, []);
     
     return (
         <button onClick={fetchUserPlaylists}
-                className="w-full bg-green-500 hover:bg-green-600 text-white hover:text-gray-900 rounded-lg h-10 p-3 mt-4 flex items-center justify-center transition-colors duration-300">
-            フォロー中のプレイリスト
+                className="w-full bg-green-500 hover:bg-green-600 text-white hover:text-gray-900 rounded-lg h-10 p-3 mt-4 flex items-center justify-center transition-colors duration-300">フォロー中のプレイリスト
         </button>
     );
 };

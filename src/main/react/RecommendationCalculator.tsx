@@ -1,5 +1,6 @@
 export class RecommendationCalculator {
     static calculateMode(tracks: any[]) {
+        console.log('Calculating modeが呼び出されました');
         const modeCounts: { [key: string]: number } = {};
         let maxCount = 0;
         let mode = '';
@@ -17,6 +18,7 @@ export class RecommendationCalculator {
     }
     
     static calculateModeArtistNames(tracks: any[]) {
+        console.log('Calculating mode artist namesが呼び出されました');
         const artistFrequency: { [key: string]: number } = {};
         const artistNames: string[] = [];
         
@@ -53,6 +55,8 @@ export class RecommendationCalculator {
     }
     
     static calculateAverageValues(tracks: any[]) {
+        console.log('Calculating average valuesが呼び出されました');
+        
         let totalTempo = 0;
         let totalKey = 0;
         let totalDanceability = 0;

@@ -10,6 +10,7 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({message, type}) => {
     const messageClass = type === 'success' ? 'bg-green-500 border-green-500' : 'bg-red-500 border-red-500';
     
     useEffect(() => {
+        console.log('メッセージを表示します');
         setIsVisible(true);
         const timer = setTimeout(() => {
             setIsVisible(false);

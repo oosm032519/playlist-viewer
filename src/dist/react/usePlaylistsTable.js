@@ -14,19 +14,24 @@ export const usePlaylistsTable = () => {
     const { playlists, setShowTracks, setShowPlaylists, setIsLoading, setShowRecommendations } = useContext(CombinedContext);
     const { fetchPlaylistById } = useApi();
     const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
+    const [prevSelectedPlaylistId, setPrevSelectedPlaylistId] = useState(null);
     const fetchAndSetPlaylist = useCallback((id) => __awaiter(void 0, void 0, void 0, function* () {
         if (id) {
+            console.log('fetchAndSetPlaylistが呼び出されました');
             setIsLoading(true);
             yield fetchPlaylistById(id);
             setShowPlaylists(false);
-            setShowRecommendations(false);
             setIsLoading(false);
             setShowTracks(true);
         }
     }), [fetchPlaylistById, setIsLoading, setShowTracks, setShowPlaylists, setShowRecommendations]);
     useEffect(() => {
-        fetchAndSetPlaylist(selectedPlaylistId);
-    }, [selectedPlaylistId, fetchAndSetPlaylist]);
+        if (selectedPlaylistId !== prevSelectedPlaylistId) {
+            console.log('selectedPlaylistIdが変更されました');
+            fetchAndSetPlaylist(selectedPlaylistId);
+            setPrevSelectedPlaylistId(selectedPlaylistId);
+        }
+    }, [selectedPlaylistId, prevSelectedPlaylistId, fetchAndSetPlaylist]);
     return { playlists, setSelectedPlaylistId };
 };
 //# sourceMappingURL=usePlaylistsTable.js.map

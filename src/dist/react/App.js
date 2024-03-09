@@ -43,8 +43,7 @@ const App = () => {
                 React.createElement(Form, { setIsLoading: setIsLoading, isLoading: isLoading }),
                 React.createElement("div", { className: "my-4" }, showPlaylists && React.createElement(PlaylistsTable, null)),
                 React.createElement("div", { className: "my-4" }, showTracks && React.createElement(TracksTable, { playlist: selectedPlaylist })),
-                React.createElement("div", { className: "my-4" }, showRecommendations &&
-                    React.createElement(RecommendationsTable, { playlist: selectedPlaylist, setMessage: setMessage, setMessageType: setMessageType })),
+                React.createElement("div", { className: "my-4" }, showRecommendations && React.createElement(RecommendationsTable, { playlist: selectedPlaylist, setMessage: setMessage, setMessageType: setMessageType })),
                 React.createElement("div", { className: "my-4" }, !isLoading && showVisitedPlaylists && React.createElement(VisitedPlaylistsTable, null)),
                 React.createElement(LoadingAnimation, { isLoading: isLoading }),
                 message && messageType && React.createElement(MessageDisplay, { message: message, type: messageType })))));

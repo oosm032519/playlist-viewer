@@ -16,54 +16,39 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
     const [trackStatus, setTrackStatus] = useState<{ [key: string]: boolean }>({});
     const [, setShowPlaylists] = useState(false);
     
-    const addTrackToPlaylist = async (trackId: string, playlistId: string) => {
-        console.log('addTrackToPlaylistが呼び出されました');
+    const handleTrackAction = useCallback(async (trackId: string, action: 'add' | 'remove') => {
+        console.log(`楽曲${trackId}をプレイリスト${playlistId.playlistId}に${action === 'add' ? '追加' : '削除'}します`);
+        const actionMap = {
+            add: {
+                url: `/java/playlist/addTrack?trackId=${trackId}&playlistId=${playlistId.playlistId}`,
+                successMessage: '楽曲がプレイリストに追加されました',
+                errorMessage: '楽曲の追加に失敗しました',
+                statusUpdate: true
+            },
+            remove: {
+                url: `/java/playlist/removeTrack?trackId=${trackId}&playlistId=${playlistId.playlistId}`,
+                successMessage: '楽曲がプレイリストから削除されました',
+                errorMessage: '楽曲の削除に失敗しました',
+                statusUpdate: false
+            }
+        };
+        
         try {
-            const response = await fetch(`/java/playlist/addTrack?trackId=${trackId}&playlistId=${playlistId}`, {
-                method: 'GET',
-            });
+            const response = await fetch(actionMap[action].url, {method: 'GET'});
             if (response.status === 200) {
-                const data = await response.text();
-                console.log('Track added successfully:', data);
-                setMessage('楽曲がプレイリストに追加されました');
+                setMessage(actionMap[action].successMessage);
                 setMessageType('success');
-                setTrackStatus(prevStatus => ({...prevStatus, [trackId]: true}));
+                setTrackStatus(prevStatus => ({...prevStatus, [trackId]: actionMap[action].statusUpdate}));
             } else {
-                console.error('Error adding track:', response.status);
-                setMessage('楽曲の追加に失敗しました');
+                setMessage(actionMap[action].errorMessage);
                 setMessageType('error');
             }
         } catch (error) {
-            console.error('Error adding track:', error);
-            setMessage('楽曲の追加に失敗しました');
+            setMessage(actionMap[action].errorMessage);
             setMessageType('error');
         }
-    };
+    }, [playlistId, setMessage, setMessageType]);
     
-    const removeTrackFromPlaylist = async (trackId: string, playlistId: string) => {
-        console.log('removeTrackFromPlaylistが呼び出されました');
-        try {
-            const response = await fetch(`/java/playlist/removeTrack?trackId=${trackId}&playlistId=${playlistId}`, {
-                method: 'GET',
-            });
-            if (response.status === 200) {
-                const data = await response.text();
-                console.log('Track removed successfully:', data);
-                setMessage('楽曲がプレイリストから削除されました');
-                setMessageType('success');
-                setTrackStatus(prevStatus => ({...prevStatus, [trackId]: false}));
-            } else {
-                console.error('Error removing track:', response.status);
-                setMessage('楽曲の削除に失敗しました');
-                setMessageType('error');
-            }
-        } catch (error) {
-            console.error('Error removing track:', error);
-            setMessage('楽曲の削除に失敗しました');
-            setMessageType('error');
-        }
-    };
-
     const fetchAndSetRecommendations = useCallback(() => {
         fetchRecommendations(playlist.tracks)
             .then(data => {
@@ -71,54 +56,44 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
             })
             .catch(error => console.error(error));
     }, [fetchRecommendations, playlist]);
-
+    
     useEffect(() => {
         fetchAndSetRecommendations();
-        setShowPlaylists(false);
     }, [fetchAndSetRecommendations, setShowPlaylists]);
-
+    
     const data = React.useMemo(() => recommendations, [recommendations]);
-
+    
     const columns = React.useMemo(() => [
-        { Header: 'Track Name', accessor: 'name' },
-        { Header: 'Artist', accessor: 'artists[0].name' },
+        {Header: 'Track Name', accessor: 'name'},
+        {Header: 'Artist', accessor: 'artists[0].name'},
         {
             Header: 'Actions',
             accessor: 'id',
             Cell: ({row}: { row: any }) => (
                 <div>
-                    <button onClick={() => {
-                        console.log('Plus button clicked for', row.values.name);
-                        console.log('Playlist ID:', playlistId);
-                        addTrackToPlaylist(row.values.id, playlistId.playlistId);
-                    }}>+
-                    </button>
-                    <button onClick={() => {
-                        console.log('Minus button clicked for', row.values.name);
-                        console.log('Playlist ID:', playlistId);
-                        removeTrackFromPlaylist(row.values.id, playlistId.playlistId);
-                    }}>-
-                    </button>
+                    <button onClick={() => handleTrackAction(row.values.id, 'add')}>+</button>
+                    <button onClick={() => handleTrackAction(row.values.id, 'remove')}>-</button>
                 </div>
             ),
         },
-    ], [playlistId]);
-
+    ], [handleTrackAction]);
+    
     const {
         getTableProps,
         getTableBodyProps,
         headerGroups,
         rows,
         prepareRow,
-    } = useTable({ columns, data });
-
+    } = useTable({columns, data});
+    
     return (
         <table {...getTableProps()} className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
             {headerGroups.map((headerGroup: { getHeaderGroupProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>; headers: any[]; }) => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
                     {headerGroup.headers.map(column => (
-                        <th {...column.getHeaderProps()} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th {...column.getHeaderProps()}
+                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             {column.render('Header')}
                         </th>
                     ))}
@@ -126,11 +101,7 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
             ))}
             </thead>
             <tbody {...getTableBodyProps()} className="bg-white divide-y divide-gray-200">
-            {rows.map((row: {
-                getRowProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>;
-                cells: any[];
-                original: any;
-            }) => {
+            {rows.map((row: { getRowProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>; original: { id: string | number; }; cells: any[]; }) => {
                 prepareRow(row);
                 return (
                     <tr {...row.getRowProps()}

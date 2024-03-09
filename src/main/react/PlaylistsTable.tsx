@@ -9,7 +9,10 @@ const PreviewCell = ({value, row}: { value: string, row: any }) => (
 );
 
 const PlaylistNameCell = ({row, setSelectedPlaylistId}: { row: any, setSelectedPlaylistId: Function }) => (
-    <div onClick={() => setSelectedPlaylistId(row.original.id)}>
+    <div onClick={() => {
+        console.log('NameCellがクリックされました');
+        setSelectedPlaylistId(row.original.id)
+    }}>
         {row.values.name}
     </div>
 );

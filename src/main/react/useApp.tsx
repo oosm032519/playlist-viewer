@@ -19,6 +19,7 @@ export const useApp = () => {
     
     useEffect(() => {
         const fetchPlaylists = async () => {
+            console.log('fetchPlaylistsが呼び出されました');
             setIsLoading(true);
             try {
                 const visitedPlaylists = await fetchVisitedPlaylists();
@@ -34,9 +35,8 @@ export const useApp = () => {
     }, []);
     
     useEffect(() => {
-        if (showTracks) {
-            setShowRecommendations(showTracks);
-        }
+        console.log('showPlaylistsが変更されました');
+        setShowRecommendations(showTracks);
     }, [showTracks]);
     
     useEffect(() => {

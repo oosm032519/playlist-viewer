@@ -3,7 +3,10 @@ import { useTable } from 'react-table';
 import { usePlaylistsTable } from './usePlaylistsTable';
 const PreviewCell = ({ value, row }) => (React.createElement("a", { href: `https://open.spotify.com/playlist/${row.original.id}`, target: "_blank", rel: "noopener noreferrer" },
     React.createElement("img", { src: value, alt: "Playlist", style: { width: '50px', height: '50px' } })));
-const PlaylistNameCell = ({ row, setSelectedPlaylistId }) => (React.createElement("div", { onClick: () => setSelectedPlaylistId(row.original.id) }, row.values.name));
+const PlaylistNameCell = ({ row, setSelectedPlaylistId }) => (React.createElement("div", { onClick: () => {
+        console.log('NameCellがクリックされました');
+        setSelectedPlaylistId(row.original.id);
+    } }, row.values.name));
 const columns = (setSelectedPlaylistId) => [
     {
         Header: 'Preview',

@@ -26,6 +26,7 @@ export const useApp = () => {
     const [messageType, setMessageType] = useState(null);
     useEffect(() => {
         const fetchPlaylists = () => __awaiter(void 0, void 0, void 0, function* () {
+            console.log('fetchPlaylistsが呼び出されました');
             setIsLoading(true);
             try {
                 const visitedPlaylists = yield fetchVisitedPlaylists();
@@ -41,9 +42,8 @@ export const useApp = () => {
         fetchPlaylists();
     }, []);
     useEffect(() => {
-        if (showTracks) {
-            setShowRecommendations(showTracks);
-        }
+        console.log('showPlaylistsが変更されました');
+        setShowRecommendations(showTracks);
     }, [showTracks]);
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);

@@ -77,9 +77,7 @@ const App: React.FC = () => {
                         {showTracks && <TracksTable playlist={selectedPlaylist}/>}
                     </div>
                     <div className="my-4">
-                        {showRecommendations &&
-                            <RecommendationsTable playlist={selectedPlaylist} setMessage={setMessage}
-                                                  setMessageType={setMessageType}/>}
+                        {showRecommendations && <RecommendationsTable playlist={selectedPlaylist} setMessage={setMessage} setMessageType={setMessageType}/>}
                     </div>
                     <div className="my-4">
                         {!isLoading && showVisitedPlaylists && <VisitedPlaylistsTable/>}

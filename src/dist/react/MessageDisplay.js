@@ -3,6 +3,7 @@ const MessageDisplay = ({ message, type }) => {
     const [isVisible, setIsVisible] = useState(true);
     const messageClass = type === 'success' ? 'bg-green-500 border-green-500' : 'bg-red-500 border-red-500';
     useEffect(() => {
+        console.log('メッセージを表示します');
         setIsVisible(true);
         const timer = setTimeout(() => {
             setIsVisible(false);

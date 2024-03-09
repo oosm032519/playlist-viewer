@@ -25,10 +25,12 @@ const FormComponent: React.FC<FormComponentProps> = ({setIsLoading}) => {
 
         try {
             if (selectedOption === Option.PlaylistIdOption) {
+                console.log('fetchPlaylistByIdを呼び出します');
                 await fetchPlaylistById(inputValue);
                 setShowTracks(true);
                 setShowPlaylists(false);
             } else {
+                console.log('fetchPlaylistsByNameを呼び出します');
                 const playlists = await fetchPlaylistsByName(inputValue);
                 if (JSON.stringify(playlists) !== JSON.stringify(playlists)) {
                     setPlaylists(playlists);
@@ -46,11 +48,8 @@ const FormComponent: React.FC<FormComponentProps> = ({setIsLoading}) => {
     return (
         <div>
             <form className="m-5 form-container flex items-center" onSubmit={handleSubmit}>
-                <input ref={inputRef} type="text" name="inputField"
-                       placeholder={selectedOption === Option.PlaylistIdOption ? "プレイリストIDを入力してください" : "プレイリスト名を入力してください"}
-                       className="border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 w-11/12 p-3 mr-2"/>
-                <button type="submit"
-                        className="bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent hover:ring-4 hover:ring-green-300 z-10">
+                <input ref={inputRef} type="text" name="inputField" placeholder={selectedOption === Option.PlaylistIdOption ? "プレイリストIDを入力してください" : "プレイリスト名を入力してください"} className="border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 w-11/12 p-3 mr-2"/>
+                <button type="submit" className="bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent hover:ring-4 hover:ring-green-300 z-10">
                     {selectedOption === Option.PlaylistIdOption ? "送信" : "検索"}
                 </button>
             </form>

@@ -17,56 +17,39 @@ const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
     const { fetchRecommendations } = useApi();
     const [trackStatus, setTrackStatus] = useState({});
     const [, setShowPlaylists] = useState(false);
-    const addTrackToPlaylist = (trackId, playlistId) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log('addTrackToPlaylistが呼び出されました');
+    const handleTrackAction = useCallback((trackId, action) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log(`楽曲${trackId}をプレイリスト${playlistId.playlistId}に${action === 'add' ? '追加' : '削除'}します`);
+        const actionMap = {
+            add: {
+                url: `/java/playlist/addTrack?trackId=${trackId}&playlistId=${playlistId.playlistId}`,
+                successMessage: '楽曲がプレイリストに追加されました',
+                errorMessage: '楽曲の追加に失敗しました',
+                statusUpdate: true
+            },
+            remove: {
+                url: `/java/playlist/removeTrack?trackId=${trackId}&playlistId=${playlistId.playlistId}`,
+                successMessage: '楽曲がプレイリストから削除されました',
+                errorMessage: '楽曲の削除に失敗しました',
+                statusUpdate: false
+            }
+        };
         try {
-            const response = yield fetch(`/java/playlist/addTrack?trackId=${trackId}&playlistId=${playlistId}`, {
-                method: 'GET',
-            });
+            const response = yield fetch(actionMap[action].url, { method: 'GET' });
             if (response.status === 200) {
-                const data = yield response.text();
-                console.log('Track added successfully:', data);
-                setMessage('楽曲がプレイリストに追加されました');
+                setMessage(actionMap[action].successMessage);
                 setMessageType('success');
-                setTrackStatus(prevStatus => (Object.assign(Object.assign({}, prevStatus), { [trackId]: true })));
+                setTrackStatus(prevStatus => (Object.assign(Object.assign({}, prevStatus), { [trackId]: actionMap[action].statusUpdate })));
             }
             else {
-                console.error('Error adding track:', response.status);
-                setMessage('楽曲の追加に失敗しました');
+                setMessage(actionMap[action].errorMessage);
                 setMessageType('error');
             }
         }
         catch (error) {
-            console.error('Error adding track:', error);
-            setMessage('楽曲の追加に失敗しました');
+            setMessage(actionMap[action].errorMessage);
             setMessageType('error');
         }
-    });
-    const removeTrackFromPlaylist = (trackId, playlistId) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log('removeTrackFromPlaylistが呼び出されました');
-        try {
-            const response = yield fetch(`/java/playlist/removeTrack?trackId=${trackId}&playlistId=${playlistId}`, {
-                method: 'GET',
-            });
-            if (response.status === 200) {
-                const data = yield response.text();
-                console.log('Track removed successfully:', data);
-                setMessage('楽曲がプレイリストから削除されました');
-                setMessageType('success');
-                setTrackStatus(prevStatus => (Object.assign(Object.assign({}, prevStatus), { [trackId]: false })));
-            }
-            else {
-                console.error('Error removing track:', response.status);
-                setMessage('楽曲の削除に失敗しました');
-                setMessageType('error');
-            }
-        }
-        catch (error) {
-            console.error('Error removing track:', error);
-            setMessage('楽曲の削除に失敗しました');
-            setMessageType('error');
-        }
-    });
+    }), [playlistId, setMessage, setMessageType]);
     const fetchAndSetRecommendations = useCallback(() => {
         fetchRecommendations(playlist.tracks)
             .then(data => {
@@ -76,7 +59,6 @@ const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
     }, [fetchRecommendations, playlist]);
     useEffect(() => {
         fetchAndSetRecommendations();
-        setShowPlaylists(false);
     }, [fetchAndSetRecommendations, setShowPlaylists]);
     const data = React.useMemo(() => recommendations, [recommendations]);
     const columns = React.useMemo(() => [
@@ -86,18 +68,10 @@ const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
             Header: 'Actions',
             accessor: 'id',
             Cell: ({ row }) => (React.createElement("div", null,
-                React.createElement("button", { onClick: () => {
-                        console.log('Plus button clicked for', row.values.name);
-                        console.log('Playlist ID:', playlistId);
-                        addTrackToPlaylist(row.values.id, playlistId.playlistId);
-                    } }, "+"),
-                React.createElement("button", { onClick: () => {
-                        console.log('Minus button clicked for', row.values.name);
-                        console.log('Playlist ID:', playlistId);
-                        removeTrackFromPlaylist(row.values.id, playlistId.playlistId);
-                    } }, "-"))),
+                React.createElement("button", { onClick: () => handleTrackAction(row.values.id, 'add') }, "+"),
+                React.createElement("button", { onClick: () => handleTrackAction(row.values.id, 'remove') }, "-"))),
         },
-    ], [playlistId]);
+    ], [handleTrackAction]);
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, } = useTable({ columns, data });
     return (React.createElement("table", Object.assign({}, getTableProps(), { className: "min-w-full divide-y divide-gray-200" }),
         React.createElement("thead", { className: "bg-gray-50" }, headerGroups.map((headerGroup) => (React.createElement("tr", Object.assign({}, headerGroup.getHeaderGroupProps()), headerGroup.headers.map(column => (React.createElement("th", Object.assign({}, column.getHeaderProps(), { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" }), column.render('Header')))))))),

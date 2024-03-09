@@ -39,22 +39,33 @@ export function useApi() {
         return visitedPlaylists;
     });
     const fetchRecommendations = useCallback((tracks) => __awaiter(this, void 0, void 0, function* () {
+        var _a;
         console.log('fetchRecommendationsが呼び出されました');
         const modeArtistNames = RecommendationCalculator.calculateModeArtistNames(tracks);
         const averageValues = RecommendationCalculator.calculateAverageValues(tracks);
         const mode = RecommendationCalculator.calculateMode(tracks);
         const endpoint = `/java/recommendations?tempo=${averageValues.averageTempo}&key=${averageValues.modeKey}&danceability=${averageValues.averageDanceability}&energy=${averageValues.averageEnergy}&acousticness=${averageValues.averageAcousticness}&liveness=${averageValues.averageLiveness}&speechiness=${averageValues.averageSpeechiness}&valence=${averageValues.averageValence}&timeSignature=${averageValues.timeSignature}&durationMs=${averageValues.durationMs}&mode=${mode}&instrumentalness=${averageValues.instrumentalness}&loudness=${averageValues.loudness}&modeArtistNames=${modeArtistNames}`;
         const response = yield fetch(endpoint);
-        const data = yield response.json();
-        console.log(data);
-        if (data && data.tracks) {
-            const trackIds = tracks.map(track => track.audioFeatures.id);
-            const uniqueRecommendations = data.tracks.filter((track) => !trackIds.includes(track.id));
-            console.log(uniqueRecommendations);
-            return uniqueRecommendations;
+        if (!response.ok) {
+            console.error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        if ((_a = response.headers.get("content-type")) === null || _a === void 0 ? void 0 : _a.includes("application/json")) {
+            const data = yield response.json();
+            console.log(data);
+            if (data && data.tracks) {
+                const trackIds = tracks.map(track => track.audioFeatures.id);
+                const uniqueRecommendations = data.tracks.filter((track) => !trackIds.includes(track.id));
+                console.log(uniqueRecommendations);
+                return uniqueRecommendations;
+            }
+            else {
+                console.error('data or data.tracks is null or undefined');
+                return [];
+            }
         }
         else {
-            console.error('data or data.tracks is null or undefined');
+            console.error('Received non-JSON response');
             return [];
         }
     }), []);

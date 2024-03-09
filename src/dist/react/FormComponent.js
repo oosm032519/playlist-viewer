@@ -26,11 +26,13 @@ const FormComponent = ({ setIsLoading }) => {
         const inputValue = (_a = inputRef.current) === null || _a === void 0 ? void 0 : _a.value;
         try {
             if (selectedOption === Option.PlaylistIdOption) {
+                console.log('fetchPlaylistByIdを呼び出します');
                 yield fetchPlaylistById(inputValue);
                 setShowTracks(true);
                 setShowPlaylists(false);
             }
             else {
+                console.log('fetchPlaylistsByNameを呼び出します');
                 const playlists = yield fetchPlaylistsByName(inputValue);
                 if (JSON.stringify(playlists) !== JSON.stringify(playlists)) {
                     setPlaylists(playlists);
