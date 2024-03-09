@@ -40,10 +40,10 @@ const columns = (setSelectedPlaylistId: Function) => [
 
 const PlaylistsTable = () => {
     const {playlists, setSelectedPlaylistId} = usePlaylistsTable();
-    
+
     const data = useMemo(() => playlists, [playlists]);
     const columnData = useMemo(() => columns(setSelectedPlaylistId), [setSelectedPlaylistId]);
-    
+
     const {
         getTableProps,
         getTableBodyProps,
@@ -51,37 +51,39 @@ const PlaylistsTable = () => {
         rows,
         prepareRow,
     } = useTable({columns: columnData, data});
-    
+
     return (
-        <table {...getTableProps()} className="w-full table-auto">
-            <thead>
-            {headerGroups.map((headerGroup: {
-                getHeaderGroupProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>;
-                headers: any[];
-            }) => (
-                <tr {...headerGroup.getHeaderGroupProps()}>
-                    {headerGroup.headers.map(column => (
-                        <th {...column.getHeaderProps()} className="px-4 py-2">{column.render('Header')}</th>
-                    ))}
-                </tr>
-            ))}
-            </thead>
-            <tbody {...getTableBodyProps()}>
-            {rows.map((row: {
-                getRowProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>;
-                cells: any[];
-            }) => {
-                prepareRow(row);
-                return (
-                    <tr {...row.getRowProps()}>
-                        {row.cells.map(cell => (
-                            <td {...cell.getCellProps()} className="border px-4 py-2">{cell.render('Cell')}</td>
+        <div className="overflow-auto">
+            <table {...getTableProps()} className="w-full table-auto">
+                <thead>
+                {headerGroups.map((headerGroup: {
+                    getHeaderGroupProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>;
+                    headers: any[];
+                }) => (
+                    <tr {...headerGroup.getHeaderGroupProps()}>
+                        {headerGroup.headers.map((column, i) => (
+                            <th {...column.getHeaderProps()} className={`px-4 py-2 ${i === 0 ? 'sticky left-0' : ''} sticky top-0`}>{column.render('Header')}</th>
                         ))}
                     </tr>
-                );
-            })}
-            </tbody>
-        </table>
+                ))}
+                </thead>
+                <tbody {...getTableBodyProps()}>
+                {rows.map((row: {
+                    getRowProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>;
+                    cells: any[];
+                }) => {
+                    prepareRow(row);
+                    return (
+                        <tr {...row.getRowProps()}>
+                            {row.cells.map((cell, i) => (
+                                <td {...cell.getCellProps()} className={`border px-4 py-2 ${i === 0 ? 'sticky left-0' : ''}`}>{cell.render('Cell')}</td>
+                            ))}
+                        </tr>
+                    );
+                })}
+                </tbody>
+            </table>
+        </div>
     );
 };
 

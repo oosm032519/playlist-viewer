@@ -49,7 +49,7 @@ const FormComponent: React.FC<FormComponentProps> = ({setIsLoading}) => {
     
     return (
         <div>
-            <form className="m-5 form-container flex items-center" onSubmit={handleSubmit}>
+            <form className="m-5 form-container flex items-center w-auto" onSubmit={handleSubmit}>
                 <input ref={inputRef} type="text" name="inputField"
                        placeholder={selectedOption === Option.PlaylistIdOption ? "プレイリストIDを入力してください" : "プレイリスト名を入力してください"}
                        className={`border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 ${inputWidthClass} p-3 mr-2 transition-width duration-500 ease-in-out`}
