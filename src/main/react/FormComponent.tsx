@@ -55,7 +55,7 @@ const FormComponent: React.FC<FormComponentProps> = ({setIsLoading}) => {
                        className={`border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 ${inputWidthClass} p-3 mr-2 transition-width duration-500 ease-in-out`}
                        style={{transition: 'width 0.2s ease-in-out'}}/>
                 <button type="submit"
-                        className="bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent hover:ring-4 hover:ring-green-300">
+                        className="bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent">
                     {selectedOption === Option.PlaylistIdOption ? "送信" : "検索"}
                 </button>
             </form>

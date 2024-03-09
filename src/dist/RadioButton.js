@@ -40,7 +40,7 @@ const RadioButton = () => {
     const positionStyle = isOpen ? { marginRight: (windowWidth / 4) } : {};
     return (react_1.default.createElement("div", { className: `radio-group flex justify-center my-5 transition-all duration-200 ease-in-out`, style: positionStyle }, options.map((option) => (react_1.default.createElement("div", { className: "mx-2", key: option.id },
         react_1.default.createElement("input", { type: "radio", id: option.id, value: option.value, name: "option", className: "hidden", onChange: handleOptionChange, checked: selectedOption === option.value, style: { position: 'absolute', opacity: 0 } }),
-        react_1.default.createElement("label", { htmlFor: option.id, className: `inline-block p-2 px-5 m-2 border-2 border-green-500 rounded-md ${selectedOption === option.value ? 'bg-green-500 text-white' : 'bg-white text-green-500'} transition-all duration-300 ease-in-out cursor-pointer w-11/10 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent hover:ring-4 hover:ring-green-300` }, option.label))))));
+        react_1.default.createElement("label", { htmlFor: option.id, className: `inline-block p-2 px-5 m-2 border-2 border-green-500 rounded-full ${selectedOption === option.value ? 'bg-green-500 text-white' : 'bg-white text-green-500'} transition-all duration-300 ease-in-out cursor-pointer w-11/10 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent` }, option.label))))));
 };
 exports.default = RadioButton;
 //# sourceMappingURL=RadioButton.js.map
