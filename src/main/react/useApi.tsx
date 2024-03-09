@@ -89,5 +89,14 @@ export function useApi() {
         }
     }, []);
     
-    return {fetchPlaylistById, fetchPlaylistsByName, fetchVisitedPlaylists, fetchRecommendations};
+    const fetchUserPlaylists = useCallback(async () => {
+        const response = await fetch('/java/spotify/user/playlists');
+        if (!response.ok) {
+            const message = await response.text();
+            throw new Error(message);
+        }
+        return await response.json();
+    }, []);
+    
+    return {fetchPlaylistById, fetchPlaylistsByName, fetchVisitedPlaylists, fetchRecommendations, fetchUserPlaylists};
 }

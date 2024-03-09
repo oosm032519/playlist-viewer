@@ -1,0 +1,1 @@
+{"version":3,"file":"LoadingAnimation.js","sourceRoot":"","sources":["../main/react/LoadingAnimation.tsx"],"names":[],"mappings":";;;;;AAAA,kDAA0B;AAM1B,MAAM,gBAAgB,GAAoC,CAAC,EAAC,SAAS,EAAC,EAAE,EAAE;IACtE,IAAI,CAAC,SAAS,EAAE,CAAC;QACb,OAAO,IAAI,CAAC;IAChB,CAAC;IAED,OAAO,CACH,uCACI,SAAS,EAAC,sHAAsH,GAAO,CAC9I,CAAC;AACN,CAAC,CAAC;AAEF,kBAAe,gBAAgB,CAAC"}

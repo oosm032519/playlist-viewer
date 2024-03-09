@@ -83,7 +83,7 @@ const App: React.FC = () => {
                         {showRecommendations && <RecommendationsTable playlist={selectedPlaylist} setMessage={setMessage} setMessageType={setMessageType}/>}
                     </div>
                     <div className="my-4">
-                        {!isLoading && showVisitedPlaylists && <VisitedPlaylistsTable/>}
+                        {showVisitedPlaylists && <VisitedPlaylistsTable/>}
                     </div>
                     <LoadingAnimation isLoading={isLoading}/>
                     {message && messageType && <MessageDisplay message={message} type={messageType}/>}
