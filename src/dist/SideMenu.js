@@ -55,7 +55,6 @@ const SideMenu = ({ authorize, isOpen, toggleMenu }) => {
     });
     return (react_1.default.createElement("div", null,
         react_1.default.createElement("div", { id: "side-menu", className: `fixed top-16 right-0 w-1/4 h-screen bg-black text-white p-5 shadow-md transform ${menuClass} transition-transform duration-300 ease-in-out z-50` },
-            react_1.default.createElement(Button_1.Button, { onClick: toggleMenu }, "\u30E1\u30CB\u30E5\u30FC\u3092\u9589\u3058\u308B"),
             react_1.default.createElement(Button_1.Button, { onClick: handleAuthorize }, "Spotify\u306B\u30ED\u30B0\u30A4\u30F3"),
             react_1.default.createElement(FetchUserPlaylistsButton_1.default, null),
             react_1.default.createElement(FetchVisitedPlaylistsButton_1.default, null)),

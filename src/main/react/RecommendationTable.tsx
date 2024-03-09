@@ -67,16 +67,18 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
         {Header: 'Track Name', accessor: 'name'},
         {Header: 'Artist', accessor: 'artists[0].name'},
         {
-            Header: 'Actions',
+            Header: 'Action',
             accessor: 'id',
-            Cell: ({row}: { row: any }) => (
-                <div>
-                    <button onClick={() => handleTrackAction(row.values.id, 'add')}>+</button>
-                    <button onClick={() => handleTrackAction(row.values.id, 'remove')}>-</button>
+            Cell: ({value}: { value: string }) => (
+                <div className="flex justify-around">
+                    <button onClick={() => handleTrackAction(value, trackStatus[value] ? 'remove' : 'add')}
+                            className={`flex justify-center items-center px-4 py-2 min-w-28 rounded-md text-white transition-colors duration-300 ${trackStatus[value] ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'}`}>
+                    {trackStatus[value] ? 'Remove' : 'Add'}
+                    </button>
                 </div>
             ),
         },
-    ], [handleTrackAction]);
+    ], [handleTrackAction, trackStatus]);
     
     const {
         getTableProps,
@@ -87,13 +89,16 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
     } = useTable({columns, data});
     
     return (
-        <table {...getTableProps()} className="min-w-full divide-y divide-gray-200">
+        <table {...getTableProps()} className="min-w-full divide-y divide-gray-200 shadow-md table-auto">
             <thead className="bg-gray-50">
-            {headerGroups.map((headerGroup: { getHeaderGroupProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>; headers: any[]; }) => (
+            {headerGroups.map((headerGroup: {
+                getHeaderGroupProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>;
+                headers: any[];
+            }) => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
                     {headerGroup.headers.map(column => (
                         <th {...column.getHeaderProps()}
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded">
                             {column.render('Header')}
                         </th>
                     ))}
@@ -101,13 +106,16 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
             ))}
             </thead>
             <tbody {...getTableBodyProps()} className="bg-white divide-y divide-gray-200">
-            {rows.map((row: { getRowProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>; original: { id: string | number; }; cells: any[]; }) => {
+            {rows.map((row: {
+                getRowProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>;
+                cells: any[];
+            }) => {
                 prepareRow(row);
                 return (
-                    <tr {...row.getRowProps()}
-                        style={{backgroundColor: trackStatus[row.original.id] ? 'lightgreen' : 'white'}}>
-                        {row.cells.map(cell => (
-                            <td {...cell.getCellProps()} className="px-6 py-4 whitespace-nowrap">
+                    <tr {...row.getRowProps()} className="rounded">
+                        {row.cells.map((cell, i) => (
+                            <td {...cell.getCellProps()}
+                                className={`px-6 py-4 whitespace-nowrap ${i === 0 ? 'rounded-l' : ''} ${i === row.cells.length - 1 ? 'rounded-r' : ''}`}>
                                 {cell.render('Cell')}
                             </td>
                         ))}

@@ -12,7 +12,7 @@ const Header: React.FC = () => {
     };
     
     return (
-        <header className="fixed top-0 w-full z-50 flex justify-between items-center bg-black text-white p-5 h-10">
+        <header className="fixed top-0 w-full z-50 flex justify-between items-center bg-black text-white p-5 h-10 shadow-md">
             <h1 className="text-3xl font-light">Playlist Viewer</h1>
             <button onClick={toggleMenu} className="z-50 space-y-2 ml-auto" style={{width: '50px', height: '50px'}}>                <span
                 className={

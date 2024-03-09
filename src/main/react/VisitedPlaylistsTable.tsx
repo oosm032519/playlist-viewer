@@ -43,7 +43,7 @@ const VisitedPlaylistsTable: React.FC = () => {
     } = useTable({columns, data});
 
     return (
-        <table {...getTableProps()} className="w-full table-auto">
+        <table {...getTableProps()} className="min-w-full divide-y divide-gray-200 shadow-md table-auto">
             <thead>
             {headerGroups.map((headerGroup: { getHeaderGroupProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>; headers: any[]; }) => (
                 <tr {...headerGroup.getHeaderGroupProps()}>

@@ -28,7 +28,6 @@ const SideMenu: React.FC<SideMenuProps> = ({authorize, isOpen, toggleMenu}) => {
     return (
         <div>
             <div id="side-menu" className={`fixed top-16 right-0 w-1/4 h-screen bg-black text-white p-5 shadow-md transform ${menuClass} transition-transform duration-300 ease-in-out z-50`}>
-                <Button onClick={toggleMenu}>メニューを閉じる</Button>
                 <Button onClick={handleAuthorize}>Spotifyにログイン</Button>
                 <FetchUserPlaylistsButton/>
                 <FetchVisitedPlaylistsButton/>

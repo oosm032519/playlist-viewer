@@ -60,7 +60,7 @@ const VisitedPlaylistsTable = () => {
         },
     ], []);
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, } = (0, react_table_1.useTable)({ columns, data });
-    return (react_1.default.createElement("table", Object.assign({}, getTableProps(), { className: "w-full table-auto" }),
+    return (react_1.default.createElement("table", Object.assign({}, getTableProps(), { className: "min-w-full divide-y divide-gray-200 shadow-md table-auto" }),
         react_1.default.createElement("thead", null, headerGroups.map((headerGroup) => (react_1.default.createElement("tr", Object.assign({}, headerGroup.getHeaderGroupProps()), headerGroup.headers.map(column => (react_1.default.createElement("th", Object.assign({}, column.getHeaderProps(), { className: "px-4 py-2" }), column.render('Header')))))))),
         react_1.default.createElement("tbody", Object.assign({}, getTableBodyProps()), rows.map((row) => {
             prepareRow(row);

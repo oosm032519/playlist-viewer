@@ -52,10 +52,10 @@ const FormComponent: React.FC<FormComponentProps> = ({setIsLoading}) => {
             <form className="m-5 form-container flex items-center w-auto" onSubmit={handleSubmit}>
                 <input ref={inputRef} type="text" name="inputField"
                        placeholder={selectedOption === Option.PlaylistIdOption ? "プレイリストIDを入力してください" : "プレイリスト名を入力してください"}
-                       className={`border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 ${inputWidthClass} p-3 mr-2 transition-width duration-500 ease-in-out`}
+                       className={`border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 ${inputWidthClass} p-3 mr-2 transition-width duration-500 ease-in-out hover:shadow-md`}
                        style={{transition: 'width 0.2s ease-in-out'}}/>
                 <button type="submit"
-                        className="bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent">
+                        className="bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-md hover:border-transparent">
                     {selectedOption === Option.PlaylistIdOption ? "送信" : "検索"}
                 </button>
             </form>

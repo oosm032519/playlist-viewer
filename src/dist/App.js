@@ -18,6 +18,7 @@ const MessageDisplay_1 = __importDefault(require("./MessageDisplay"));
 const useSpotifyAuth_1 = require("./useSpotifyAuth");
 const useApp_1 = require("./useApp");
 const Header_1 = __importDefault(require("./Header"));
+const PlaylistAverageInfoChart_1 = __importDefault(require("./PlaylistAverageInfoChart"));
 const App = () => {
     const { selectedOption, setSelectedOption, playlists, setPlaylists, selectedPlaylist, setSelectedPlaylist, visitedPlaylists, setVisitedPlaylists, isLoading, setIsLoading, showPlaylists, setShowPlaylists, showTracks, setShowTracks, showVisitedPlaylists, setShowVisitedPlaylists, showRecommendations, setShowRecommendations, playlistId, setPlaylistId, message, setMessage, messageType, setMessageType, } = (0, useApp_1.useApp)();
     const authorize = (0, useSpotifyAuth_1.useSpotifyAuth)();
@@ -57,6 +58,7 @@ const App = () => {
                 react_1.default.createElement(FormComponent_1.default, { setIsLoading: setIsLoading, isLoading: isLoading }),
                 react_1.default.createElement("div", { className: "my-4" }, showPlaylists && react_1.default.createElement(PlaylistsTable_1.default, null)),
                 react_1.default.createElement("div", { className: "my-4" }, showTracks && react_1.default.createElement(TracksTable_1.default, { playlist: selectedPlaylist })),
+                react_1.default.createElement("div", { className: "my-4" }, showTracks && react_1.default.createElement(PlaylistAverageInfoChart_1.default, { playlist: selectedPlaylist })),
                 react_1.default.createElement("div", { className: "my-4" }, showRecommendations &&
                     react_1.default.createElement(RecommendationTable_1.default, { playlist: selectedPlaylist, setMessage: setMessage, setMessageType: setMessageType })),
                 react_1.default.createElement("div", { className: "my-4" }, showVisitedPlaylists && react_1.default.createElement(VisitedPlaylistsTable_1.default, null)),

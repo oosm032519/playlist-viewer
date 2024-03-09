@@ -13,6 +13,7 @@ import MessageDisplay from './MessageDisplay';
 import {useSpotifyAuth} from './useSpotifyAuth';
 import {useApp} from './useApp';
 import Header from './Header';
+import PlaylistAverageInfo from './PlaylistAverageInfoChart'
 
 const App: React.FC = () => {
     const {
@@ -86,6 +87,9 @@ const App: React.FC = () => {
                     </div>
                     <div className="my-4">
                         {showTracks && <TracksTable playlist={selectedPlaylist}/>}
+                    </div>
+                    <div className="my-4">
+                        {showTracks && <PlaylistAverageInfo playlist={selectedPlaylist}/>}
                     </div>
                     <div className="my-4">
                         {showRecommendations &&

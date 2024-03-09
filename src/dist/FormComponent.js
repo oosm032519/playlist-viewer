@@ -72,8 +72,8 @@ const FormComponent = ({ setIsLoading }) => {
     const inputWidthClass = isOpen ? 'w-8/12' : 'w-11/12';
     return (react_1.default.createElement("div", null,
         react_1.default.createElement("form", { className: "m-5 form-container flex items-center w-auto", onSubmit: handleSubmit },
-            react_1.default.createElement("input", { ref: inputRef, type: "text", name: "inputField", placeholder: selectedOption === CombinedContext_1.Option.PlaylistIdOption ? "プレイリストIDを入力してください" : "プレイリスト名を入力してください", className: `border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 ${inputWidthClass} p-3 mr-2 transition-width duration-500 ease-in-out`, style: { transition: 'width 0.2s ease-in-out' } }),
-            react_1.default.createElement("button", { type: "submit", className: "bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-lg hover:border-transparent" }, selectedOption === CombinedContext_1.Option.PlaylistIdOption ? "送信" : "検索"))));
+            react_1.default.createElement("input", { ref: inputRef, type: "text", name: "inputField", placeholder: selectedOption === CombinedContext_1.Option.PlaylistIdOption ? "プレイリストIDを入力してください" : "プレイリスト名を入力してください", className: `border-2 border-gray-300 hover:border-green-500 transition-colors duration-300 rounded-lg h-10 ${inputWidthClass} p-3 mr-2 transition-width duration-500 ease-in-out hover:shadow-md`, style: { transition: 'width 0.2s ease-in-out' } }),
+            react_1.default.createElement("button", { type: "submit", className: "bg-green-500 text-white rounded-lg h-10 p-3 flex items-center justify-center transition transform ease-in-out duration-500 hover:bg-green-500 hover:text-white hover:shadow-md hover:border-transparent" }, selectedOption === CombinedContext_1.Option.PlaylistIdOption ? "送信" : "検索"))));
 };
 exports.default = FormComponent;
 //# sourceMappingURL=FormComponent.js.map
