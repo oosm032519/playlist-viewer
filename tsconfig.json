@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "module": "esnext",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "outDir": "./src/dist",
     "sourceMap": true,
     "noImplicitAny": true,
@@ -12,7 +13,7 @@
       "esnext"
     ],
     "esModuleInterop": true,
-    "jsx": "react",
+    "jsx": "react"
   },
   "include": [
     "./**/*.ts",

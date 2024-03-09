@@ -24,6 +24,8 @@ type CombinedContextType = {
     setShowVisitedPlaylists: (show: boolean) => void;
     showRecommendations: boolean;
     setShowRecommendations: (show: boolean) => void;
+    setMessage: React.Dispatch<React.SetStateAction<string | null>>;
+    setMessageType: React.Dispatch<React.SetStateAction<'success' | 'error' | null>>;
 };
 
 const CombinedContext = React.createContext<CombinedContextType>({
@@ -53,6 +55,10 @@ const CombinedContext = React.createContext<CombinedContextType>({
     },
     showRecommendations: false,
     setShowRecommendations: () => {
+    },
+    setMessage: () => {
+    },
+    setMessageType: () => {
     },
 });
 

@@ -40,6 +40,7 @@ const App: React.FC = () => {
         messageType,
         setMessageType,
     } = useApp();
+    
     const authorize = useSpotifyAuth();
     
     return (
@@ -63,6 +64,8 @@ const App: React.FC = () => {
                 setShowVisitedPlaylists,
                 showRecommendations,
                 setShowRecommendations,
+                setMessage,
+                setMessageType,
             }}>
             <PlaylistIdContext.Provider value={{playlistId, setPlaylistId}}>
                 <div className="App">

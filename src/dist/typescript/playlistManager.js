@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,27 +8,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { PlaylistIdManager } from './playlistIdManager';
-import { TrackTable } from './trackTable';
-import { TrackManager } from './trackManager';
-import { MessageManager } from './MessageManager';
-import { LoadingAnimationManager } from './loadingAnimationManager';
-import { TableManager } from './tableManager';
-import { PlaylistDisplayManager } from './playlistDisplayManager';
-import { ValidationManager } from './validationManager';
-import { ElementManager } from './elementManager';
-import { TrackCalculator } from './trackCalculator';
-export class PlaylistManager {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PlaylistManager = void 0;
+const playlistIdManager_1 = require("./playlistIdManager");
+const trackTable_1 = require("./trackTable");
+const trackManager_1 = require("./trackManager");
+const MessageManager_1 = require("./MessageManager");
+const loadingAnimationManager_1 = require("./loadingAnimationManager");
+const tableManager_1 = require("./tableManager");
+const playlistDisplayManager_1 = require("./playlistDisplayManager");
+const validationManager_1 = require("./validationManager");
+const elementManager_1 = require("./elementManager");
+const trackCalculator_1 = require("./trackCalculator");
+class PlaylistManager {
     constructor() {
-        this.tableManager = new TableManager();
-        this.playlistIdManager = PlaylistIdManager.getInstance();
-        this.trackManager = new TrackManager();
-        this.messageManager = new MessageManager();
-        this.loadingAnimationManager = new LoadingAnimationManager();
-        this.playlistDisplayManager = new PlaylistDisplayManager();
-        this.validationManager = new ValidationManager();
-        this.elementManager = new ElementManager();
-        this.trackCalculator = new TrackCalculator();
+        this.tableManager = new tableManager_1.TableManager();
+        this.playlistIdManager = playlistIdManager_1.PlaylistIdManager.getInstance();
+        this.trackManager = new trackManager_1.TrackManager();
+        this.messageManager = new MessageManager_1.MessageManager();
+        this.loadingAnimationManager = new loadingAnimationManager_1.LoadingAnimationManager();
+        this.playlistDisplayManager = new playlistDisplayManager_1.PlaylistDisplayManager();
+        this.validationManager = new validationManager_1.ValidationManager();
+        this.elementManager = new elementManager_1.ElementManager();
+        this.trackCalculator = new trackCalculator_1.TrackCalculator();
         // ユーザーのプレイリストを取得する
         this.fetchUserPlaylists = () => this.fetchDataAndUpdateUI(() => this.fetchPlaylistsFromAPI(), (data) => this.playlistDisplayManager.displayPlaylists(data));
         // プレイリストの詳細を取得し表示する
@@ -112,9 +115,9 @@ export class PlaylistManager {
         this.resetPlaylistTrackIds();
         this.prepareUIForDataFetching();
         fetch(url)
-            .then(TrackTable.handleResponse)
+            .then(trackTable_1.TrackTable.handleResponse)
             .then(handler.bind(this))
-            .catch(TrackTable.handleError)
+            .catch(trackTable_1.TrackTable.handleError)
             .finally(() => {
             this.loadingAnimationManager.hideLoadingAnimation();
         });
@@ -226,4 +229,5 @@ export class PlaylistManager {
         }
     }
 }
+exports.PlaylistManager = PlaylistManager;
 //# sourceMappingURL=playlistManager.js.map

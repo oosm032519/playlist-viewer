@@ -1,4 +1,7 @@
-export class ToggleVisitedPlaylists {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ToggleVisitedPlaylists = void 0;
+class ToggleVisitedPlaylists {
     constructor() {
         this.isVisitedPlaylistsVisible = false;
     }
@@ -10,4 +13,5 @@ export class ToggleVisitedPlaylists {
         button.textContent = this.isVisitedPlaylistsVisible ? '参照履歴を非表示' : '参照履歴を表示';
     }
 }
+exports.ToggleVisitedPlaylists = ToggleVisitedPlaylists;
 //# sourceMappingURL=toggleVisitedPlaylists.js.map

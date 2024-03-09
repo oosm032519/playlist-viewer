@@ -1,4 +1,7 @@
-export class RecommendationCalculator {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.RecommendationCalculator = void 0;
+class RecommendationCalculator {
     static calculateMode(tracks) {
         console.log('Calculating modeが呼び出されました');
         const modeCounts = {};
@@ -91,4 +94,5 @@ export class RecommendationCalculator {
         };
     }
 }
+exports.RecommendationCalculator = RecommendationCalculator;
 //# sourceMappingURL=RecommendationCalculator.js.map

@@ -1,7 +1,10 @@
-import { FormManager } from './formManager';
-export class OptionManager {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.OptionManager = void 0;
+const formManager_1 = require("./formManager");
+class OptionManager {
     constructor() {
-        this.formManager = new FormManager();
+        this.formManager = new formManager_1.FormManager();
     }
     // プレイリスト検索オプションを切り替えるメソッド
     togglePlaylistSearchOption() {
@@ -35,4 +38,5 @@ export class OptionManager {
         });
     }
 }
+exports.OptionManager = OptionManager;
 //# sourceMappingURL=optionManager.js.map

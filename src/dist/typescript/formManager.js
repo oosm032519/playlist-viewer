@@ -1,4 +1,7 @@
-export class FormManager {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.FormManager = void 0;
+class FormManager {
     // フォームの表示を切り替えるメソッド
     toggleFormVisibility(showForm, hideForm) {
         showForm.classList.remove('hidden');
@@ -18,4 +21,5 @@ export class FormManager {
         form.addEventListener('submit', handler.bind(this));
     }
 }
+exports.FormManager = FormManager;
 //# sourceMappingURL=formManager.js.map

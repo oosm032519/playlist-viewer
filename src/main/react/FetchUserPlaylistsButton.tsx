@@ -2,7 +2,7 @@ import React, {useContext, useCallback} from 'react';
 import CombinedContext from './CombinedContext';
 
 const FetchUserPlaylistsButton = () => {
-    const {setPlaylists, setIsLoading, setShowPlaylists} = useContext(CombinedContext);
+    const {setPlaylists, setIsLoading, setShowPlaylists, setMessage, setMessageType} = useContext(CombinedContext);
     const fetchUserPlaylists = useCallback(async () => {
         setIsLoading(true);
         try {
@@ -17,6 +17,8 @@ const FetchUserPlaylistsButton = () => {
             setShowPlaylists(true);
         } catch (error) {
             console.error('There was a problem with the fetch operation: ', error);
+            setMessage('プレイリストの取得に失敗しました。');
+            setMessageType('error');
         } finally {
             setIsLoading(false);
         }

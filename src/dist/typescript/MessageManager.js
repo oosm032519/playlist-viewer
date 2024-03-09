@@ -1,4 +1,7 @@
-export class MessageManager {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MessageManager = void 0;
+class MessageManager {
     constructor() {
         // ログイン結果に対応するメッセージのマップ
         this.loginMessages = {
@@ -46,4 +49,5 @@ export class MessageManager {
         return this.loginMessages[loginResult];
     }
 }
+exports.MessageManager = MessageManager;
 //# sourceMappingURL=MessageManager.js.map

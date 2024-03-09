@@ -1,4 +1,7 @@
-export class DescriptionManager {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DescriptionManager = void 0;
+class DescriptionManager {
     constructor() {
         this.descriptions = {
             'Acousticness': 'アコースティック感。1に近いほどアコースティック。',
@@ -10,4 +13,5 @@ export class DescriptionManager {
         };
     }
 }
+exports.DescriptionManager = DescriptionManager;
 //# sourceMappingURL=descriptionManager.js.map

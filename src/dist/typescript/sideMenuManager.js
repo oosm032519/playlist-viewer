@@ -1,4 +1,7 @@
-export class SideMenuManager {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SideMenuManager = void 0;
+class SideMenuManager {
     // サイドメニューを切り替えるメソッド
     toggleSideMenu() {
         // ボタンを取得
@@ -15,4 +18,5 @@ export class SideMenuManager {
         sideMenu.classList.toggle('translate-x-full');
     }
 }
+exports.SideMenuManager = SideMenuManager;
 //# sourceMappingURL=sideMenuManager.js.map

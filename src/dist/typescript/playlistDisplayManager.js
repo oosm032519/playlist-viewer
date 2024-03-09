@@ -1,12 +1,15 @@
-import { TableManager } from './tableManager';
-import { Track } from './track';
-import { ElementManager } from './elementManager';
-import { TrackCalculator } from './trackCalculator';
-export class PlaylistDisplayManager {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PlaylistDisplayManager = void 0;
+const tableManager_1 = require("./tableManager");
+const track_1 = require("./track");
+const elementManager_1 = require("./elementManager");
+const trackCalculator_1 = require("./trackCalculator");
+class PlaylistDisplayManager {
     constructor() {
-        this.tableManager = new TableManager();
-        this.elementManager = new ElementManager();
-        this.trackCalculator = new TrackCalculator();
+        this.tableManager = new tableManager_1.TableManager();
+        this.elementManager = new elementManager_1.ElementManager();
+        this.trackCalculator = new trackCalculator_1.TrackCalculator();
     }
     displayPlaylistName(name) {
         if (name) {
@@ -23,7 +26,7 @@ export class PlaylistDisplayManager {
         playlistNameElement.textContent = `${playlist.name}`;
         this.elementManager.playlistTracksDiv.appendChild(playlistNameElement);
         if (data && Array.isArray(data.tracks)) {
-            const tracks = data.tracks.map((item) => new Track(item.playlistTrack.track, item.audioFeatures));
+            const tracks = data.tracks.map((item) => new track_1.Track(item.playlistTrack.track, item.audioFeatures));
             this.tableManager.createDomTable(tracks);
             this.trackCalculator.calculateTrackAverageAndMode(tracks);
         }
@@ -41,4 +44,5 @@ export class PlaylistDisplayManager {
         }
     }
 }
+exports.PlaylistDisplayManager = PlaylistDisplayManager;
 //# sourceMappingURL=playlistDisplayManager.js.map

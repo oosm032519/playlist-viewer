@@ -1,4 +1,7 @@
-export class PlaylistIdManager {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PlaylistIdManager = void 0;
+class PlaylistIdManager {
     constructor() {
         this.playlistTrackIds = [];
     }
@@ -9,4 +12,5 @@ export class PlaylistIdManager {
         return PlaylistIdManager.instance;
     }
 }
+exports.PlaylistIdManager = PlaylistIdManager;
 //# sourceMappingURL=playlistIdManager.js.map

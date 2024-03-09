@@ -1,9 +1,12 @@
-import { TrackButtonManager } from './trackButtonManager';
-import { ElementManager } from './elementManager';
-export class TrackTableManager {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TrackTableManager = void 0;
+const trackButtonManager_1 = require("./trackButtonManager");
+const elementManager_1 = require("./elementManager");
+class TrackTableManager {
     constructor() {
-        this.trackButtonManager = new TrackButtonManager();
-        this.elementManager = new ElementManager();
+        this.trackButtonManager = new trackButtonManager_1.TrackButtonManager();
+        this.elementManager = new elementManager_1.ElementManager();
     }
     // ペアの行を作成する関数
     createRowForPair(pair, playlistId) {
@@ -49,4 +52,5 @@ export class TrackTableManager {
         this.elementManager.playlistTracksDiv.appendChild(table);
     }
 }
+exports.TrackTableManager = TrackTableManager;
 //# sourceMappingURL=trackTableManager.js.map

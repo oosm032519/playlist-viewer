@@ -1,4 +1,7 @@
-export class ValidationManager {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ValidationManager = void 0;
+class ValidationManager {
     isValidData(data) {
         return data && Array.isArray(data.tracks);
     }
@@ -8,4 +11,5 @@ export class ValidationManager {
         }
     }
 }
+exports.ValidationManager = ValidationManager;
 //# sourceMappingURL=validationManager.js.map

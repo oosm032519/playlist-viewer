@@ -1,4 +1,7 @@
-export class ElementManager {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ElementManager = void 0;
+class ElementManager {
     // IDに基づいてHTML要素を取得する
     getElementById(id) {
         return document.getElementById(id);
@@ -23,4 +26,5 @@ export class ElementManager {
         element.addEventListener('click', listener);
     }
 }
+exports.ElementManager = ElementManager;
 //# sourceMappingURL=elementManager.js.map

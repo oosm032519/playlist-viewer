@@ -1,7 +1,10 @@
-import { TrackFetcher } from './trackFetcher';
-export class TrackCalculator {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TrackCalculator = void 0;
+const trackFetcher_1 = require("./trackFetcher");
+class TrackCalculator {
     constructor() {
-        this.trackFetcher = new TrackFetcher();
+        this.trackFetcher = new trackFetcher_1.TrackFetcher();
     }
     calculateAverageAndMode(tracks) {
         const sum = this.calculateSum(tracks);
@@ -114,4 +117,5 @@ export class TrackCalculator {
         this.calculateAverageAndMode(tracks);
     }
 }
+exports.TrackCalculator = TrackCalculator;
 //# sourceMappingURL=trackCalculator.js.map

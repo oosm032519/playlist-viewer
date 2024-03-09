@@ -1,9 +1,12 @@
-import { PlaylistManager } from './playlistManager';
-import { TrackTable } from './trackTable';
-import { ElementManager } from './elementManager';
-export class TableManager {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TableManager = void 0;
+const playlistManager_1 = require("./playlistManager");
+const trackTable_1 = require("./trackTable");
+const elementManager_1 = require("./elementManager");
+class TableManager {
     constructor() {
-        this.elementManager = new ElementManager();
+        this.elementManager = new elementManager_1.ElementManager();
     }
     // テーブルの幅をチェックする関数
     checkTableWidth() {
@@ -51,20 +54,20 @@ export class TableManager {
         const nameCell = document.createElement('td');
         nameCell.textContent = playlist.name;
         row.appendChild(nameCell);
-        const playlistManager = new PlaylistManager();
+        const playlistManager = new playlistManager_1.PlaylistManager();
         row.addEventListener('click', () => playlistManager.fetchAndDisplayPlaylistDetails(playlist));
         return row;
     }
     // すべてのテーブルをクリアする
     clearAllTables() {
-        const elementManager = new ElementManager();
+        const elementManager = new elementManager_1.ElementManager();
         elementManager.playlistTracksDiv.innerHTML = '';
         elementManager.searchResultsDiv.innerHTML = '';
     }
     // テーブルを作成する
     createDomTable(tracks) {
         this.clearAllTables();
-        const trackTable = new TrackTable(tracks);
+        const trackTable = new trackTable_1.TrackTable(tracks);
         this.elementManager.playlistTracksDiv.appendChild(trackTable.createTable());
     }
     createSearchResultsTable(results) {
@@ -90,7 +93,7 @@ export class TableManager {
         const row = document.createElement('tr');
         row.classList.add('odd:bg-white', 'even:bg-gray-100', 'hover:bg-gray-200', 'transition-colors', 'duration-300', 'ease-in-out');
         const td = this.createTableCell(result.name);
-        const playlistManager = new PlaylistManager();
+        const playlistManager = new playlistManager_1.PlaylistManager();
         this.elementManager.addClickListener(td, () => playlistManager.fetchAndDisplayPlaylistDetailsUI(result));
         row.appendChild(td);
         return row;
@@ -134,4 +137,5 @@ export class TableManager {
         return table;
     }
 }
+exports.TableManager = TableManager;
 //# sourceMappingURL=tableManager.js.map

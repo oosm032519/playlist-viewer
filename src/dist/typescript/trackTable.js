@@ -1,5 +1,8 @@
-import { DescriptionManager } from './descriptionManager';
-export class TrackTable {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TrackTable = void 0;
+const descriptionManager_1 = require("./descriptionManager");
+class TrackTable {
     constructor(tracks) {
         this.tracks = tracks;
     }
@@ -27,7 +30,7 @@ export class TrackTable {
     createHeaderCell(text, index) {
         const th = document.createElement('th');
         th.textContent = text;
-        const descriptions = new DescriptionManager();
+        const descriptions = new descriptionManager_1.DescriptionManager();
         if (descriptions.descriptions[text]) {
             th.title = descriptions.descriptions[text];
         }
@@ -112,4 +115,5 @@ export class TrackTable {
         return table;
     }
 }
+exports.TrackTable = TrackTable;
 //# sourceMappingURL=trackTable.js.map
