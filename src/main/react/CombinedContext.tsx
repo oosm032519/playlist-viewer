@@ -28,6 +28,8 @@ type CombinedContextType = {
     setMessageType: React.Dispatch<React.SetStateAction<'success' | 'error' | null>>;
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    selectedTrack: any;
+    setSelectedTrack: (track: any) => void;
 };
 
 const CombinedContext = React.createContext<CombinedContextType>({
@@ -64,6 +66,9 @@ const CombinedContext = React.createContext<CombinedContextType>({
     },
     isOpen: false,
     setIsOpen: () => {
+    },
+    selectedTrack: null,
+    setSelectedTrack: () => {
     },
 });
 

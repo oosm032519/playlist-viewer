@@ -1,7 +1,10 @@
 import React from 'react';
 import {useTable, useSortBy} from 'react-table';
 
-const TracksTable = ({playlist}: { playlist: { name: string, tracks: any[] }}) => {
+const TracksTable = ({playlist, setSelectedTrack}: {
+    playlist: { name: string, tracks: any[] },
+    setSelectedTrack: (track: any) => void
+}) => {
     const data = React.useMemo(() => playlist.tracks, [playlist]);
     
     const columns = React.useMemo(() => [
@@ -22,7 +25,7 @@ const TracksTable = ({playlist}: { playlist: { name: string, tracks: any[] }}) =
         { Header: 'Valence', accessor: 'audioFeatures.valence' },
         { Header: 'Popularity', accessor: 'playlistTrack.track.popularity' },
     ], []);
-
+    
     const {
         getTableProps,
         getTableBodyProps,
@@ -30,12 +33,24 @@ const TracksTable = ({playlist}: { playlist: { name: string, tracks: any[] }}) =
         rows,
         prepareRow,
     } = useTable({columns, data}, useSortBy);
-
+    
+    const handleRowClick = (row: {
+        [x: string]: any;
+        getRowProps?: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>;
+        cells?: any[];
+        original?: any;
+    }) => {
+        setSelectedTrack(row.original);
+    };
+    
     return (
         <div className="whitespace-nowrap overflow-auto h-full w-full divide-y divide-gray-200 shadow-md">
             <table {...getTableProps()} className="min-w-full divide-y divide-gray-200 shadow-md table-auto">
                 <thead className="bg-gray-50 sticky top-0 z-10">
-                {headerGroups.map((headerGroup: { getHeaderGroupProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>; headers: any[]; }) => (
+                {headerGroups.map((headerGroup: {
+                    getHeaderGroupProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>;
+                    headers: any[];
+                }) => (
                     <tr {...headerGroup.getHeaderGroupProps()}>
                         {headerGroup.headers.map((column, i) => (
                             <th {...column.getHeaderProps(column.getSortByToggleProps())}
@@ -61,7 +76,7 @@ const TracksTable = ({playlist}: { playlist: { name: string, tracks: any[] }}) =
                 }) => {
                     prepareRow(row);
                     return (
-                        <tr {...row.getRowProps()} className="h-50">
+                        <tr {...row.getRowProps()} className="h-50" onClick={() => handleRowClick(row)}>
                             {row.cells.map((cell, i) => (
                                 <td {...cell.getCellProps()}
                                     className={`px-6 py-4 whitespace-nowrap ${i === 0 ? 'sticky left-0 z-10 bg-white' : ''}`}>

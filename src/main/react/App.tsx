@@ -14,6 +14,7 @@ import {useSpotifyAuth} from './useSpotifyAuth';
 import {useApp} from './useApp';
 import Header from './Header';
 import PlaylistAverageInfo from './PlaylistAverageInfoChart'
+import TrackInfoChart from './TrackInfoChart'; // Import TrackInfoChart
 
 const App: React.FC = () => {
     const {
@@ -42,10 +43,12 @@ const App: React.FC = () => {
         messageType,
         setMessageType,
     } = useApp();
-    
+
+    const [selectedTrack, setSelectedTrack] = React.useState(null); // Add state for selectedTrack
+
     const authorize = useSpotifyAuth();
     const [isOpen, setIsOpen] = React.useState(false);
-    
+
     const toggleMenu = () => {
         setIsOpen(!isOpen);
     };
@@ -75,6 +78,8 @@ const App: React.FC = () => {
                 setMessageType,
                 isOpen,
                 setIsOpen,
+                selectedTrack,
+                setSelectedTrack,
             }}>
             <PlaylistIdContext.Provider value={{playlistId, setPlaylistId}}>
                 <div className="App pt-16">
@@ -86,9 +91,10 @@ const App: React.FC = () => {
                         {showPlaylists && <PlaylistsTable/>}
                     </div>
                     <div className="my-4">
-                        {showTracks && <TracksTable playlist={selectedPlaylist}/>}
+                        {showTracks && <TracksTable playlist={selectedPlaylist} setSelectedTrack={setSelectedTrack}/>}
                     </div>
-                    <div className="my-4">
+                    <div className="my-4 flex">
+                        {selectedTrack && <TrackInfoChart track={selectedTrack}/>}
                         {showTracks && <PlaylistAverageInfo playlist={selectedPlaylist}/>}
                     </div>
                     <div className="my-4">
