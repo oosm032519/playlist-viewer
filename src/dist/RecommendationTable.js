@@ -39,12 +39,13 @@ const react_1 = __importStar(require("react"));
 const react_table_1 = require("react-table");
 const useApi_1 = require("./useApi");
 const PlaylistIdContext_1 = __importDefault(require("./PlaylistIdContext"));
+let audio = new Audio();
 const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
     const playlistId = (0, react_1.useContext)(PlaylistIdContext_1.default);
     const [recommendations, setRecommendations] = (0, react_1.useState)([]);
     const { fetchRecommendations } = (0, useApi_1.useApi)();
     const [trackStatus, setTrackStatus] = (0, react_1.useState)({});
-    const [, setShowPlaylists] = (0, react_1.useState)(false);
+    const [setShowPlaylists] = (0, react_1.useState)(false);
     const handleTrackAction = (0, react_1.useCallback)((trackId, action) => __awaiter(void 0, void 0, void 0, function* () {
         console.log(`楽曲${trackId}をプレイリスト${playlistId.playlistId}に${action === 'add' ? '追加' : '削除'}します`);
         const actionMap = {
@@ -92,6 +93,18 @@ const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
     const columns = react_1.default.useMemo(() => [
         { Header: 'Track Name', accessor: 'name' },
         { Header: 'Artist', accessor: 'artists[0].name' },
+        {
+            Header: 'Preview',
+            accessor: 'previewUrl',
+            Cell: ({ value }) => (react_1.default.createElement("button", { onClick: () => {
+                    if (audio) {
+                        audio.pause();
+                        audio.currentTime = 0;
+                    }
+                    audio = new Audio(value);
+                    audio.play();
+                }, className: "px-4 py-2 rounded-md text-white bg-blue-500 hover:bg-blue-700" }, "\u8A66\u8074")),
+        },
         {
             Header: 'Action',
             accessor: 'id',

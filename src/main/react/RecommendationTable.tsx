@@ -9,12 +9,14 @@ type RecommendationsTableProps = {
     setMessageType: Dispatch<SetStateAction<'success' | 'error' | null>>
 };
 
+let audio = new Audio();
+
 const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, setMessage, setMessageType}) => {
     const playlistId = useContext(PlaylistIdContext);
     const [recommendations, setRecommendations] = useState([]);
     const {fetchRecommendations} = useApi();
     const [trackStatus, setTrackStatus] = useState<{ [key: string]: boolean }>({});
-    const [, setShowPlaylists] = useState(false);
+    const [setShowPlaylists] = useState(false);
     
     const handleTrackAction = useCallback(async (trackId: string, action: 'add' | 'remove') => {
         console.log(`楽曲${trackId}をプレイリスト${playlistId.playlistId}に${action === 'add' ? '追加' : '削除'}します`);
@@ -67,13 +69,29 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
         {Header: 'Track Name', accessor: 'name'},
         {Header: 'Artist', accessor: 'artists[0].name'},
         {
+            Header: 'Preview',
+            accessor: 'previewUrl',
+            Cell: ({value}: { value: string }) => (
+                <button onClick={() => {
+                    if (audio) {
+                        audio.pause();
+                        audio.currentTime = 0;
+                    }
+                    audio = new Audio(value);
+                    audio.play();
+                }} className="px-4 py-2 rounded-md text-white bg-blue-500 hover:bg-blue-700">
+                    試聴
+                </button>
+            ),
+        },
+        {
             Header: 'Action',
             accessor: 'id',
             Cell: ({value}: { value: string }) => (
                 <div className="flex justify-around">
                     <button onClick={() => handleTrackAction(value, trackStatus[value] ? 'remove' : 'add')}
                             className={`flex justify-center items-center px-4 py-2 min-w-28 rounded-md text-white transition-colors duration-300 ${trackStatus[value] ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'}`}>
-                    {trackStatus[value] ? 'Remove' : 'Add'}
+                        {trackStatus[value] ? 'Remove' : 'Add'}
                     </button>
                 </div>
             ),
