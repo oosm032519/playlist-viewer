@@ -39,6 +39,7 @@ const react_1 = __importStar(require("react"));
 const react_table_1 = require("react-table");
 const useApi_1 = require("./useApi");
 const PlaylistIdContext_1 = __importDefault(require("./PlaylistIdContext"));
+const react_loader_spinner_1 = require("react-loader-spinner");
 let audio = new Audio();
 const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
     const playlistId = (0, react_1.useContext)(PlaylistIdContext_1.default);
@@ -46,6 +47,24 @@ const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
     const { fetchRecommendations } = (0, useApi_1.useApi)();
     const [trackStatus, setTrackStatus] = (0, react_1.useState)({});
     const [setShowPlaylists] = (0, react_1.useState)(false);
+    const [playingTrackId, setPlayingTrackId] = (0, react_1.useState)(null);
+    const handlePreviewClick = (trackId, previewUrl) => {
+        if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+        if (playingTrackId === trackId) {
+            setPlayingTrackId(null);
+        }
+        else {
+            audio = new Audio(previewUrl);
+            audio.play();
+            setPlayingTrackId(trackId);
+            audio.onended = () => {
+                setPlayingTrackId(null);
+            };
+        }
+    };
     const handleTrackAction = (0, react_1.useCallback)((trackId, action) => __awaiter(void 0, void 0, void 0, function* () {
         console.log(`楽曲${trackId}をプレイリスト${playlistId.playlistId}に${action === 'add' ? '追加' : '削除'}します`);
         const actionMap = {
@@ -96,14 +115,8 @@ const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
         {
             Header: 'Preview',
             accessor: 'previewUrl',
-            Cell: ({ value }) => (react_1.default.createElement("button", { onClick: () => {
-                    if (audio) {
-                        audio.pause();
-                        audio.currentTime = 0;
-                    }
-                    audio = new Audio(value);
-                    audio.play();
-                }, className: "px-4 py-2 rounded-md text-white bg-blue-500 hover:bg-blue-700" }, "\u8A66\u8074")),
+            Cell: ({ row, value }) => (react_1.default.createElement("button", { onClick: () => handlePreviewClick(row.original.id, value), className: "flex justify-center items-center px-4 py-2 rounded-md text-white bg-blue-500 hover:bg-blue-700" }, playingTrackId === row.original.id ?
+                react_1.default.createElement(react_loader_spinner_1.Bars, { height: "70%", width: "80%", color: "#FFF", ariaLabel: "audio-loading", wrapperStyle: { height: '100%', width: '100%' }, wrapperClass: "wrapper-class", visible: true }) : '試聴')),
         },
         {
             Header: 'Action',
@@ -111,7 +124,7 @@ const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
             Cell: ({ value }) => (react_1.default.createElement("div", { className: "flex justify-around" },
                 react_1.default.createElement("button", { onClick: () => handleTrackAction(value, trackStatus[value] ? 'remove' : 'add'), className: `flex justify-center items-center px-4 py-2 min-w-28 rounded-md text-white transition-colors duration-300 ${trackStatus[value] ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'}` }, trackStatus[value] ? 'Remove' : 'Add'))),
         },
-    ], [handleTrackAction, trackStatus]);
+    ], [handleTrackAction, trackStatus, playingTrackId]);
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, } = (0, react_table_1.useTable)({ columns, data });
     return (react_1.default.createElement("table", Object.assign({}, getTableProps(), { className: "min-w-full divide-y divide-gray-200 shadow-md table-auto" }),
         react_1.default.createElement("thead", { className: "bg-gray-50" }, headerGroups.map((headerGroup) => (react_1.default.createElement("tr", Object.assign({}, headerGroup.getHeaderGroupProps()), headerGroup.headers.map(column => (react_1.default.createElement("th", Object.assign({}, column.getHeaderProps(), { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded" }), column.render('Header')))))))),

@@ -2,7 +2,7 @@ import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, use
 import {useTable} from 'react-table';
 import {useApi} from './useApi'
 import PlaylistIdContext from './PlaylistIdContext';
-
+import {Bars} from 'react-loader-spinner';
 type RecommendationsTableProps = {
     playlist: { name: string, tracks: any[] },
     setMessage: Dispatch<SetStateAction<string | null>>,
@@ -17,6 +17,24 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
     const {fetchRecommendations} = useApi();
     const [trackStatus, setTrackStatus] = useState<{ [key: string]: boolean }>({});
     const [setShowPlaylists] = useState(false);
+    const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
+    
+    const handlePreviewClick = (trackId: string, previewUrl: string) => {
+        if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+        if (playingTrackId === trackId) {
+            setPlayingTrackId(null);
+        } else {
+            audio = new Audio(previewUrl);
+            audio.play();
+            setPlayingTrackId(trackId);
+            audio.onended = () => {
+                setPlayingTrackId(null);
+            };
+        }
+    };
     
     const handleTrackAction = useCallback(async (trackId: string, action: 'add' | 'remove') => {
         console.log(`楽曲${trackId}をプレイリスト${playlistId.playlistId}に${action === 'add' ? '追加' : '削除'}します`);
@@ -71,16 +89,19 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
         {
             Header: 'Preview',
             accessor: 'previewUrl',
-            Cell: ({value}: { value: string }) => (
-                <button onClick={() => {
-                    if (audio) {
-                        audio.pause();
-                        audio.currentTime = 0;
-                    }
-                    audio = new Audio(value);
-                    audio.play();
-                }} className="px-4 py-2 rounded-md text-white bg-blue-500 hover:bg-blue-700">
-                    試聴
+            Cell: ({row, value}: { row: { original: { id: string } }, value: string }) => (
+                <button onClick={() => handlePreviewClick(row.original.id, value)}
+                        className="flex justify-center items-center px-4 py-2 rounded-md text-white bg-blue-500 hover:bg-blue-700">
+                    {playingTrackId === row.original.id ?
+                        <Bars
+                            height="70%"
+                            width="80%"
+                            color="#FFF"
+                            ariaLabel="audio-loading"
+                            wrapperStyle={{height: '100%', width: '100%'}}
+                            wrapperClass="wrapper-class"
+                            visible={true}
+                        /> : '試聴'}
                 </button>
             ),
         },
@@ -96,7 +117,7 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
                 </div>
             ),
         },
-    ], [handleTrackAction, trackStatus]);
+    ], [handleTrackAction, trackStatus, playingTrackId]);
     
     const {
         getTableProps,
