@@ -147,7 +147,7 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
                             width="80%"
                             color="#FFF"
                             ariaLabel="audio-loading"
-                            wrapperStyle={{height: '100%', width: '100%'}}
+                            wrapperStyle={{height: '70%', width: '80%'}}
                             wrapperClass="wrapper-class"
                             visible={true}
                         /> : '試聴'}

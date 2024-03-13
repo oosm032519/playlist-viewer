@@ -149,7 +149,7 @@ const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
             Header: 'Preview',
             accessor: 'previewUrl',
             Cell: ({ row, value }) => (react_1.default.createElement("button", { onClick: () => handlePreviewClick(row.original.id, value), className: "flex justify-center items-center px-4 py-2 rounded-md text-white bg-blue-500 hover:bg-blue-700" }, playingTrackId === row.original.id ?
-                react_1.default.createElement(react_loader_spinner_1.Bars, { height: "70%", width: "80%", color: "#FFF", ariaLabel: "audio-loading", wrapperStyle: { height: '100%', width: '100%' }, wrapperClass: "wrapper-class", visible: true }) : '試聴')),
+                react_1.default.createElement(react_loader_spinner_1.Bars, { height: "70%", width: "80%", color: "#FFF", ariaLabel: "audio-loading", wrapperStyle: { height: '70%', width: '80%' }, wrapperClass: "wrapper-class", visible: true }) : '試聴')),
             disableSortBy: true,
         },
         {

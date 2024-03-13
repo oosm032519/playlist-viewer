@@ -1,52 +1,38 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const react_1 = __importDefault(require("react"));
+const react_1 = __importStar(require("react"));
 const react_table_1 = require("react-table");
-// プレイリストの総再生時間と平均曲長を計算する関数
-function calculatePlaylistStats(tracks) {
-    let totalDurationMs = 0;
-    tracks.forEach(track => {
-        totalDurationMs += track.audioFeatures.durationMs;
-    });
-    const averageDurationMs = totalDurationMs / tracks.length;
-    return { totalDurationMs, averageDurationMs };
-}
-// プレイリスト情報を表示するコンポーネント
-const PlaylistInfo = ({ playlist }) => {
-    const { totalDurationMs, averageDurationMs } = calculatePlaylistStats(playlist.tracks);
-    const totalDuration = formatDuration(totalDurationMs);
-    const averageDuration = formatDuration(averageDurationMs);
-    return (react_1.default.createElement("div", { className: "p-4 bg-primary text-white rounded-md shadow-md" },
-        react_1.default.createElement("h2", { className: "text-2xl font-bold mb-2" }, playlist.name),
-        react_1.default.createElement("p", { className: "text-lg" },
-            "Tracks: ",
-            react_1.default.createElement("span", { className: "font-semibold" }, playlist.tracks.length)),
-        react_1.default.createElement("p", { className: "text-lg" },
-            "Total Duration: ",
-            react_1.default.createElement("span", { className: "font-semibold" }, totalDuration)),
-        react_1.default.createElement("p", { className: "text-lg" },
-            "Average Track Length: ",
-            react_1.default.createElement("span", { className: "font-semibold" }, averageDuration))));
-};
-const formatDuration = (durationMs) => {
-    const minutes = Math.floor(durationMs / 60000);
-    const seconds = ((durationMs % 60000) / 1000).toFixed(0);
-    return minutes + ":" + (parseFloat(seconds) < 10 ? '0' : '') + seconds;
-};
-// TracksTableコンポーネントにPlaylistInfoコンポーネントを追加
+const PlaylistInfo_1 = __importDefault(require("./PlaylistInfo"));
+const utils_1 = require("./utils");
 const TracksTable = ({ playlist, setSelectedTrack }) => {
-    const data = react_1.default.useMemo(() => playlist.tracks, [playlist]);
-    function keyToNote(key) {
-        const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-        return notes[key];
-    }
-    function timeSignatureToString(timeSignature) {
-        return timeSignature + "/4";
-    }
-    const columns = react_1.default.useMemo(() => [
+    const data = (0, react_1.useMemo)(() => playlist.tracks, [playlist]);
+    const columns = (0, react_1.useMemo)(() => [
         {
             Header: 'Album',
             accessor: (row) => row.playlistTrack.track.album.images[0].url,
@@ -58,16 +44,16 @@ const TracksTable = ({ playlist, setSelectedTrack }) => {
         {
             Header: 'Duration',
             accessor: 'audioFeatures.durationMs',
-            Cell: ({ value }) => (react_1.default.createElement("div", null, formatDuration(value))),
+            Cell: ({ value }) => (react_1.default.createElement("div", null, (0, utils_1.formatDuration)(value))),
         },
         { Header: 'Popularity', accessor: 'playlistTrack.track.popularity' },
         { Header: 'Tempo', accessor: 'audioFeatures.tempo' },
         {
             Header: 'Time Signature',
             accessor: 'audioFeatures.timeSignature',
-            Cell: ({ value }) => timeSignatureToString(value)
+            Cell: ({ value }) => (0, utils_1.timeSignatureToString)(value)
         },
-        { Header: 'Key', accessor: 'audioFeatures.key', Cell: ({ value }) => keyToNote(value) },
+        { Header: 'Key', accessor: 'audioFeatures.key', Cell: ({ value }) => (0, utils_1.keyToNote)(value) },
         { Header: 'Mode', accessor: 'audioFeatures.mode' },
         { Header: 'Acousticness', accessor: 'audioFeatures.acousticness' },
         { Header: 'Danceability', accessor: 'audioFeatures.danceability' },
@@ -83,7 +69,7 @@ const TracksTable = ({ playlist, setSelectedTrack }) => {
         setSelectedTrack(row.original);
     };
     return (react_1.default.createElement("div", null,
-        react_1.default.createElement(PlaylistInfo, { playlist: playlist }),
+        react_1.default.createElement(PlaylistInfo_1.default, { playlist: playlist }),
         react_1.default.createElement("div", { className: "whitespace-nowrap overflow-auto h-full w-full divide-y divide-gray-200 shadow-md" },
             react_1.default.createElement("table", Object.assign({}, getTableProps(), { className: "min-w-full divide-y divide-gray-200 shadow-md table-auto" }),
                 react_1.default.createElement("thead", { className: "bg-gray-50 sticky top-0 z-10" }, headerGroups.map((headerGroup) => (react_1.default.createElement("tr", Object.assign({}, headerGroup.getHeaderGroupProps()), headerGroup.headers.map((column, i) => (react_1.default.createElement("th", Object.assign({}, column.getHeaderProps(column.getSortByToggleProps()), { className: `px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider h-50 ${i === 0 ? 'sticky left-0 z-10 bg-gray-50' : ''}` }),
