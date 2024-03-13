@@ -54,7 +54,7 @@ const TracksTable = ({playlist, setSelectedTrack}: {
                     <tr {...headerGroup.getHeaderGroupProps()}>
                         {headerGroup.headers.map((column, i) => (
                             <th {...column.getHeaderProps(column.getSortByToggleProps())}
-                                className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider h-50 ${i === 0 ? 'sticky left-0 z-10 bg-white' : ''}`}>
+                                className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider h-50 ${i === 0 ? 'sticky left-0 z-10 bg-gray-50' : ''}`}>
                                 {column.render('Header')}
                                 <span>
                                     {column.isSorted

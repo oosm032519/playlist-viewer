@@ -1,5 +1,5 @@
 import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useState} from 'react';
-import {useTable} from 'react-table';
+import {useTable, useSortBy} from 'react-table';
 import {useApi} from './useApi'
 import PlaylistIdContext from './PlaylistIdContext';
 import {Bars} from 'react-loader-spinner';
@@ -35,6 +35,12 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
             };
         }
     };
+    
+    const formatDuration = (durationMs: number) => {
+        const minutes = Math.floor(durationMs / 60000);
+        const seconds = ((durationMs % 60000) / 1000).toFixed(0);
+        return minutes + ":" + (parseFloat(seconds) < 10 ? '0' : '') + seconds;
+    }
     
     const handleTrackAction = useCallback(async (trackId: string, action: 'add' | 'remove') => {
         console.log(`楽曲${trackId}をプレイリスト${playlistId.playlistId}に${action === 'add' ? '追加' : '削除'}します`);
@@ -84,8 +90,37 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
     const data = React.useMemo(() => recommendations, [recommendations]);
     
     const columns = React.useMemo(() => [
-        {Header: 'Track Name', accessor: 'name'},
-        {Header: 'Artist', accessor: 'artists[0].name'},
+        {
+            Header: 'Album',
+            accessor: (row: { album: { images: { url: any; }[]; externalUrls: { externalUrls: { spotify: any; }; }; }; }) => ({
+                imageUrl: row.album.images[0].url,
+                albumUrl: row.album.externalUrls.externalUrls.spotify
+            }),
+            Cell: ({value}: { value: { imageUrl: string, albumUrl: string } }) => (
+                <a href={value.albumUrl} target="_blank" rel="noopener noreferrer">
+                    <img src={value.imageUrl} alt="Album Cover" width="50" height="50"/>
+                </a>
+            ),
+            disableSortBy: true,
+        },
+        {
+            Header: 'Track Name',
+            accessor: 'name',
+            Cell: ({row, value}: { row: { original: { id: string } }, value: string }) => (
+                <a href={`https://open.spotify.com/track/${row.original.id}`} target="_blank" rel="noopener noreferrer">
+                    {value}
+                </a>
+            ),
+        },
+        {
+            Header: 'Artist',
+            accessor: 'artists[0].name',
+            Cell: ({row, value}: { row: { original: { artists: any[] } }, value: string }) => (
+                <a href={row.original.artists[0].externalUrls.externalUrls.spotify} target="_blank" rel="noopener noreferrer">
+                    {value}
+                </a>
+            ),
+        },
         {
             Header: 'Preview',
             accessor: 'previewUrl',
@@ -104,6 +139,7 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
                         /> : '試聴'}
                 </button>
             ),
+            disableSortBy: true,
         },
         {
             Header: 'Action',
@@ -116,6 +152,21 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
                     </button>
                 </div>
             ),
+            disableSortBy: true,
+        },
+        {
+            Header: 'Duration',
+            accessor: 'durationMs',
+            Cell: ({value}: { value: number }) => (
+                <div>{formatDuration(value)}</div>
+            ),
+        },
+        {
+            Header: 'Popularity',
+            accessor: 'popularity',
+            Cell: ({value}: { value: number }) => (
+                <div>{value}</div>
+            ),
         },
     ], [handleTrackAction, trackStatus, playingTrackId]);
     
@@ -125,42 +176,56 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
         headerGroups,
         rows,
         prepareRow,
-    } = useTable({columns, data});
+    } = useTable({columns, data}, useSortBy);
     
     return (
         <table {...getTableProps()} className="min-w-full divide-y divide-gray-200 shadow-md table-auto">
             <thead className="bg-gray-50">
-            {headerGroups.map((headerGroup: {
-                getHeaderGroupProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>;
-                headers: any[];
-            }) => (
-                <tr {...headerGroup.getHeaderGroupProps()}>
-                    {headerGroup.headers.map(column => (
-                        <th {...column.getHeaderProps()}
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded">
-                            {column.render('Header')}
-                        </th>
-                    ))}
-                </tr>
-            ))}
-            </thead>
-            <tbody {...getTableBodyProps()} className="bg-white divide-y divide-gray-200">
-            {rows.map((row: {
-                getRowProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>;
-                cells: any[];
-            }) => {
-                prepareRow(row);
-                return (
-                    <tr {...row.getRowProps()} className="rounded">
-                        {row.cells.map((cell, i) => (
-                            <td {...cell.getCellProps()}
-                                className={`px-6 py-4 whitespace-nowrap ${i === 0 ? 'rounded-l' : ''} ${i === row.cells.length - 1 ? 'rounded-r' : ''}`}>
-                                {cell.render('Cell')}
-                            </td>
+            {
+                headerGroups.map((headerGroup: {
+                    getHeaderGroupProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>;
+                    headers: any[];
+                }) => (
+                    <tr {...headerGroup.getHeaderGroupProps()}>
+                        {headerGroup.headers.map((column, i) => (
+                            <th {...column.getHeaderProps(column.getSortByToggleProps())}
+                                className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider h-50 ${i === 0 ? 'sticky left-0 z-10 bg-gray-50' : ''}`}>
+                                {column.render('Header')}
+                                <span>
+                                    {
+                                        column.isSorted
+                                        ? column.isSortedDesc
+                                        ? ' ▼'
+                                        : ' ▲'
+                                        : ''
+                                    }
+                                </span>
+                            </th>
                         ))}
                     </tr>
-                );
-            })}
+                ))
+            }
+            </thead>
+            <tbody {...getTableBodyProps()} className="bg-white divide-y divide-gray-200">
+            {
+                rows.map((row: {
+                    [x: string]: any;
+                    getRowProps: () => React.JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>;
+                    cells: any[];
+                }) => {
+                    prepareRow(row);
+                    return (
+                        <tr {...row.getRowProps()} className="h-50">
+                            {row.cells.map((cell, i) => (
+                                <td {...cell.getCellProps()}
+                                    className={`px-6 py-4 whitespace-nowrap ${i === 0 ? 'sticky left-0 z-10 bg-white' : ''}`}>
+                                    {cell.render('Cell')}
+                                </td>
+                            ))}
+                        </tr>
+                    );
+                })
+            }
             </tbody>
         </table>
     );

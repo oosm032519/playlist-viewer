@@ -65,6 +65,11 @@ const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
             };
         }
     };
+    const formatDuration = (durationMs) => {
+        const minutes = Math.floor(durationMs / 60000);
+        const seconds = ((durationMs % 60000) / 1000).toFixed(0);
+        return minutes + ":" + (parseFloat(seconds) < 10 ? '0' : '') + seconds;
+    };
     const handleTrackAction = (0, react_1.useCallback)((trackId, action) => __awaiter(void 0, void 0, void 0, function* () {
         console.log(`楽曲${trackId}をプレイリスト${playlistId.playlistId}に${action === 'add' ? '追加' : '削除'}します`);
         const actionMap = {
@@ -110,27 +115,63 @@ const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
     }, [fetchAndSetRecommendations, setShowPlaylists]);
     const data = react_1.default.useMemo(() => recommendations, [recommendations]);
     const columns = react_1.default.useMemo(() => [
-        { Header: 'Track Name', accessor: 'name' },
-        { Header: 'Artist', accessor: 'artists[0].name' },
+        {
+            Header: 'Album',
+            accessor: (row) => ({
+                imageUrl: row.album.images[0].url,
+                albumUrl: row.album.externalUrls.externalUrls.spotify
+            }),
+            Cell: ({ value }) => (react_1.default.createElement("a", { href: value.albumUrl, target: "_blank", rel: "noopener noreferrer" },
+                react_1.default.createElement("img", { src: value.imageUrl, alt: "Album Cover", width: "50", height: "50" }))),
+            disableSortBy: true,
+        },
+        {
+            Header: 'Track Name',
+            accessor: 'name',
+            Cell: ({ row, value }) => (react_1.default.createElement("a", { href: `https://open.spotify.com/track/${row.original.id}`, target: "_blank", rel: "noopener noreferrer" }, value)),
+        },
+        {
+            Header: 'Artist',
+            accessor: 'artists[0].name',
+            Cell: ({ row, value }) => (react_1.default.createElement("a", { href: row.original.artists[0].externalUrls.externalUrls.spotify, target: "_blank", rel: "noopener noreferrer" }, value)),
+        },
         {
             Header: 'Preview',
             accessor: 'previewUrl',
             Cell: ({ row, value }) => (react_1.default.createElement("button", { onClick: () => handlePreviewClick(row.original.id, value), className: "flex justify-center items-center px-4 py-2 rounded-md text-white bg-blue-500 hover:bg-blue-700" }, playingTrackId === row.original.id ?
                 react_1.default.createElement(react_loader_spinner_1.Bars, { height: "70%", width: "80%", color: "#FFF", ariaLabel: "audio-loading", wrapperStyle: { height: '100%', width: '100%' }, wrapperClass: "wrapper-class", visible: true }) : '試聴')),
+            disableSortBy: true,
         },
         {
             Header: 'Action',
             accessor: 'id',
             Cell: ({ value }) => (react_1.default.createElement("div", { className: "flex justify-around" },
                 react_1.default.createElement("button", { onClick: () => handleTrackAction(value, trackStatus[value] ? 'remove' : 'add'), className: `flex justify-center items-center px-4 py-2 min-w-28 rounded-md text-white transition-colors duration-300 ${trackStatus[value] ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'}` }, trackStatus[value] ? 'Remove' : 'Add'))),
+            disableSortBy: true,
+        },
+        {
+            Header: 'Duration',
+            accessor: 'durationMs',
+            Cell: ({ value }) => (react_1.default.createElement("div", null, formatDuration(value))),
+        },
+        {
+            Header: 'Popularity',
+            accessor: 'popularity',
+            Cell: ({ value }) => (react_1.default.createElement("div", null, value)),
         },
     ], [handleTrackAction, trackStatus, playingTrackId]);
-    const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, } = (0, react_table_1.useTable)({ columns, data });
+    const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, } = (0, react_table_1.useTable)({ columns, data }, react_table_1.useSortBy);
     return (react_1.default.createElement("table", Object.assign({}, getTableProps(), { className: "min-w-full divide-y divide-gray-200 shadow-md table-auto" }),
-        react_1.default.createElement("thead", { className: "bg-gray-50" }, headerGroups.map((headerGroup) => (react_1.default.createElement("tr", Object.assign({}, headerGroup.getHeaderGroupProps()), headerGroup.headers.map(column => (react_1.default.createElement("th", Object.assign({}, column.getHeaderProps(), { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded" }), column.render('Header')))))))),
+        react_1.default.createElement("thead", { className: "bg-gray-50" }, headerGroups.map((headerGroup) => (react_1.default.createElement("tr", Object.assign({}, headerGroup.getHeaderGroupProps()), headerGroup.headers.map((column, i) => (react_1.default.createElement("th", Object.assign({}, column.getHeaderProps(column.getSortByToggleProps()), { className: `px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider h-50 ${i === 0 ? 'sticky left-0 z-10 bg-gray-50' : ''}` }),
+            column.render('Header'),
+            react_1.default.createElement("span", null, column.isSorted
+                ? column.isSortedDesc
+                    ? ' ▼'
+                    : ' ▲'
+                : '')))))))),
         react_1.default.createElement("tbody", Object.assign({}, getTableBodyProps(), { className: "bg-white divide-y divide-gray-200" }), rows.map((row) => {
             prepareRow(row);
-            return (react_1.default.createElement("tr", Object.assign({}, row.getRowProps(), { className: "rounded" }), row.cells.map((cell, i) => (react_1.default.createElement("td", Object.assign({}, cell.getCellProps(), { className: `px-6 py-4 whitespace-nowrap ${i === 0 ? 'rounded-l' : ''} ${i === row.cells.length - 1 ? 'rounded-r' : ''}` }), cell.render('Cell'))))));
+            return (react_1.default.createElement("tr", Object.assign({}, row.getRowProps(), { className: "h-50" }), row.cells.map((cell, i) => (react_1.default.createElement("td", Object.assign({}, cell.getCellProps(), { className: `px-6 py-4 whitespace-nowrap ${i === 0 ? 'sticky left-0 z-10 bg-white' : ''}` }), cell.render('Cell'))))));
         }))));
 };
 exports.default = RecommendationsTable;
