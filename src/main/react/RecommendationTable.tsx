@@ -122,6 +122,20 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
             ),
         },
         {
+            Header: 'Duration',
+            accessor: 'durationMs',
+            Cell: ({value}: { value: number }) => (
+                <div>{formatDuration(value)}</div>
+            ),
+        },
+        {
+            Header: 'Popularity',
+            accessor: 'popularity',
+            Cell: ({value}: { value: number }) => (
+                <div>{value}</div>
+            ),
+        },
+        {
             Header: 'Preview',
             accessor: 'previewUrl',
             Cell: ({row, value}: { row: { original: { id: string } }, value: string }) => (
@@ -154,20 +168,6 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
             ),
             disableSortBy: true,
         },
-        {
-            Header: 'Duration',
-            accessor: 'durationMs',
-            Cell: ({value}: { value: number }) => (
-                <div>{formatDuration(value)}</div>
-            ),
-        },
-        {
-            Header: 'Popularity',
-            accessor: 'popularity',
-            Cell: ({value}: { value: number }) => (
-                <div>{value}</div>
-            ),
-        },
     ], [handleTrackAction, trackStatus, playingTrackId]);
     
     const {
@@ -179,7 +179,8 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
     } = useTable({columns, data}, useSortBy);
     
     return (
-        <table {...getTableProps()} className="min-w-full divide-y divide-gray-200 shadow-md table-auto">
+        <div className="whitespace-nowrap overflow-auto h-full w-full divide-y divide-gray-200 shadow-md">
+        <table {...getTableProps()} className="overflow-auto h-full w-full divide-y divide-gray-200 shadow-md table-auto">
             <thead className="bg-gray-50">
             {
                 headerGroups.map((headerGroup: {
@@ -228,6 +229,7 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
             }
             </tbody>
         </table>
+        </div>
     );
 };
 

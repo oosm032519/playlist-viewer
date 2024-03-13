@@ -991,6 +991,11 @@ video {
   background-color: rgb(46 189 89 / var(--tw-bg-opacity));
 }
 
+.bg-primary {
+  --tw-bg-opacity: 1;
+  background-color: rgb(46 189 89 / var(--tw-bg-opacity));
+}
+
 .bg-red-100 {
   --tw-bg-opacity: 1;
   background-color: rgb(254 226 226 / var(--tw-bg-opacity));
@@ -1012,6 +1017,10 @@ video {
 
 .p-3 {
   padding: 16px;
+}
+
+.p-4 {
+  padding: 24px;
 }
 
 .p-5 {
@@ -1108,6 +1117,10 @@ video {
 
 .font-medium {
   font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
 }
 
 .uppercase {
