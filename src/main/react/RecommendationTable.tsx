@@ -3,6 +3,7 @@ import {useTable, useSortBy} from 'react-table';
 import {useApi} from './useApi'
 import PlaylistIdContext from './PlaylistIdContext';
 import {Bars} from 'react-loader-spinner';
+import CombinedContext from './CombinedContext';
 type RecommendationsTableProps = {
     playlist: { name: string, tracks: any[] },
     setMessage: Dispatch<SetStateAction<string | null>>,
@@ -13,11 +14,19 @@ let audio = new Audio();
 
 const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, setMessage, setMessageType}) => {
     const playlistId = useContext(PlaylistIdContext);
+    const {setSelectedPlaylist} = useContext(CombinedContext);
     const [recommendations, setRecommendations] = useState([]);
     const {fetchRecommendations} = useApi();
     const [trackStatus, setTrackStatus] = useState<{ [key: string]: boolean }>({});
     const [setShowPlaylists] = useState(false);
     const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
+    const [addedTracks] = useState<any[]>([]);
+    const {setAddedTracks} = useContext(CombinedContext);
+    
+    // addedTracksが更新されたときにログを出力する
+    useEffect(() => {
+        console.log("useEffect:", addedTracks);
+    }, [addedTracks]);
     
     const handlePreviewClick = (trackId: string, previewUrl: string) => {
         if (audio) {
@@ -65,6 +74,30 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
                 setMessage(actionMap[action].successMessage);
                 setMessageType('success');
                 setTrackStatus(prevStatus => ({...prevStatus, [trackId]: actionMap[action].statusUpdate}));
+                
+                // If the action was 'add', fetch the track data and log it to the console
+                if (action === 'add') {
+                    const trackResponse = await fetch(`/java/track/getTrack?trackId=${trackId}`);
+                    const trackData = await trackResponse.json();
+                    console.log("trackData:", trackData);
+                    const audioFeaturesResponse = await fetch(`/java/track/getAudioFeatures?trackId=${trackId}`);
+                    const audioFeaturesData = await audioFeaturesResponse.json();
+                    console.log("audioFeaturesData:", audioFeaturesData);
+                    
+                    const newTrack = {track: trackData, audioFeatures: audioFeaturesData};
+                    console.log("newTrack:", newTrack);
+                    setAddedTracks(prevTracks => [...prevTracks, newTrack]);
+                    console.log("addedTracks:" ,addedTracks);
+                    
+                    setSelectedPlaylist((prevPlaylist: { tracks: any; }) => ({
+                        ...prevPlaylist,
+                        tracks: [...prevPlaylist.tracks, {
+                            playlistTrack: {track: trackData},
+                            audioFeatures: audioFeaturesData
+                        }]
+                    }));
+                    
+                }
             } else {
                 setMessage(actionMap[action].errorMessage);
                 setMessageType('error');
@@ -73,7 +106,7 @@ const RecommendationsTable: React.FC<RecommendationsTableProps> = ({playlist, se
             setMessage(actionMap[action].errorMessage);
             setMessageType('error');
         }
-    }, [playlistId, setMessage, setMessageType]);
+    }, [playlistId, setMessage, setMessageType, setSelectedPlaylist, addedTracks, setAddedTracks]);
     
     const fetchAndSetRecommendations = useCallback(() => {
         fetchRecommendations(playlist.tracks)

@@ -16,6 +16,7 @@ export const useApp = () => {
     const [playlistId, setPlaylistId] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
     const [messageType, setMessageType] = useState<'success' | 'error' | null>(null);
+    const [addedTracks, setAddedTracks] = useState<any[]>([]);
     
     useEffect(() => {
         const fetchPlaylists = async () => {
@@ -73,5 +74,7 @@ export const useApp = () => {
         setMessage,
         messageType,
         setMessageType,
+        addedTracks,
+        setAddedTracks,
     };
 };

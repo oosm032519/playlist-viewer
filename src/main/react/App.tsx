@@ -14,7 +14,8 @@ import {useSpotifyAuth} from './useSpotifyAuth';
 import {useApp} from './useApp';
 import Header from './Header';
 import PlaylistAverageInfo from './PlaylistAverageInfoChart'
-import TrackInfoChart from './TrackInfoChart'; // Import TrackInfoChart
+import TrackInfoChart from './TrackInfoChart';
+import AddedTracksTable from './AddedTracksTable';
 
 const App: React.FC = () => {
     const {
@@ -42,9 +43,11 @@ const App: React.FC = () => {
         setMessage,
         messageType,
         setMessageType,
+        addedTracks,
+        setAddedTracks,
     } = useApp();
 
-    const [selectedTrack, setSelectedTrack] = React.useState(null); // Add state for selectedTrack
+    const [selectedTrack, setSelectedTrack] = React.useState(null);
 
     const authorize = useSpotifyAuth();
     const [isOpen, setIsOpen] = React.useState(false);
@@ -80,6 +83,8 @@ const App: React.FC = () => {
                 setIsOpen,
                 selectedTrack,
                 setSelectedTrack,
+                addedTracks,
+                setAddedTracks,
             }}>
             <PlaylistIdContext.Provider value={{playlistId, setPlaylistId}}>
                 <div className="App pt-16">
@@ -101,6 +106,10 @@ const App: React.FC = () => {
                         {showRecommendations &&
                             <RecommendationsTable playlist={selectedPlaylist} setMessage={setMessage}
                                                   setMessageType={setMessageType}/>}
+                    </div>
+                    <div className="my-4">
+                        {showRecommendations &&
+                            <AddedTracksTable/>}
                     </div>
                     <div className="my-4">
                         {showVisitedPlaylists && <VisitedPlaylistsTable/>}

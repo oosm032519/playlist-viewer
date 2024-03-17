@@ -40,14 +40,22 @@ const react_table_1 = require("react-table");
 const useApi_1 = require("./useApi");
 const PlaylistIdContext_1 = __importDefault(require("./PlaylistIdContext"));
 const react_loader_spinner_1 = require("react-loader-spinner");
+const CombinedContext_1 = __importDefault(require("./CombinedContext"));
 let audio = new Audio();
 const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
     const playlistId = (0, react_1.useContext)(PlaylistIdContext_1.default);
+    const { setSelectedPlaylist } = (0, react_1.useContext)(CombinedContext_1.default);
     const [recommendations, setRecommendations] = (0, react_1.useState)([]);
     const { fetchRecommendations } = (0, useApi_1.useApi)();
     const [trackStatus, setTrackStatus] = (0, react_1.useState)({});
     const [setShowPlaylists] = (0, react_1.useState)(false);
     const [playingTrackId, setPlayingTrackId] = (0, react_1.useState)(null);
+    const [addedTracks] = (0, react_1.useState)([]);
+    const { setAddedTracks } = (0, react_1.useContext)(CombinedContext_1.default);
+    // addedTracksが更新されたときにログを出力する
+    (0, react_1.useEffect)(() => {
+        console.log("useEffect:", addedTracks);
+    }, [addedTracks]);
     const handlePreviewClick = (trackId, previewUrl) => {
         if (audio) {
             audio.pause();
@@ -92,6 +100,23 @@ const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
                 setMessage(actionMap[action].successMessage);
                 setMessageType('success');
                 setTrackStatus(prevStatus => (Object.assign(Object.assign({}, prevStatus), { [trackId]: actionMap[action].statusUpdate })));
+                // If the action was 'add', fetch the track data and log it to the console
+                if (action === 'add') {
+                    const trackResponse = yield fetch(`/java/track/getTrack?trackId=${trackId}`);
+                    const trackData = yield trackResponse.json();
+                    console.log("trackData:", trackData);
+                    const audioFeaturesResponse = yield fetch(`/java/track/getAudioFeatures?trackId=${trackId}`);
+                    const audioFeaturesData = yield audioFeaturesResponse.json();
+                    console.log("audioFeaturesData:", audioFeaturesData);
+                    const newTrack = { track: trackData, audioFeatures: audioFeaturesData };
+                    console.log("newTrack:", newTrack);
+                    setAddedTracks(prevTracks => [...prevTracks, newTrack]);
+                    console.log("addedTracks:", addedTracks);
+                    setSelectedPlaylist((prevPlaylist) => (Object.assign(Object.assign({}, prevPlaylist), { tracks: [...prevPlaylist.tracks, {
+                                playlistTrack: { track: trackData },
+                                audioFeatures: audioFeaturesData
+                            }] })));
+                }
             }
             else {
                 setMessage(actionMap[action].errorMessage);
@@ -102,7 +127,7 @@ const RecommendationsTable = ({ playlist, setMessage, setMessageType }) => {
             setMessage(actionMap[action].errorMessage);
             setMessageType('error');
         }
-    }), [playlistId, setMessage, setMessageType]);
+    }), [playlistId, setMessage, setMessageType, setSelectedPlaylist, addedTracks, setAddedTracks]);
     const fetchAndSetRecommendations = (0, react_1.useCallback)(() => {
         fetchRecommendations(playlist.tracks)
             .then(data => {

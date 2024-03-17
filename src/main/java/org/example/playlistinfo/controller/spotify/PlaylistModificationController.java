@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
+import se.michaelthelin.spotify.model_objects.specification.AudioFeatures;
+import se.michaelthelin.spotify.model_objects.specification.Track;
 
 import java.io.IOException;
 
@@ -46,6 +48,26 @@ public class PlaylistModificationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("エラー: " + e.getMessage());  // Spotify APIの例外の場合、403エラーを返す
         } else {
             throw new RuntimeException("エラー: " + e.getMessage());  // その他の例外の場合、ランタイムエラーをスロー
+        }
+    }
+
+    @GetMapping("/java/track/getTrack")
+    public ResponseEntity<Track> getTrack(@RequestParam String trackId) {
+        try {
+            Track track = spotifyService.getTrack(trackId);
+            return ResponseEntity.ok(track);
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+        throw new RuntimeException("エラー: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/java/track/getAudioFeatures")
+    public ResponseEntity<AudioFeatures> getAudioFeaturesForTrack(@RequestParam String trackId) {
+        try {
+            AudioFeatures audioFeatures = spotifyService.getAudioFeaturesForTrack(trackId);
+            return ResponseEntity.ok(audioFeatures);
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            throw new RuntimeException("エラー: " + e.getMessage());
         }
     }
 }

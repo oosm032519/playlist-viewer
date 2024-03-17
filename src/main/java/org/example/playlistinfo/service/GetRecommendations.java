@@ -53,7 +53,7 @@ public class GetRecommendations {
         String seedArtists = String.join(",", modeArtistIds);
         logger.info("Seed artists: " + seedArtists);
         return spotifyApi.getRecommendations()
-                .limit(10)
+                .limit(20)
                 .seed_artists(seedArtists)
                 .target_acousticness(acousticness)
                 .target_danceability(danceability)

@@ -30,6 +30,8 @@ type CombinedContextType = {
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
     selectedTrack: any;
     setSelectedTrack: (track: any) => void;
+    addedTracks: any[];
+    setAddedTracks: Dispatch<SetStateAction<any[]>>;
 };
 
 const CombinedContext = React.createContext<CombinedContextType>({
@@ -69,6 +71,9 @@ const CombinedContext = React.createContext<CombinedContextType>({
     },
     selectedTrack: null,
     setSelectedTrack: () => {
+    },
+    addedTracks: [],
+    setAddedTracks: () => {
     },
 });
 

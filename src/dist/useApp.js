@@ -27,6 +27,7 @@ const useApp = () => {
     const [playlistId, setPlaylistId] = (0, react_1.useState)(null);
     const [message, setMessage] = (0, react_1.useState)(null);
     const [messageType, setMessageType] = (0, react_1.useState)(null);
+    const [addedTracks, setAddedTracks] = (0, react_1.useState)([]);
     (0, react_1.useEffect)(() => {
         const fetchPlaylists = () => __awaiter(void 0, void 0, void 0, function* () {
             console.log('fetchPlaylistsが呼び出されました');
@@ -81,6 +82,8 @@ const useApp = () => {
         setMessage,
         messageType,
         setMessageType,
+        addedTracks,
+        setAddedTracks,
     };
 };
 exports.useApp = useApp;

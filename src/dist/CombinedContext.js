@@ -48,6 +48,9 @@ const CombinedContext = react_1.default.createContext({
     selectedTrack: null,
     setSelectedTrack: () => {
     },
+    addedTracks: [],
+    setAddedTracks: () => {
+    },
 });
 exports.default = CombinedContext;
 //# sourceMappingURL=CombinedContext.js.map
