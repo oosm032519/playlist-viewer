@@ -39,11 +39,13 @@ const react_1 = __importStar(require("react"));
 const react_table_1 = require("react-table");
 const CombinedContext_1 = __importDefault(require("./CombinedContext"));
 const utils_1 = require("./utils");
+const PlaylistIdContext_1 = __importDefault(require("./PlaylistIdContext"));
 const AddedTracksTable = () => {
-    const { addedTracks, setMessage, setMessageType } = (0, react_1.useContext)(CombinedContext_1.default);
+    const { addedTracks, setMessage, setMessageType, setAddedTracks } = (0, react_1.useContext)(CombinedContext_1.default);
+    const playlistId = (0, react_1.useContext)(PlaylistIdContext_1.default);
     const handleTrackAction = (0, react_1.useCallback)((trackId) => __awaiter(void 0, void 0, void 0, function* () {
         console.log(`楽曲${trackId}をプレイリストから削除します`);
-        const url = `/java/playlist/removeTrack?trackId=${trackId}`;
+        const url = `/java/playlist/removeTrack?trackId=${trackId}&playlistId=${playlistId.playlistId}`;
         const successMessage = '楽曲がプレイリストから削除されました';
         const errorMessage = '楽曲の削除に失敗しました';
         try {
@@ -51,6 +53,7 @@ const AddedTracksTable = () => {
             if (response.status === 200) {
                 setMessage(successMessage);
                 setMessageType('success');
+                setAddedTracks((prevTracks) => prevTracks.filter(track => track.track.id !== trackId));
             }
             else {
                 setMessage(errorMessage);

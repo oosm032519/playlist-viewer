@@ -2,13 +2,15 @@ import React, {useContext, useCallback, useEffect} from 'react';
 import {useTable, useSortBy} from 'react-table';
 import CombinedContext from './CombinedContext';
 import {formatDuration} from './utils'
+import PlaylistIdContext from './PlaylistIdContext'
 
 const AddedTracksTable: React.FC = () => {
-    const {addedTracks, setMessage, setMessageType} = useContext(CombinedContext);
+    const {addedTracks, setMessage, setMessageType, setAddedTracks} = useContext(CombinedContext);
+    const playlistId = useContext(PlaylistIdContext);
     
     const handleTrackAction = useCallback(async (trackId: string) => {
         console.log(`楽曲${trackId}をプレイリストから削除します`);
-        const url = `/java/playlist/removeTrack?trackId=${trackId}`;
+        const url = `/java/playlist/removeTrack?trackId=${trackId}&playlistId=${playlistId.playlistId}`;
         const successMessage = '楽曲がプレイリストから削除されました';
         const errorMessage = '楽曲の削除に失敗しました';
         
@@ -17,6 +19,7 @@ const AddedTracksTable: React.FC = () => {
             if (response.status === 200) {
                 setMessage(successMessage);
                 setMessageType('success');
+                setAddedTracks((prevTracks: any[]) => prevTracks.filter(track => track.track.id !== trackId));
             } else {
                 setMessage(errorMessage);
                 setMessageType('error');
